@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro Ultra Max Control</title>
+  <title>Piva B3 Pro Ultra Control</title>
   <style>
     :root {
       --bg: #090d16;
@@ -28,26 +28,27 @@
     .alert-banner { display: none; width: 100%; max-width: 400px; padding: 10px; border-radius: 10px; background: rgba(255, 68, 68, 0.2); border: 1px solid var(--red); color: #fff; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; animation: pulse 1s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    /* Hero Center Fan Image */
-    .hero { position: relative; width: 140px; height: 140px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
+    /* Hero Fan PIVA B3 PRO */
+    .hero { position: relative; width: 150px; height: 150px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
     .fan-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent); border-bottom-color: #ff007f; animation: spin 3s linear infinite; filter: drop-shadow(0 0 12px var(--accent)); }
     
-    .fan-img-box {
-      width: 115px;
-      height: 115px;
+    .piva-img-box {
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
       overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,0.8);
-      background: #141c2d;
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+      background: #111;
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 2px solid rgba(255,255,255,0.1);
     }
-    .fan-img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .piva-svg { width: 100%; height: 100%; }
+
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Grid Thông số 6 ô */
+    /* Grid Thông số */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; }
     .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(10px); border-radius: 12px; padding: 8px; text-align: center; }
     .stat-val { font-size: 13px; font-weight: bold; color: var(--accent); margin-top: 2px; }
@@ -94,16 +95,33 @@
 
   <div id="alertBanner" class="alert-banner">🚨 CẢNH BÁO AN TOÀN</div>
 
-  <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI SÒ B3 PRO</button>
+  <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI TỰ ĐỘNG</button>
 
   <div class="hero">
     <div class="fan-ring" id="fanRing"></div>
-    <div class="fan-img-box">
-      <img class="fan-img" id="deviceImg" src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400" alt="Piva B3 Pro" onerror="fallbackImg()">
+    <div class="piva-img-box">
+      <svg class="piva-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="95" fill="#1c2331" stroke="#333" stroke-width="4"/>
+        <circle cx="100" cy="100" r="82" fill="none" stroke="url(#rgbGradient)" stroke-width="8" opacity="0.9"/>
+        <circle cx="100" cy="100" r="70" fill="#0d1117" stroke="#2a3547" stroke-width="2"/>
+        <path d="M100,30 L100,170 M30,100 L170,100 M50,50 L150,150 M50,150 L150,50" stroke="#1f293d" stroke-width="2" opacity="0.5"/>
+        <circle cx="100" cy="100" r="50" fill="none" stroke="#2a3547" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="32" fill="#161b26" stroke="#ffd700" stroke-width="2"/>
+        <polygon points="100,78 84,115 116,115" fill="#ffd700"/>
+        <polygon points="100,92 92,110 108,110" fill="#161b26"/>
+        
+        <defs>
+          <linearGradient id="rgbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00f2fe"/>
+            <stop offset="33%" stop-color="#ff007f"/>
+            <stop offset="66%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#00e676"/>
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   </div>
 
-  <!-- 6 THẺ THÔNG SỐ -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt độ Sò</div>
@@ -131,7 +149,6 @@
     </div>
   </div>
 
-  <!-- BỘ ĐIỀU KHIỂN LÀM LẠNH -->
   <div class="section-title">Chế độ Làm Lạnh (Level)</div>
   <div class="panel-card">
     <div class="level-grid">
@@ -151,7 +168,6 @@
     </div>
   </div>
 
-  <!-- BỘ ÉP XUNG VÀ CHỈNH TỐC ĐỘ QUẠT -->
   <div class="section-title">Chế độ Ép Xung (Turbo Overclock)</div>
   <div class="panel-card">
     <div class="smart-card">
@@ -170,7 +186,6 @@
     </div>
   </div>
 
-  <!-- BỘ 10 CHẾ ĐỘ LED -->
   <div class="section-title">Bộ 10 Chế Độ LED Chuyên Sâu</div>
   <div class="panel-card">
     <div class="color-picker-row">
@@ -208,38 +223,30 @@
     let isSmartMode = false;
     let isTurboMode = false;
 
-    function fallbackImg() {
-      document.getElementById('deviceImg').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23121824' stroke='%2300f2fe' stroke-width='3'/><circle cx='50' cy='50' r='18' fill='%2300f2fe'/><text x='50' y='55' font-size='14' font-weight='bold' fill='%23000' text-anchor='middle'>PIVA B3</text></svg>";
-    }
+    // Tự động kết nối lại khi tải trang nếu đã ghép đôi trước đó
+    window.addEventListener('DOMContentLoaded', () => {
+      autoConnectPreviousDevice();
+    });
 
-    function checkConnection() {
-      if (!writeChar) {
-        alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' ở phía trên trước!");
-        return false;
-      }
-      return true;
-    }
-
-    async function connectBLE() {
-      if (!navigator.bluetooth) {
-        alert("Trình duyệt không hỗ trợ Web Bluetooth. Hãy dùng Google Chrome hoặc Edge!");
-        return;
-      }
+    async function autoConnectPreviousDevice() {
+      if (!navigator.bluetooth || !navigator.bluetooth.getDevices) return;
       try {
-        // Lọc trực tiếp theo Service UUID để tránh hiện nhiều dãy mã linh tinh
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [
-            { services: [SERVICE_UUID] },
-            { namePrefix: 'Piva' },
-            { namePrefix: 'B3' }
-          ],
-          optionalServices: [SERVICE_UUID]
-        });
-        
+        const devices = await navigator.bluetooth.getDevices();
+        if (devices.length > 0) {
+          setupDeviceConnection(devices[0]);
+        }
+      } catch (err) {
+        console.log("Auto-connect Error:", err);
+      }
+    }
+
+    async function setupDeviceConnection(device) {
+      try {
+        document.getElementById('status').innerText = "Đang nối...";
         const server = await device.gatt.connect();
         const service = await server.getPrimaryService(SERVICE_UUID);
         writeChar = await service.getCharacteristic(WRITE_UUID);
-        
+
         document.getElementById('status').innerText = "Đã kết nối";
         document.getElementById('status').classList.add('connected');
         document.getElementById('btnConnect').style.display = "none";
@@ -255,26 +262,43 @@
 
         startSafetyMonitor();
       } catch (e) {
-        console.log(e);
-        // Nếu lọc thất bại thì mở quét lại bình thường
-        try {
-          const device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
-            optionalServices: [SERVICE_UUID]
-          });
-          const server = await device.gatt.connect();
-          const service = await server.getPrimaryService(SERVICE_UUID);
-          writeChar = await service.getCharacteristic(WRITE_UUID);
-          
-          document.getElementById('status').innerText = "Đã kết nối";
-          document.getElementById('status').classList.add('connected');
-          document.getElementById('btnConnect').style.display = "none";
-          updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM");
-          startSafetyMonitor();
-        } catch(err) {
-          alert("Không thể kết nối với thiết bị Bluetooth!");
+        document.getElementById('status').innerText = "Thất bại";
+      }
+    }
+
+    async function connectBLE() {
+      if (!navigator.bluetooth) {
+        alert("Trình duyệt không hỗ trợ Web Bluetooth!");
+        return;
+      }
+
+      // Thử dùng thiết bị đã nhớ trước
+      if (navigator.bluetooth.getDevices) {
+        const devices = await navigator.bluetooth.getDevices();
+        if (devices.length > 0) {
+          await setupDeviceConnection(devices[0]);
+          if (writeChar) return;
         }
       }
+
+      // Nếu chưa ghép đôi bao giờ thì mở cửa sổ chọn 1 lần duy nhất
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [SERVICE_UUID]
+        });
+        await setupDeviceConnection(device);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    function checkConnection() {
+      if (!writeChar) {
+        alert("Chưa kết nối Bluetooth với Sò B3 Pro!");
+        return false;
+      }
+      return true;
     }
 
     async function sendCmd(cmd) {
@@ -303,10 +327,7 @@
     }
 
     function toggleSmartMode(enable) {
-      if (!checkConnection()) { 
-        document.getElementById('smartToggle').checked = false; 
-        return; 
-      }
+      if (!checkConnection()) { document.getElementById('smartToggle').checked = false; return; }
       isSmartMode = enable;
       if (enable) {
         if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
@@ -318,10 +339,7 @@
     }
 
     function toggleTurboMode(enable) {
-      if (!checkConnection()) { 
-        document.getElementById('turboToggle').checked = false; 
-        return; 
-      }
+      if (!checkConnection()) { document.getElementById('turboToggle').checked = false; return; }
       isTurboMode = enable;
       if (enable) {
         if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
