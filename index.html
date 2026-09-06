@@ -744,10 +744,10 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* ===================== CONFIG ===================== */
-const SERVICE_UUID = '49535343-fe7d-4350-a8d4-26080b4e5670';
+/* ===================== CONFIG - UUID ĐÚNG ===================== */
+const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
 const WRITE_UUID   = '49535343-6daa-4d02-abf6-19569aca69fe';
-const NOTIFY_UUID  = '49535343-1e4d-4bd9-ba61-23c647249616';
+const NOTIFY_UUID  = '49535343-aca3-481c-91ec-d85e28a60318';
 
 /* ===================== STATE ===================== */
 let bleDevice = null;
@@ -829,7 +829,6 @@ async function connect() {
     btn.textContent = 'ĐANG TÌM THIẾT BỊ...';
 
     try {
-        // Ưu tiên tìm theo tên B3PRO
         bleDevice = await navigator.bluetooth.requestDevice({
             filters: [
                 { name: 'B3PRO' },
@@ -841,7 +840,6 @@ async function connect() {
 
         bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
-        // Nếu đã connected sẵn thì cố gắng dùng luôn
         let server;
         if (bleDevice.gatt.connected) {
             server = bleDevice.gatt;
@@ -852,7 +850,6 @@ async function connect() {
         const service = await server.getPrimaryService(SERVICE_UUID);
         writeChar = await service.getCharacteristic(WRITE_UUID);
 
-        // Thử notify (không bắt buộc)
         try {
             notifyChar = await service.getCharacteristic(NOTIFY_UUID);
             await notifyChar.startNotifications();
