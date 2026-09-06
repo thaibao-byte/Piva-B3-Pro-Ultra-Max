@@ -2,1014 +2,269 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#07090f">
-<title>PIVA B3 PRO ULTRA · DEBUG V3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIVA B3 Pro DEBUG v4</title>
 
 <style>
-:root{
- --bg:#07090f;
- --card:#101424;
- --border:#252b3d;
- --text:#f4f7ff;
- --muted:#8b97b0;
- --cyan:#00e5ff;
- --green:#00e676;
- --red:#ff3d71;
-}
-*{
- box-sizing:border-box;
- margin:0;
- padding:0;
- font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
- -webkit-tap-highlight-color:transparent;
-}
+*{box-sizing:border-box}
 body{
- background:var(--bg);
- color:var(--text);
- padding:18px 14px 40px;
+  margin:0;
+  padding:16px;
+  background:#111;
+  color:#eee;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-.app{
- max-width:460px;
- margin:auto;
-}
-header{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:16px;
-}
-.logo h1{
- font-size:18px;
- color:var(--cyan);
-}
-.logo span{
- display:block;
- color:var(--muted);
- font-size:11px;
- margin-top:3px;
-}
-.status{
- padding:7px 11px;
- border-radius:20px;
- font-size:11px;
- color:var(--red);
- background:#21101a;
- border:1px solid #492033;
-}
-.status.on{
- color:var(--green);
- background:#0b2118;
- border-color:#174c34;
-}
-.connect{
- width:100%;
- border:0;
- padding:15px;
- border-radius:14px;
- background:linear-gradient(135deg,#00c6ff,#0072ff,#7c5cff);
- color:white;
- font-size:14px;
- font-weight:800;
- margin-bottom:12px;
-}
+h1{font-size:22px;margin:0 0 6px}
+h2{font-size:17px;margin:18px 0 10px}
 .card{
- background:var(--card);
- border:1px solid var(--border);
- border-radius:15px;
- margin-bottom:10px;
- overflow:hidden;
+  background:#1d1d1f;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
 }
-.title{
- padding:14px;
- font-size:13px;
- font-weight:800;
- border-bottom:1px solid #1b2030;
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 14px;
+  margin:4px;
+  background:#333;
+  color:white;
+  font-size:14px;
 }
-.body{
- padding:14px;
+button:active{opacity:.6}
+button.primary{background:#147ef5}
+button.warn{background:#8a5a00}
+button.danger{background:#8b2222}
+.status{
+  padding:10px;
+  border-radius:9px;
+  background:#292929;
+  margin-top:8px;
+  font-size:13px;
 }
-.row{
- display:flex;
- gap:7px;
- flex-wrap:wrap;
- margin-bottom:9px;
+input,select{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #555;
+  background:#111;
+  color:#fff;
+  margin:5px 0;
 }
-.btn{
- flex:1;
- min-width:65px;
- border:1px solid var(--border);
- background:#171c2b;
- color:var(--text);
- padding:11px 7px;
- border-radius:10px;
- font-size:12px;
- font-weight:700;
+#log{
+  background:#050505;
+  color:#ddd;
+  border-radius:10px;
+  padding:10px;
+  height:420px;
+  overflow:auto;
+  white-space:pre-wrap;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+  line-height:1.5;
 }
-.btn:active{
- transform:scale(.97);
+.small{
+  color:#aaa;
+  font-size:12px;
 }
-.btn.active{
- background:var(--cyan);
- color:#001018;
- border-color:var(--cyan);
-}
-.btn.debug{
- background:#18202d;
- border-color:#31516a;
-}
-.btn.danger{
- border-color:#542337;
-}
-.label{
- color:var(--muted);
- font-size:11px;
- margin:10px 0 5px;
-}
-input[type=range]{
- width:100%;
-}
-.value{
- text-align:right;
- color:var(--cyan);
- font-size:12px;
- margin-top:4px;
-}
-.toggle{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:10px 0;
- border-bottom:1px solid #1b2030;
-}
-.toggle:last-child{
- border-bottom:0;
-}
-.toggle small{
- display:block;
- color:var(--muted);
- margin-top:3px;
-}
-.switch{
- width:45px;
- height:25px;
- position:relative;
-}
-.switch input{
- display:none;
-}
-.slider{
- position:absolute;
- inset:0;
- background:#33394a;
- border-radius:20px;
-}
-.slider:before{
- content:"";
- position:absolute;
- width:19px;
- height:19px;
- left:3px;
- top:3px;
- background:white;
- border-radius:50%;
- transition:.2s;
-}
-.switch input:checked+.slider{
- background:var(--cyan);
-}
-.switch input:checked+.slider:before{
- transform:translateX(20px);
-}
-pre{
- background:#05070b;
- border:1px solid #1e2533;
- border-radius:10px;
- color:#a8f4ff;
- padding:10px;
- min-height:180px;
- max-height:420px;
- overflow:auto;
- white-space:pre-wrap;
- word-break:break-word;
- font:10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-.note{
- color:var(--muted);
- font-size:10px;
- line-height:1.45;
- margin-top:9px;
-}
-.toast{
- position:fixed;
- left:50%;
- bottom:20px;
- transform:translateX(-50%);
- background:#181d2a;
- border:1px solid #30384c;
- padding:10px 15px;
- border-radius:10px;
- font-size:12px;
- display:none;
- z-index:99;
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
 }
 </style>
 </head>
 
 <body>
-<div class="app">
 
-<header>
- <div class="logo">
-  <h1>PIVA B3 PRO ULTRA</h1>
-  <span>Web Bluetooth Controller · DEBUG V3</span>
- </div>
- <div id="status" class="status">● Chưa kết nối</div>
-</header>
+<h1>PIVA B3 Pro — BLE DEBUG v4</h1>
+<div class="small">
+Passive RX logging + GATT scanner + WRITE 8841 test
+</div>
 
-<button id="btnConnect" class="connect" onclick="toggleConnection()">
- KẾT NỐI BLUETOOTH
+<div class="card">
+  <button class="primary" onclick="connectBLE()">KẾT NỐI B3 PRO</button>
+  <button onclick="disconnectBLE()">NGẮT KẾT NỐI</button>
+
+  <div id="status" class="status">
+    Chưa kết nối
+  </div>
+</div>
+
+<div class="card">
+<h2>GATT DEBUG</h2>
+
+<button onclick="dumpGatt()">QUÉT GATT</button>
+<button onclick="readAll()">READ ALL</button>
+<button onclick="clearLog()" class="danger">XÓA LOG</button>
+<button onclick="copyLog()">COPY LOG</button>
+
+<div class="small">
+  Sau khi kết nối, hãy QUÉT GATT để kiểm tra các characteristic.
+</div>
+</div>
+
+<div class="card">
+<h2>WRITE CHARACTERISTIC</h2>
+
+<select id="writeSelect">
+  <option value="">Chưa chọn</option>
+</select>
+
+<div class="small">
+Characteristic UART RX chuẩn thường cần kiểm tra:
+<br>
+49535343-8841-43F4-A8D4-ECBE34729BB3
+</div>
+
+<button class="primary" onclick="select8841()">
+CHỌN WRITE 8841
 </button>
 
-<!-- MODE -->
-<div class="card">
- <div class="title">⚡ CÔNG SUẤT</div>
- <div class="body">
-  <div class="row">
-   <button id="btnL1" class="btn active" onclick="setMode(1)">L1</button>
-   <button id="btnL2" class="btn" onclick="setMode(2)">L2</button>
-   <button id="btnL3" class="btn" onclick="setMode(3)">L3</button>
-  </div>
+<button class="warn" onclick="testL1()">
+TEST L1 → WRITE 8841
+</button>
 
-  <div class="toggle">
-   <div>
-    <b>Smart</b>
-    <small>Tự động điều chỉnh</small>
-   </div>
-   <label class="switch">
-    <input id="smartToggle" type="checkbox"
-           onchange="toggleSmart(this.checked)">
-    <span class="slider"></span>
-   </label>
-  </div>
-
-  <div class="toggle">
-   <div>
-    <b>Turbo</b>
-    <small>Chế độ tăng cường</small>
-   </div>
-   <label class="switch">
-    <input id="turboToggle" type="checkbox"
-           onchange="toggleTurbo(this.checked)">
-    <span class="slider"></span>
-   </label>
-  </div>
- </div>
 </div>
 
-<!-- FAN -->
 <div class="card">
- <div class="title">🌀 QUẠT</div>
- <div class="body">
-  <div class="row">
-   <button id="fan20" class="btn" onclick="setFan(20)">20%</button>
-   <button id="fan40" class="btn" onclick="setFan(40)">40%</button>
-   <button id="fan60" class="btn" onclick="setFan(60)">60%</button>
-   <button id="fan80" class="btn" onclick="setFan(80)">80%</button>
-   <button id="fan100" class="btn" onclick="setFan(100)">100%</button>
-  </div>
- </div>
+<h2>COMMAND TEST</h2>
+
+<div class="grid">
+<button onclick="sendCommand([0xA5,0x02,0x01,0x5A])">
+L1
+</button>
+
+<button onclick="sendCommand([0xA5,0x02,0x02,0x5A])">
+L2
+</button>
+
+<button onclick="sendCommand([0xA5,0x02,0x03,0x5A])">
+L3
+</button>
+
+<button onclick="sendCommand([0xA5,0x03,0x01,0x5A])">
+TURBO
+</button>
+
+<button onclick="sendCommand([0xA5,0x06,0x01,0x5A])">
+SMART ON
+</button>
+
+<button onclick="sendCommand([0xA5,0x06,0x00,0x5A])">
+SMART OFF
+</button>
 </div>
 
-<!-- LED -->
-<div class="card">
- <div class="title">💡 LED</div>
- <div class="body">
-  <div class="row">
-   <button class="btn" onclick="setLed(0,this)">Tắt</button>
-   <button class="btn" onclick="setLed(1,this)">Đơn màu</button>
-   <button class="btn" onclick="setLed(2,this)">Rainbow</button>
-   <button class="btn" onclick="setLed(3,this)">Breath</button>
-  </div>
-
-  <div class="label">Màu tùy chỉnh</div>
-  <input type="color" id="customColor"
-         value="#00e5ff"
-         onchange="setCustomColor(this.value)">
-
-  <div class="label">Độ sáng</div>
-  <input type="range" min="0" max="100" value="100"
-         oninput="setBrightness(this.value)">
-  <div id="valBrightness" class="value">100%</div>
-
-  <div class="label">Tốc độ LED</div>
-  <input type="range" min="0" max="100" value="50"
-         oninput="setLedSpeed(this.value)">
-  <div id="valSpeed" class="value">50%</div>
- </div>
+<div class="small">
+Chỉ test khi đã xác nhận WRITE characteristic.
+</div>
 </div>
 
-<!-- TIMER -->
 <div class="card">
- <div class="title">⏱ HẸN GIỜ</div>
- <div class="body">
+<h2>READ CHARACTERISTIC</h2>
 
-  <div class="label">Giờ</div>
-  <input id="sliderHour" type="range"
-         min="0" max="12" value="0"
-         oninput="updateTimerLabels()">
-  <div id="valHour" class="value">0h</div>
+<input
+  id="readUUID"
+  placeholder="Nhập UUID cần READ"
+/>
 
-  <div class="label">Phút</div>
-  <input id="sliderMin" type="range"
-         min="0" max="59" value="0"
-         oninput="updateTimerLabels()">
-  <div id="valMin" class="value">0p</div>
-
-  <div class="label">Giây</div>
-  <input id="sliderSec" type="range"
-         min="0" max="59" value="0"
-         oninput="updateTimerLabels()">
-  <div id="valSec" class="value">0s</div>
-
-  <div class="row">
-   <button class="btn" onclick="startTimer()">BẬT HẸN GIỜ</button>
-   <button class="btn" onclick="cancelTimer()">HỦY</button>
-  </div>
-
-  <div id="timerDisplay" class="value">Chưa hẹn giờ</div>
- </div>
+<button onclick="readOne()">
+READ UUID
+</button>
 </div>
 
-<!-- SAFETY -->
 <div class="card">
- <div class="title">🛡 BẢO VỆ</div>
- <div class="body">
-
-  <div class="toggle">
-   <div>
-    <b>Bảo vệ sò</b>
-    <small>Tự theo dõi nhiệt độ</small>
-   </div>
-   <label class="switch">
-    <input id="peltierSafety"
-           type="checkbox"
-           checked
-           onchange="peltierSafety=this.checked">
-    <span class="slider"></span>
-   </label>
-  </div>
-
-  <div class="toggle">
-   <div>
-    <b>Bảo vệ củ sạc</b>
-    <small>Giới hạn nhiệt độ an toàn</small>
-   </div>
-   <label class="switch">
-    <input id="chargerSafety"
-           type="checkbox"
-           checked
-           onchange="chargerSafety=this.checked">
-    <span class="slider"></span>
-   </label>
-  </div>
-
- </div>
-</div>
-
-<!-- DEBUG -->
-<div class="card">
- <div class="title">🔧 BLE DEBUG V3</div>
-
- <div class="body">
-
-  <div class="row">
-   <button class="btn debug"
-           onclick="readDebugChars()">
-    READ ALL
-   </button>
-
-   <button class="btn debug"
-           onclick="dumpGattV2()">
-    QUÉT GATT
-   </button>
-  </div>
-
-  <div class="row">
-   <button class="btn debug"
-           onclick="readOneDebug('49535343-1E4D-4BD9-BA61-23C647249616')">
-    READ 1E4D
-   </button>
-
-   <button class="btn debug"
-           onclick="readOneDebug('00002A29-0000-1000-8000-00805F9B34FB')">
-    READ 2A29
-   </button>
-  </div>
-
-  <div class="row">
-   <button class="btn debug"
-           onclick="copyDebugLog()">
-    COPY LOG
-   </button>
-
-   <button class="btn danger"
-           onclick="clearDebugLog()">
-    XÓA LOG
-   </button>
-  </div>
-
-  <pre id="debugLog"></pre>
-
-  <div class="note">
-   READ ALL chỉ đọc các characteristic có thuộc tính READ.
-   Không gửi dữ liệu tới characteristic chỉ có WRITE.
-  </div>
-
- </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
+<h2>LOG</h2>
+<div id="log"></div>
 </div>
 
 <script>
+
 /* =========================================================
-   PIVA B3 PRO ULTRA
-   BLE UUID
+   PIVA B3 PRO UUID
    ========================================================= */
 
 const SERVICE_UUID =
-'49535343-fe7d-4ae5-8fa9-9fafd205e455';
+"49535343-fe7d-4ae5-8fa9-9fafd205e455";
 
-const WRITE_UUID =
-'49535343-6daa-4d02-abf6-19569aca69fe';
+const WRITE_6DAA =
+"49535343-6daa-4d02-abf6-19569aca69fe";
 
-const NOTIFY_UUID =
-'49535343-aca3-481c-91ec-d85e28a60318';
+const NOTIFY_1E4D =
+"49535343-1e4d-4bd9-ba61-23c647249616";
 
-const UART_NOTIFY_UUID =
-'49535343-1e4d-4bd9-ba61-23c647249616';
+const WRITE_8841 =
+"49535343-8841-43f4-a8d4-ecbe34729bb3";
 
-const DEVICE_INFO_UUID =
-'00002a29-0000-1000-8000-00805f9b34fb';
+let device = null;
+let server = null;
+let service = null;
 
+let characteristics = {};
 
-/* =========================================================
-   STATE
-   ========================================================= */
-
-let bleDevice = null;
-let writeChar = null;
-let notifyChar = null;
-let isConnected = false;
-let isConnecting = false;
-
-let smartMode = false;
-
-let peltierSafety = true;
-let chargerSafety = true;
-
-let timerInterval = null;
-let timerTarget = null;
-
-let debugListeners = new Map();
+let writeCharacteristic = null;
 
 
 /* =========================================================
-   BASIC HELPERS
+   LOG
    ========================================================= */
 
-function hex(bytes) {
-    return Array.from(
-        bytes,
-        b => b.toString(16).padStart(2,'0').toUpperCase()
-    ).join(' ');
+function timestamp(){
+
+  return new Date().toLocaleTimeString();
+
 }
 
+function log(message){
 
-function debugLog(msg) {
+  const box = document.getElementById("log");
 
-    const el = document.getElementById('debugLog');
+  box.textContent +=
+    `[${timestamp()}] ${message}\n`;
 
-    if (!el) return;
+  box.scrollTop = box.scrollHeight;
 
-    const line =
-        '[' +
-        new Date().toLocaleTimeString() +
-        '] ' +
-        msg;
-
-    el.textContent += line + '\n';
-
-    el.scrollTop = el.scrollHeight;
-
-    console.log('[PIVA DEBUG]', msg);
 }
 
+function clearLog(){
 
-function clearDebugLog() {
+  document.getElementById("log").textContent = "";
 
-    const el =
-        document.getElementById('debugLog');
+  log("Đã xóa log.");
 
-    if (el) {
-        el.textContent =
-            'Đã xóa log.\n';
-    }
 }
 
+async function copyLog(){
 
-async function copyDebugLog() {
+  const text =
+    document.getElementById("log").textContent;
 
-    const el =
-        document.getElementById('debugLog');
+  try{
 
-    if (!el) return;
+    await navigator.clipboard.writeText(text);
 
-    try {
+    log("Đã COPY LOG.");
 
-        await navigator.clipboard.writeText(
-            el.textContent
-        );
+  }catch(e){
 
-        toast(
-            'Đã copy log',
-            'success'
-        );
+    log("COPY lỗi: " + e);
 
-    } catch (e) {
+  }
 
-        toast(
-            'Không copy được log',
-            'error'
-        );
-    }
-}
-
-
-function describeProperties(p) {
-
-    const a = [];
-
-    if (p.read)
-        a.push('READ');
-
-    if (p.write)
-        a.push('WRITE');
-
-    if (p.writeWithoutResponse)
-        a.push('WRITE_NO_RESPONSE');
-
-    if (p.notify)
-        a.push('NOTIFY');
-
-    if (p.indicate)
-        a.push('INDICATE');
-
-    return a.join(', ') || 'NONE';
-}
-
-
-function toast(message, type) {
-
-    const el =
-        document.getElementById('toast');
-
-    if (!el) return;
-
-    el.textContent = message;
-    el.style.display = 'block';
-
-    clearTimeout(
-        toast._timer
-    );
-
-    toast._timer =
-        setTimeout(() => {
-            el.style.display = 'none';
-        }, 2200);
 }
 
 
 /* =========================================================
-   STATUS
+   HEX
    ========================================================= */
 
-function setStatus(on, text) {
+function bytesToHex(data){
 
-    const status =
-        document.getElementById('status');
+  return Array.from(data)
+    .map(x => x.toString(16).padStart(2,"0").toUpperCase())
+    .join(" ");
 
-    const btn =
-        document.getElementById('btnConnect');
-
-    isConnected = !!on;
-
-    if (on) {
-
-        status.classList.add('on');
-
-        status.textContent =
-            '● ' +
-            (text || 'Đã kết nối');
-
-        btn.textContent =
-            'NGẮT KẾT NỐI';
-
-    } else {
-
-        status.classList.remove('on');
-
-        status.textContent =
-            '● Chưa kết nối';
-
-        btn.textContent =
-            'KẾT NỐI BLUETOOTH';
-    }
-}
-
-
-/* =========================================================
-   GATT DEBUG
-   ========================================================= */
-
-async function dumpGattV2() {
-
-    if (!bleDevice ||
-        !bleDevice.gatt ||
-        !bleDevice.gatt.connected) {
-
-        debugLog(
-            'GATT SCAN ERROR: chưa kết nối'
-        );
-
-        return;
-    }
-
-    debugLog(
-        '========== GATT SCAN =========='
-    );
-
-    try {
-
-        const services =
-            await bleDevice.gatt
-                .getPrimaryServices();
-
-        debugLog(
-            `PRIMARY SERVICES: ${services.length}`
-        );
-
-        for (const service of services) {
-
-            debugLog(
-                `SERVICE ${service.uuid}`
-            );
-
-            let chars = [];
-
-            try {
-
-                chars =
-                    await service
-                        .getCharacteristics();
-
-            } catch (e) {
-
-                debugLog(
-                    `CHAR ERROR ${service.uuid} | ${
-                        e.message || e
-                    }`
-                );
-
-                continue;
-            }
-
-            for (const c of chars) {
-
-                const props =
-                    describeProperties(
-                        c.properties
-                    );
-
-                debugLog(
-                    `  CHAR ${c.uuid} | ${props}`
-                );
-
-                if (
-                    c.properties.notify ||
-                    c.properties.indicate
-                ) {
-
-                    if (!debugListeners.has(c.uuid)) {
-
-                        try {
-
-                            await c.startNotifications();
-
-                            const fn =
-                                handleDebugNotify;
-
-                            c.addEventListener(
-                                'characteristicvaluechanged',
-                                fn
-                            );
-
-                            debugListeners.set(
-                                c.uuid,
-                                {
-                                    characteristic:c,
-                                    listener:fn
-                                }
-                            );
-
-                            debugLog(
-                                `  NOTIFY ATTACHED ${c.uuid}`
-                            );
-
-                        } catch (e) {
-
-                            debugLog(
-                                `  NOTIFY ERROR ${c.uuid} | ${
-                                    e.message || e
-                                }`
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        debugLog(
-            '========== GATT SCAN DONE =========='
-        );
-
-    } catch (e) {
-
-        debugLog(
-            `GATT ERROR | ${e.message || e}`
-        );
-    }
-}
-
-
-function handleDebugNotify(event) {
-
-    const c =
-        event.target;
-
-    const value =
-        c.value;
-
-    const data =
-        new Uint8Array(
-            value.buffer,
-            value.byteOffset,
-            value.byteLength
-        );
-
-    debugLog(
-        `RX <- ${c.uuid} | ${hex(data)}`
-    );
-}
-
-
-/* =========================================================
-   READ ONE
-   ========================================================= */
-
-async function readOneDebug(uuid) {
-
-    if (!bleDevice ||
-        !bleDevice.gatt ||
-        !bleDevice.gatt.connected) {
-
-        toast(
-            'Chưa kết nối Bluetooth',
-            'error'
-        );
-
-        return;
-    }
-
-    debugLog(
-        `READ ONE -> ${uuid}`
-    );
-
-    try {
-
-        const services =
-            await bleDevice.gatt
-                .getPrimaryServices();
-
-        for (const service of services) {
-
-            const chars =
-                await service
-                    .getCharacteristics();
-
-            for (const c of chars) {
-
-                if (
-                    c.uuid.toLowerCase() !==
-                    uuid.toLowerCase()
-                ) {
-                    continue;
-                }
-
-                debugLog(
-                    `FOUND ${c.uuid} | ${
-                        describeProperties(
-                            c.properties
-                        )
-                    }`
-                );
-
-                if (!c.properties.read) {
-
-                    debugLog(
-                        `READ NOT SUPPORTED ${c.uuid}`
-                    );
-
-                    return;
-                }
-
-                const value =
-                    await c.readValue();
-
-                const data =
-                    new Uint8Array(
-                        value.buffer,
-                        value.byteOffset,
-                        value.byteLength
-                    );
-
-                debugLog(
-                    `READ <- ${c.uuid} | ${hex(data)}`
-                );
-
-                return;
-            }
-        }
-
-        debugLog(
-            `READ NOT FOUND ${uuid}`
-        );
-
-    } catch (e) {
-
-        debugLog(
-            `READ ERROR ${uuid} | ${
-                e.message || e
-            }`
-        );
-    }
-}
-
-
-/* =========================================================
-   READ ALL
-   ========================================================= */
-
-async function readDebugChars() {
-
-    if (!bleDevice ||
-        !bleDevice.gatt ||
-        !bleDevice.gatt.connected) {
-
-        toast(
-            'Chưa kết nối Bluetooth',
-            'error'
-        );
-
-        debugLog(
-            'READ ALL ERROR: GATT chưa kết nối'
-        );
-
-        return;
-    }
-
-    debugLog('');
-    debugLog(
-        '========== READ ALL START =========='
-    );
-
-    let count = 0;
-
-    try {
-
-        const services =
-            await bleDevice.gatt
-                .getPrimaryServices();
-
-        debugLog(
-            `Tìm thấy ${services.length} primary service`
-        );
-
-        for (const service of services) {
-
-            debugLog(
-                `SERVICE: ${service.uuid}`
-            );
-
-            let chars = [];
-
-            try {
-
-                chars =
-                    await service
-                        .getCharacteristics();
-
-            } catch (e) {
-
-                debugLog(
-                    `CHAR ERROR ${service.uuid} | ${
-                        e.message || e
-                    }`
-                );
-
-                continue;
-            }
-
-            for (const c of chars) {
-
-                const props =
-                    describeProperties(
-                        c.properties
-                    );
-
-                debugLog(
-                    `CHAR: ${c.uuid} | ${props}`
-                );
-
-                if (!c.properties.read) {
-
-                    debugLog(
-                        `SKIP ${c.uuid} | không có READ`
-                    );
-
-                    continue;
-                }
-
-                count++;
-
-                try {
-
-                    debugLog(
-                        `READ -> ${c.uuid}`
-                    );
-
-                    const value =
-                        await c.readValue();
-
-                    const data =
-                        new Uint8Array(
-                            value.buffer,
-                            value.byteOffset,
-                            value.byteLength
-                        );
-
-                    debugLog(
-                        `READ <- ${c.uuid} | ${hex(data)}`
-                    );
-
-                } catch (e) {
-
-                    debugLog(
-                        `READ ERROR ${c.uuid} | ${
-                            e.message || e
-                        }`
-                    );
-                }
-            }
-        }
-
-        debugLog('');
-        debugLog(
-            `========== READ ALL DONE | ${
-                count
-            } readable characteristic(s) ==========`
-        );
-
-        toast(
-            `READ ALL xong: ${count} characteristic`,
-            'success'
-        );
-
-    } catch (e) {
-
-        debugLog(
-            `READ ALL ERROR | ${
-                e.message || e
-            }`
-        );
-
-        toast(
-            'READ ALL lỗi',
-            'error'
-        );
-    }
 }
 
 
@@ -1017,719 +272,553 @@ async function readDebugChars() {
    CONNECT
    ========================================================= */
 
-async function toggleConnection() {
+async function connectBLE(){
 
-    if (isConnecting)
-        return;
+  try{
 
-    if (isConnected) {
+    log("Đang tìm PIVA B3 Pro...");
 
-        await disconnect();
+    device =
+      await navigator.bluetooth.requestDevice({
 
-    } else {
+        filters:[
+          {namePrefix:"B3PRO"},
+          {namePrefix:"B3"},
+          {namePrefix:"PIVA"}
+        ],
 
-        await connect();
-    }
-}
+        optionalServices:[
+          SERVICE_UUID
+        ]
 
+      });
 
-async function connect() {
+    log("DEVICE = " + device.name);
 
-    if (!navigator.bluetooth) {
-
-        toast(
-            'Trình duyệt không hỗ trợ Web Bluetooth',
-            'error'
-        );
-
-        return;
-    }
-
-    isConnecting = true;
-
-    const btn =
-        document.getElementById(
-            'btnConnect'
-        );
-
-    btn.textContent =
-        'ĐANG TÌM THIẾT BỊ...';
-
-    try {
-
-        bleDevice =
-            await navigator.bluetooth
-                .requestDevice({
-
-                    filters:[
-                        {name:'B3PRO'},
-                        {namePrefix:'B3'},
-                        {namePrefix:'PIVA'}
-                    ],
-
-                    optionalServices:[
-                        SERVICE_UUID
-                    ]
-                });
-
-        debugLog(
-            `DEVICE = ${
-                bleDevice.name || '(no name)'
-            }`
-        );
-
-        debugLog(
-            `DEVICE ID = ${bleDevice.id}`
-        );
-
-        bleDevice.addEventListener(
-            'gattserverdisconnected',
-            onDisconnected
-        );
-
-        const server =
-            bleDevice.gatt.connected
-            ? bleDevice.gatt
-            : await bleDevice.gatt.connect();
-
-        const service =
-            await server
-                .getPrimaryService(
-                    SERVICE_UUID
-                );
-
-        writeChar =
-            await service
-                .getCharacteristic(
-                    WRITE_UUID
-                );
-
-        debugLog(
-            `PRIMARY SERVICE = ${service.uuid}`
-        );
-
-        debugLog(
-            `WRITE CHAR = ${writeChar.uuid} | ${
-                describeProperties(
-                    writeChar.properties
-                )
-            }`
-        );
-
-        try {
-
-            notifyChar =
-                await service
-                    .getCharacteristic(
-                        NOTIFY_UUID
-                    );
-
-            await notifyChar
-                .startNotifications();
-
-            notifyChar.addEventListener(
-                'characteristicvaluechanged',
-                handleNotify
-            );
-
-            debugLog(
-                `NOTIFY CHAR = ${notifyChar.uuid} | ${
-                    describeProperties(
-                        notifyChar.properties
-                    )
-                }`
-            );
-
-        } catch (e) {
-
-            notifyChar = null;
-
-            debugLog(
-                `NOTIFY SETUP ERROR | ${
-                    e.message || e
-                }`
-            );
-        }
-
-        setStatus(
-            true,
-            'Đã kết nối'
-        );
-
-        toast(
-            'Kết nối thành công!',
-            'success'
-        );
-
-        debugLog(
-            'BLE CONNECTED'
-        );
-
-        /*
-         * Quét toàn bộ GATT ngay sau khi kết nối.
-         */
-        await dumpGattV2();
-
-        /*
-         * Lệnh khởi tạo hiện tại.
-         */
-        await send([
-            0xA5,
-            0x02,
-            0x01,
-            0x5A
-        ]);
-
-    } catch (e) {
-
-        console.error(e);
-
-        debugLog(
-            `CONNECT ERROR | ${
-                e.message || e
-            }`
-        );
-
-        toast(
-            'Lỗi: ' +
-            (e.message || e.name || ''),
-            'error'
-        );
-
-        setStatus(false);
-
-    } finally {
-
-        isConnecting = false;
-
-        if (!isConnected) {
-
-            btn.textContent =
-                'KẾT NỐI BLUETOOTH';
-        }
-    }
-}
-
-
-async function disconnect() {
-
-    try {
-
-        if (
-            bleDevice &&
-            bleDevice.gatt &&
-            bleDevice.gatt.connected
-        ) {
-            bleDevice.gatt.disconnect();
-        }
-
-    } catch (e) {}
-
-    cleanup();
-
-    setStatus(false);
-
-    toast(
-        'Đã ngắt kết nối'
-    );
-}
-
-
-function onDisconnected() {
-
-    debugLog(
-        'BLE DISCONNECTED'
+    device.addEventListener(
+      "gattserverdisconnected",
+      onDisconnected
     );
 
-    cleanup();
+    server =
+      await device.gatt.connect();
 
-    setStatus(false);
+    log("GATT CONNECTED");
 
-    toast(
-        'Mất kết nối Bluetooth',
-        'error'
-    );
+    service =
+      await server.getPrimaryService(SERVICE_UUID);
+
+    log("SERVICE = " + service.uuid);
+
+    document.getElementById("status").textContent =
+      "Đã kết nối: " + device.name;
+
+    await dumpGatt();
+
+  }catch(e){
+
+    log("CONNECT ERROR: " + e);
+
+  }
+
 }
 
 
-function cleanup() {
+/* =========================================================
+   DISCONNECT
+   ========================================================= */
 
-    for (
-        const item
-        of debugListeners.values()
-    ) {
+function disconnectBLE(){
 
-        try {
+  if(device && device.gatt.connected){
 
-            item.characteristic
-                .removeEventListener(
-                    'characteristicvaluechanged',
-                    item.listener
-                );
+    device.gatt.disconnect();
 
-        } catch (e) {}
+  }
+
+}
+
+function onDisconnected(){
+
+  log("BLE DISCONNECTED");
+
+  document.getElementById("status").textContent =
+    "Đã ngắt kết nối";
+
+}
+
+
+/* =========================================================
+   GATT SCAN
+   ========================================================= */
+
+async function dumpGatt(){
+
+  if(!service){
+
+    log("Chưa kết nối.");
+
+    return;
+
+  }
+
+  log("========== GATT SCAN ==========");
+
+  const select =
+    document.getElementById("writeSelect");
+
+  select.innerHTML =
+    '<option value="">Chưa chọn</option>';
+
+  characteristics = {};
+
+  const chars =
+    await service.getCharacteristics();
+
+  for(const c of chars){
+
+    characteristics[c.uuid] = c;
+
+    const p = c.properties;
+
+    let props = [];
+
+    if(p.read) props.push("READ");
+
+    if(p.write) props.push("WRITE");
+
+    if(p.writeWithoutResponse)
+      props.push("WRITE_NO_RESPONSE");
+
+    if(p.notify) props.push("NOTIFY");
+
+    if(p.indicate) props.push("INDICATE");
+
+    log(
+      `CHAR ${c.uuid} | ${props.join(", ")}`
+    );
+
+    if(
+      p.write ||
+      p.writeWithoutResponse
+    ){
+
+      const option =
+        document.createElement("option");
+
+      option.value = c.uuid;
+
+      option.textContent =
+        c.uuid + " [" + props.join(", ") + "]";
+
+      select.appendChild(option);
+
     }
 
-    debugListeners.clear();
+    if(p.notify || p.indicate){
 
-    writeChar = null;
-    notifyChar = null;
-    bleDevice = null;
+      try{
 
-    clearInterval(
-        timerInterval
-    );
+        await c.startNotifications();
+
+        c.addEventListener(
+          "characteristicvaluechanged",
+          handleRX
+        );
+
+        log(
+          "NOTIFY ON <- " + c.uuid
+        );
+
+      }catch(e){
+
+        log(
+          "NOTIFY ERROR " +
+          c.uuid +
+          " | " +
+          e
+        );
+
+      }
+
+    }
+
+  }
+
+  log("========== END GATT ==========");
+
 }
+
+
+/* =========================================================
+   RX
+   ========================================================= */
+
+function handleRX(event){
+
+  const value =
+    new Uint8Array(
+      event.target.value.buffer
+    );
+
+  log(
+    "RX <- " +
+    event.target.uuid +
+    " | " +
+    bytesToHex(value)
+  );
+
+}
+
+
+/* =========================================================
+   SELECT 8841
+   ========================================================= */
+
+function select8841(){
+
+  const c =
+    characteristics[WRITE_8841];
+
+  if(!c){
+
+    log(
+      "KHÔNG TÌM THẤY WRITE 8841: " +
+      WRITE_8841
+    );
+
+    return;
+
+  }
+
+  writeCharacteristic = c;
+
+  document.getElementById("writeSelect").value =
+    WRITE_8841;
+
+  log(
+    "WRITE CHARACTERISTIC = 8841"
+  );
+
+}
+
+
+/* =========================================================
+   SELECT MANUAL
+   ========================================================= */
+
+document
+  .getElementById("writeSelect")
+  .addEventListener("change", function(){
+
+    const uuid = this.value;
+
+    if(!uuid){
+
+      writeCharacteristic = null;
+
+      return;
+
+    }
+
+    writeCharacteristic =
+      characteristics[uuid];
+
+    log(
+      "WRITE SELECTED = " + uuid
+    );
+
+  });
 
 
 /* =========================================================
    SEND
    ========================================================= */
 
-async function send(bytes) {
+async function sendCommand(bytes){
 
-    if (!writeChar ||
-        !isConnected) {
+  if(!writeCharacteristic){
 
-        toast(
-            'Chưa kết nối thiết bị',
-            'error'
-        );
+    log(
+      "CHƯA CHỌN WRITE CHARACTERISTIC."
+    );
 
-        return false;
+    return;
+
+  }
+
+  const data =
+    new Uint8Array(bytes);
+
+  log(
+    "TX -> " +
+    writeCharacteristic.uuid +
+    " | " +
+    bytesToHex(data)
+  );
+
+  try{
+
+    const p =
+      writeCharacteristic.properties;
+
+    if(p.writeWithoutResponse){
+
+      await writeCharacteristic
+        .writeValueWithoutResponse(data);
+
+      log("TX OK: writeWithoutResponse");
+
+    }else if(p.write){
+
+      await writeCharacteristic
+        .writeValue(data);
+
+      log("TX OK: write");
+
+    }else{
+
+      log(
+        "CHARACTERISTIC KHÔNG CÓ WRITE."
+      );
+
     }
 
-    try {
+  }catch(e){
 
-        debugLog(
-            `TX -> ${writeChar.uuid} | ${hex(bytes)}`
-        );
+    log(
+      "TX ERROR: " + e
+    );
 
-        if (
-            writeChar.properties
-                .writeWithoutResponse
-        ) {
+  }
 
-            await writeChar
-                .writeValueWithoutResponse(
-                    new Uint8Array(bytes)
-                );
-
-            debugLog(
-                'TX METHOD = WRITE WITHOUT RESPONSE'
-            );
-
-        } else {
-
-            await writeChar
-                .writeValue(
-                    new Uint8Array(bytes)
-                );
-
-            debugLog(
-                'TX METHOD = WRITE'
-            );
-        }
-
-        debugLog(
-            'TX OK'
-        );
-
-        return true;
-
-    } catch (e) {
-
-        debugLog(
-            `TX ERROR | ${
-                e.message || e
-            }`
-        );
-
-        toast(
-            'Gửi lệnh thất bại',
-            'error'
-        );
-
-        return false;
-    }
 }
 
 
 /* =========================================================
-   DEVICE COMMANDS
+   TEST L1 → 8841
    ========================================================= */
 
-function setActive(selector, id) {
+async function testL1(){
 
-    document
-        .querySelectorAll(selector)
-        .forEach(
-            b => b.classList.remove('active')
-        );
+  const c =
+    characteristics[WRITE_8841];
 
-    const el =
-        document.getElementById(id);
+  if(!c){
 
-    if (el)
-        el.classList.add('active');
-}
-
-
-function setMode(level) {
-
-    setActive(
-        '#btnL1,#btnL2,#btnL3',
-        'btnL' + level
+    log(
+      "Không tìm thấy 8841. Hãy QUÉT GATT."
     );
 
-    if (smartMode) {
+    return;
 
-        document.getElementById(
-            'smartToggle'
-        ).checked = false;
+  }
 
-        smartMode = false;
-    }
+  writeCharacteristic = c;
 
-    send([
-        0xA5,
-        0x02,
-        level,
-        0x5A
-    ]);
-}
+  document.getElementById("writeSelect").value =
+    WRITE_8841;
 
+  log(
+    "========== TEST L1 → 8841 =========="
+  );
 
-function toggleSmart(enable) {
+  log(
+    "Đang gửi A5 02 01 5A"
+  );
 
-    smartMode = enable;
+  await sendCommand([
+    0xA5,
+    0x02,
+    0x01,
+    0x5A
+  ]);
 
-    send([
-        0xA5,
-        0x06,
-        enable ? 0x01 : 0x00,
-        0x5A
-    ]);
-}
+  log(
+    "========== END TEST =========="
+  );
 
-
-function toggleTurbo(enable) {
-
-    send([
-        0xA5,
-        0x03,
-        enable ? 0x01 : 0x00,
-        0x5A
-    ]);
-}
-
-
-function setFan(percent) {
-
-    setActive(
-        '#fan20,#fan40,#fan60,#fan80,#fan100',
-        'fan' + percent
-    );
-
-    send([
-        0xA5,
-        0x04,
-        percent,
-        0x5A
-    ]);
-}
-
-
-function setLed(modeId, btn) {
-
-    document
-        .querySelectorAll('.led-btn')
-        .forEach(
-            b => b.classList.remove('active')
-        );
-
-    if (btn)
-        btn.classList.add('active');
-
-    send([
-        0xA5,
-        0x05,
-        modeId,
-        0x5A
-    ]);
-}
-
-
-function setCustomColor(value) {
-
-    const r =
-        parseInt(
-            value.slice(1,3),
-            16
-        );
-
-    const g =
-        parseInt(
-            value.slice(3,5),
-            16
-        );
-
-    const b =
-        parseInt(
-            value.slice(5,7),
-            16
-        );
-
-    send([
-        0xA5,
-        0x07,
-        r,
-        g,
-        b,
-        0x5A
-    ]);
-}
-
-
-function setBrightness(value) {
-
-    document.getElementById(
-        'valBrightness'
-    ).textContent =
-        value + '%';
-
-    send([
-        0xA5,
-        0x08,
-        parseInt(value),
-        0x5A
-    ]);
-}
-
-
-function setLedSpeed(value) {
-
-    document.getElementById(
-        'valSpeed'
-    ).textContent =
-        value + '%';
-
-    send([
-        0xA5,
-        0x09,
-        parseInt(value),
-        0x5A
-    ]);
 }
 
 
 /* =========================================================
-   NORMAL NOTIFY
+   READ ALL
    ========================================================= */
 
-function handleNotify(event) {
+async function readAll(){
+
+  if(!service){
+
+    log("Chưa kết nối.");
+
+    return;
+
+  }
+
+  log("========== READ ALL ==========");
+
+  const chars =
+    await service.getCharacteristics();
+
+  for(const c of chars){
+
+    if(!c.properties.read)
+      continue;
+
+    try{
+
+      const value =
+        await c.readValue();
+
+      const bytes =
+        new Uint8Array(
+          value.buffer,
+          value.byteOffset,
+          value.byteLength
+        );
+
+      log(
+        "READ <- " +
+        c.uuid +
+        " | " +
+        bytesToHex(bytes)
+      );
+
+    }catch(e){
+
+      log(
+        "READ ERROR <- " +
+        c.uuid +
+        " | " +
+        e
+      );
+
+    }
+
+  }
+
+  log("========== END READ ALL ==========");
+
+}
+
+
+/* =========================================================
+   READ ONE
+   ========================================================= */
+
+async function readOne(){
+
+  const uuid =
+    document.getElementById("readUUID")
+      .value
+      .trim()
+      .toLowerCase();
+
+  if(!uuid){
+
+    log("Chưa nhập UUID.");
+
+    return;
+
+  }
+
+  const c =
+    characteristics[uuid];
+
+  if(!c){
+
+    log(
+      "Không tìm thấy characteristic: " +
+      uuid
+    );
+
+    return;
+
+  }
+
+  if(!c.properties.read){
+
+    log(
+      "Characteristic này không hỗ trợ READ."
+    );
+
+    return;
+
+  }
+
+  try{
 
     const value =
-        event.target.value;
+      await c.readValue();
 
-    const data =
-        new Uint8Array(
-            value.buffer,
-            value.byteOffset,
-            value.byteLength
-        );
+    const bytes =
+      new Uint8Array(
+        value.buffer,
+        value.byteOffset,
+        value.byteLength
+      );
 
-    debugLog(
-        `RX <- ${event.target.uuid} | ${hex(data)}`
+    log(
+      "READ <- " +
+      uuid +
+      " | " +
+      bytesToHex(bytes)
     );
+
+  }catch(e){
+
+    log(
+      "READ ERROR: " + e
+    );
+
+  }
+
 }
 
 
 /* =========================================================
-   TIMER
+   AUTO SELECT POSSIBLE WRITE
    ========================================================= */
 
-function updateTimerLabels() {
+function findWriteCandidates(){
 
-    document.getElementById(
-        'valHour'
-    ).textContent =
-        document.getElementById(
-            'sliderHour'
-        ).value + 'h';
+  const candidates = [];
 
-    document.getElementById(
-        'valMin'
-    ).textContent =
-        document.getElementById(
-            'sliderMin'
-        ).value + 'p';
+  for(const uuid in characteristics){
 
-    document.getElementById(
-        'valSec'
-    ).textContent =
-        document.getElementById(
-            'sliderSec'
-        ).value + 's';
-}
+    const c =
+      characteristics[uuid];
 
+    if(
+      c.properties.write ||
+      c.properties.writeWithoutResponse
+    ){
 
-function startTimer() {
+      candidates.push(c);
 
-    const h =
-        parseInt(
-            document.getElementById(
-                'sliderHour'
-            ).value
-        ) || 0;
-
-    const m =
-        parseInt(
-            document.getElementById(
-                'sliderMin'
-            ).value
-        ) || 0;
-
-    const s =
-        parseInt(
-            document.getElementById(
-                'sliderSec'
-            ).value
-        ) || 0;
-
-    const total =
-        h * 3600 +
-        m * 60 +
-        s;
-
-    if (total <= 0) {
-
-        toast(
-            'Vui lòng chọn thời gian > 0',
-            'error'
-        );
-
-        return;
     }
 
-    clearInterval(
-        timerInterval
-    );
+  }
 
-    timerTarget =
-        Date.now() +
-        total * 1000;
+  return candidates;
 
-    const display =
-        document.getElementById(
-            'timerDisplay'
-        );
-
-    timerInterval =
-        setInterval(() => {
-
-            const remain =
-                timerTarget -
-                Date.now();
-
-            if (remain <= 0) {
-
-                clearInterval(
-                    timerInterval
-                );
-
-                display.textContent =
-                    'Đã hết giờ';
-
-                toast(
-                    'Hết giờ',
-                    'success'
-                );
-
-                return;
-            }
-
-            const sec =
-                Math.ceil(
-                    remain / 1000
-                );
-
-            const rh =
-                Math.floor(
-                    sec / 3600
-                );
-
-            const rm =
-                Math.floor(
-                    (sec % 3600) / 60
-                );
-
-            const rs =
-                sec % 60;
-
-            display.textContent =
-                `Còn ${
-                    String(rh).padStart(2,'0')
-                }:${
-                    String(rm).padStart(2,'0')
-                }:${
-                    String(rs).padStart(2,'0')
-                }`;
-
-        },250);
-
-    toast(
-        'Đã bật hẹn giờ'
-    );
-}
-
-
-function cancelTimer() {
-
-    clearInterval(
-        timerInterval
-    );
-
-    timerTarget = null;
-
-    document.getElementById(
-        'timerDisplay'
-    ).textContent =
-        'Chưa hẹn giờ';
-
-    toast(
-        'Đã hủy hẹn giờ'
-    );
 }
 
 
 /* =========================================================
-   INIT
+   PAGE START
    ========================================================= */
 
-clearDebugLog();
+log("PIVA B3 Pro DEBUG v4 sẵn sàng.");
 
-updateTimerLabels();
-
-setStatus(
-    false
+log(
+  "WRITE 8841 = " + WRITE_8841
 );
 
-debugLog(
-    'PIVA B3 PRO DEBUG V3 READY'
+log(
+  "NOTIFY 1E4D = " + NOTIFY_1E4D
 );
 
-debugLog(
-    `SERVICE = ${SERVICE_UUID}`
-);
-
-debugLog(
-    `WRITE = ${WRITE_UUID}`
-);
-
-debugLog(
-    `NOTIFY = ${NOTIFY_UUID}`
-);
 </script>
 
 </body>
