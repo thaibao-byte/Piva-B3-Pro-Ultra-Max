@@ -2,516 +2,702 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>PIVA B3 Pro DEBUG V5</title>
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>PIVA B3 Pro DEBUG V6</title>
 
 <style>
-body {
-    margin: 0;
-    padding: 20px;
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:20px 14px 40px;
+  background:#101010;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
-
-h1 {
-    font-size: 22px;
+.app{max-width:760px;margin:auto}
+h1{text-align:center;font-size:25px;margin:8px 0 18px}
+button{
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:17px 12px;
+  margin:6px 0;
+  font-size:17px;
+  font-weight:800;
+  background:#303030;
+  color:white
 }
-
-button {
-    width: 100%;
-    padding: 14px;
-    margin: 6px 0;
-    border: 0;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
+button:active{transform:scale(.98)}
+.connect{background:#006cff}
+.yellow{background:#ffc400;color:#000}
+.green{background:#00a85a}
+.red{background:#c62828}
+.row{display:flex;gap:8px}
+.row button{flex:1}
+.card{
+  margin-top:12px;
+  padding:14px;
+  border-radius:18px;
+  background:#191919
 }
-
-.connect {
-    background: #333;
-    color: white;
+.title{
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:8px
 }
-
-.test {
-    background: #ffcc00;
-    color: black;
+.log{
+  margin-top:15px;
+  padding:14px;
+  height:430px;
+  overflow:auto;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#000;
+  border-radius:18px;
+  color:#00ff70;
+  font-family:monospace;
+  font-size:13px;
+  line-height:1.45
 }
-
-#log {
-    margin-top: 15px;
-    padding: 12px;
-    height: 450px;
-    overflow-y: auto;
-    background: #000;
-    color: #00ff66;
-    border-radius: 10px;
-    white-space: pre-wrap;
-    word-break: break-word;
-    font-family: monospace;
-    font-size: 13px;
+.status{
+  text-align:center;
+  padding:10px;
+  border-radius:12px;
+  background:#222;
+  margin-bottom:10px;
+  font-weight:700
+}
+input[type=range]{width:100%}
+label{
+  display:block;
+  margin-top:10px;
+  font-weight:700
+}
+.small{
+  font-size:12px;
+  color:#aaa;
+  margin-top:5px
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<h1>PIVA B3 Pro DEBUG V5</h1>
+<h1>❄️ PIVA B3 Pro DEBUG V6</h1>
 
-<button class="connect" onclick="connectBLE()">
-🔵 KẾT NỐI B3 PRO
+<div id="status" class="status">
+  🔴 CHƯA KẾT NỐI
+</div>
+
+<button id="connectBtn"
+        class="connect"
+        onclick="toggleConnection()">
+  🔵 KẾT NỐI B3 PRO
 </button>
 
-<button class="test" onclick="testL1_8841()">
-⚡ TEST L1 → 8841
+<div class="card">
+<div class="title">⚡ MỨC LÀM LẠNH — WRITE 8841</div>
+
+<div class="row">
+<button onclick="setMode(1)">L1</button>
+<button onclick="setMode(2)">L2</button>
+<button onclick="setMode(3)">L3</button>
+</div>
+
+<button class="yellow"
+        onclick="toggleTurbo(true)">
+  ⚡ TURBO ON → 8841
 </button>
 
-<button class="connect" onclick="testL2_8841()">
+<button onclick="toggleTurbo(false)">
+  TURBO OFF → 8841
+</button>
+</div>
+
+<div class="card">
+<div class="title">🧠 SMART</div>
+
+<div class="row">
+<button class="green"
+        onclick="toggleSmart(true)">
+  SMART ON
+</button>
+
+<button class="red"
+        onclick="toggleSmart(false)">
+  SMART OFF
+</button>
+</div>
+</div>
+
+<div class="card">
+<div class="title">🌀 QUẠT</div>
+
+<div class="row">
+<button onclick="setFan(20)">20%</button>
+<button onclick="setFan(40)">40%</button>
+<button onclick="setFan(60)">60%</button>
+</div>
+
+<div class="row">
+<button onclick="setFan(80)">80%</button>
+<button onclick="setFan(100)">100%</button>
+</div>
+</div>
+
+<div class="card">
+<div class="title">💡 LED</div>
+
+<div class="row">
+<button onclick="setLed(0)">OFF</button>
+<button onclick="setLed(1)">ON</button>
+<button onclick="setLed(2)">AUTO</button>
+</div>
+
+<label>
+Độ sáng:
+<span id="brightnessValue">50%</span>
+</label>
+
+<input id="brightness"
+       type="range"
+       min="0"
+       max="100"
+       value="50"
+       oninput="brightnessValue.textContent=this.value+'%'"
+       onchange="setBrightness(this.value)">
+
+<label>
+Tốc độ LED:
+<span id="speedValue">50%</span>
+</label>
+
+<input id="speed"
+       type="range"
+       min="0"
+       max="100"
+       value="50"
+       oninput="speedValue.textContent=this.value+'%'"
+       onchange="setLedSpeed(this.value)">
+</div>
+
+<div class="card">
+<div class="title">🧪 TEST RAW</div>
+
+<button onclick="testL1()">
+TEST L1 → 8841
+</button>
+
+<button onclick="testL2()">
 TEST L2 → 8841
 </button>
 
-<button class="connect" onclick="testL3_8841()">
+<button onclick="testL3()">
 TEST L3 → 8841
 </button>
 
-<button class="connect" onclick="testTurbo_8841()">
+<button class="yellow"
+        onclick="testTurbo()">
 TEST TURBO → 8841
 </button>
 
-<pre id="log"></pre>
+<button onclick="readAll()">
+📖 READ ALL CHARACTERISTICS
+</button>
+
+<button class="red"
+        onclick="clearLog()">
+XÓA LOG
+</button>
+</div>
+
+<div id="log" class="log"></div>
+
+</div>
 
 <script>
 
-/* =====================================================
-   UUID CỦA PIVA B3 PRO
-===================================================== */
+/* =========================================================
+   PIVA B3 PRO DEBUG V6
+   WRITE COMMANDS → 8841
+   NOTIFY → 1E4D
+   ========================================================= */
 
 const SERVICE_UUID =
-    '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+'49535343-fe7d-4ae5-8fa9-9fafd205e455';
 
-const WRITE_6DAA =
-    '49535343-6daa-4d02-abf6-19569aca69fe';
+const WRITE_6DAA_UUID =
+'49535343-6daa-4d02-abf6-19569aca69fe';
 
-const WRITE_8841 =
-    '49535343-8841-43f4-a8d4-ecbe34729bb3';
+const WRITE_8841_UUID =
+'49535343-8841-43f4-a8d4-ecbe34729bb3';
 
-/*
-   UUID 1E4D THỰC TẾ CỦA B3 PRO
-*/
-const NOTIFY_1E4D =
-    '49535343-1e4d-4bd9-ba61-23c647249616';
+const NOTIFY_ACA3_UUID =
+'49535343-aca3-481c-91ec-d85e28a60318';
 
+const NOTIFY_1E4D_UUID =
+'49535343-1e4d-4bd9-ba61-23c647249616';
 
-/* =====================================================
-   BIẾN
-===================================================== */
 
 let bleDevice = null;
-let gattServer = null;
-let service = null;
+let bleServer = null;
+let bleService = null;
 
-let write6DAAChar = null;
+let writeChar = null;
 let write8841Char = null;
+
+let notifyChar = null;
 let notify1E4DChar = null;
 
+let connected = false;
 
-/* =====================================================
+
+/* =========================================================
    LOG
-===================================================== */
+   ========================================================= */
 
-function log(text) {
+function timeNow(){
+    return new Date().toLocaleTimeString('vi-VN',{
+        hour12:false
+    });
+}
 
-    const box = document.getElementById('log');
-
-    const time =
-        new Date().toLocaleTimeString();
+function log(msg){
+    const box=document.getElementById('log');
 
     box.textContent +=
-        '[' + time + '] ' + text + '\n';
+        `[${timeNow()}] ${msg}\n`;
 
-    box.scrollTop =
-        box.scrollHeight;
+    box.scrollTop=box.scrollHeight;
+}
 
-    console.log(text);
+function clearLog(){
+    document.getElementById('log').textContent='';
+    log('LOG CLEARED');
 }
 
 
-/* =====================================================
+/* =========================================================
    HEX
-===================================================== */
+   ========================================================= */
 
-function hex(data) {
+function hex(data){
 
     return Array.from(data)
-        .map(
-            b =>
-                b.toString(16)
-                 .padStart(2, '0')
-                 .toUpperCase()
-        )
+        .map(x=>x.toString(16)
+        .padStart(2,'0')
+        .toUpperCase())
         .join(' ');
 }
 
 
-/* =====================================================
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setStatus(ok){
+
+    connected=ok;
+
+    const s=document.getElementById('status');
+    const b=document.getElementById('connectBtn');
+
+    if(ok){
+
+        s.textContent='🟢 B3 PRO ĐÃ KẾT NỐI';
+        s.style.background='#063d24';
+
+        b.textContent='🔴 NGẮT KẾT NỐI';
+        b.style.background='#9e1b32';
+
+    }else{
+
+        s.textContent='🔴 CHƯA KẾT NỐI';
+        s.style.background='#222';
+
+        b.textContent='🔵 KẾT NỐI B3 PRO';
+        b.style.background='#006cff';
+    }
+}
+
+
+/* =========================================================
+   PROPERTIES
+   ========================================================= */
+
+function properties(p){
+
+    const a=[];
+
+    if(p.read) a.push('READ');
+    if(p.write) a.push('WRITE');
+    if(p.writeWithoutResponse)
+        a.push('WRITE_NO_RESPONSE');
+
+    if(p.notify) a.push('NOTIFY');
+    if(p.indicate) a.push('INDICATE');
+
+    return a.join(', ');
+}
+
+
+/* =========================================================
    CONNECT
-===================================================== */
+   ========================================================= */
 
-async function connectBLE() {
+async function toggleConnection(){
 
-    try {
+    if(connected){
 
-        log('');
+        disconnect();
+        return;
+    }
+
+    await connect();
+}
+
+
+async function connect(){
+
+    if(!navigator.bluetooth){
+
+        log('ERROR: Web Bluetooth không được hỗ trợ');
+        alert(
+          'Trình duyệt này không hỗ trợ Web Bluetooth.'
+        );
+        return;
+    }
+
+    try{
+
         log('==============================');
-        log('REQUESTING BLUETOOTH DEVICE');
-        log('==============================');
+        log('BẮT ĐẦU KẾT NỐI');
 
         bleDevice =
             await navigator.bluetooth.requestDevice({
 
-                filters: [
-                    { namePrefix: 'B3PRO' },
-                    { namePrefix: 'B3' },
-                    { namePrefix: 'PIVA' }
-                ],
+            filters:[
+                {name:'B3PRO'},
+                {namePrefix:'B3'},
+                {namePrefix:'PIVA'}
+            ],
 
-                optionalServices: [
-                    SERVICE_UUID
-                ]
-            });
+            optionalServices:[
+                SERVICE_UUID
+            ]
 
+        });
 
-        log(
-            'DEVICE = ' +
-            (bleDevice.name || '(unknown)')
-        );
-
+        log('DEVICE = ' +
+            (bleDevice.name || 'UNKNOWN'));
 
         bleDevice.addEventListener(
             'gattserverdisconnected',
-            function() {
-                log('BLE DISCONNECTED');
-            }
+            disconnected
         );
 
-
-        gattServer =
+        bleServer =
             await bleDevice.gatt.connect();
-
 
         log('BLE CONNECTED');
 
+        bleService =
+            await bleServer.getPrimaryService(
+                SERVICE_UUID
+            );
 
-        await scanGatt();
+        log('PRIMARY SERVICE = ' +
+            bleService.uuid);
 
+        await scanCharacteristics();
 
-    } catch (error) {
+        await setupNotify();
 
-        log(
-            'CONNECT ERROR = ' +
-            error
-        );
+        connected=true;
+
+        setStatus(true);
+
+        log('==============================');
+        log('GATT READY');
+        log('WRITE CHANNEL = 8841');
+        log('NOTIFY CHANNEL = 1E4D');
+        log('==============================');
+
+    }catch(e){
+
+        log('CONNECT ERROR | ' +
+            (e.message || e));
+
+        setStatus(false);
     }
 }
 
 
-/* =====================================================
-   GATT SCAN
-===================================================== */
+/* =========================================================
+   SCAN GATT
+   ========================================================= */
 
-async function scanGatt() {
-
-    write6DAAChar = null;
-    write8841Char = null;
-    notify1E4DChar = null;
-
-
-    service =
-        await gattServer
-            .getPrimaryService(
-                SERVICE_UUID
-            );
-
-
-    log(
-        'PRIMARY SERVICE = ' +
-        service.uuid
-    );
-
-
-    const characteristics =
-        await service.getCharacteristics();
-
+async function scanCharacteristics(){
 
     log('');
     log('GATT SCAN:');
 
+    const chars =
+        await bleService.getCharacteristics();
 
-    for (
-        const c of characteristics
-    ) {
+    for(const c of chars){
 
-        const uuid =
-            c.uuid.toLowerCase();
-
-
-        let props = [];
-
-
-        if (c.properties.read)
-            props.push('READ');
-
-
-        if (c.properties.write)
-            props.push('WRITE');
-
-
-        if (c.properties.writeWithoutResponse)
-            props.push('WRITE_NO_RESPONSE');
-
-
-        if (c.properties.notify)
-            props.push('NOTIFY');
-
+        const id=c.uuid.toLowerCase();
 
         log(
-            'CHAR ' +
-            c.uuid +
-            ' | ' +
-            props.join(', ')
+          `CHAR ${c.uuid} | ${properties(c.properties)}`
         );
 
+        if(id===WRITE_8841_UUID){
 
-        /* ==============================
-           6DAA
-        ============================== */
-
-        if (
-            uuid === WRITE_6DAA
-        ) {
-
-            write6DAAChar = c;
+            write8841Char=c;
 
             log(
-                '>>> WRITE 6DAA FOUND'
+              '>>> WRITE 8841 FOUND'
+            );
+
+            log(
+              '>>> 8841 WRITE = ' +
+              c.properties.write
+            );
+
+            log(
+              '>>> 8841 WRITE_NO_RESPONSE = ' +
+              c.properties.writeWithoutResponse
             );
         }
 
+        if(id===WRITE_6DAA_UUID){
 
-        /* ==============================
-           8841
-        ============================== */
-
-        if (
-            uuid === WRITE_8841
-        ) {
-
-            write8841Char = c;
+            writeChar=c;
 
             log(
-                '>>> WRITE 8841 FOUND = ' +
-                c.uuid
-            );
-
-            log(
-                '>>> 8841 WRITE = ' +
-                c.properties.write
-            );
-
-            log(
-                '>>> 8841 WRITE_NO_RESPONSE = ' +
-                c.properties.writeWithoutResponse
+              '>>> WRITE 6DAA FOUND'
             );
         }
 
+        if(id===NOTIFY_1E4D_UUID){
 
-        /* ==============================
-           1E4D
-        ============================== */
-
-        if (
-            uuid === NOTIFY_1E4D
-        ) {
-
-            notify1E4DChar = c;
+            notify1E4DChar=c;
 
             log(
-                '>>> NOTIFY 1E4D FOUND = ' +
-                c.uuid
+              '>>> NOTIFY 1E4D FOUND'
             );
+        }
 
+        if(id===NOTIFY_ACA3_UUID){
 
-            if (
-                c.properties.notify
-            ) {
+            notifyChar=c;
 
-                try {
-
-                    await c.startNotifications();
-
-
-                    c.addEventListener(
-                        'characteristicvaluechanged',
-                        onNotify1E4D
-                    );
-
-
-                    log(
-                        '>>> 1E4D NOTIFICATIONS STARTED'
-                    );
-
-
-                } catch (error) {
-
-                    log(
-                        'NOTIFY ERROR = ' +
-                        error
-                    );
-                }
-            }
+            log(
+              '>>> NOTIFY ACA3 FOUND'
+            );
         }
     }
 
+    if(!write8841Char){
 
-    log('');
-    log('==============================');
+        log('!!! KHÔNG TÌM THẤY WRITE 8841');
 
+    }else{
 
-    if (write8841Char) {
-
-        log(
-            '=== WRITE 8841 READY ==='
-        );
-
-    } else {
-
-        log(
-            '!!! KHONG TIM THAY WRITE 8841'
-        );
+        log('8841 READY');
     }
-
-
-    if (notify1E4DChar) {
-
-        log(
-            '=== NOTIFY 1E4D READY ==='
-        );
-
-    } else {
-
-        log(
-            '!!! KHONG TIM THAY NOTIFY 1E4D'
-        );
-    }
-
-
-    log('==============================');
 }
 
 
-/* =====================================================
-   NHẬN DỮ LIỆU 1E4D
-===================================================== */
+/* =========================================================
+   NOTIFY
+   ========================================================= */
 
-function onNotify1E4D(event) {
+async function setupNotify(){
 
-    const value =
+    /*
+       Ưu tiên 1E4D vì đây là channel
+       đang trả packet telemetry trong test.
+    */
+
+    if(notify1E4DChar){
+
+        try{
+
+            await notify1E4DChar.startNotifications();
+
+            notify1E4DChar.addEventListener(
+                'characteristicvaluechanged',
+                handleNotify
+            );
+
+            log('NOTIFY 1E4D STARTED');
+
+        }catch(e){
+
+            log(
+              'NOTIFY 1E4D ERROR | ' +
+              (e.message || e)
+            );
+        }
+    }
+
+
+    /*
+       ACA3 cũng được thử nếu có notify.
+    */
+
+    if(notifyChar &&
+       notifyChar !== notify1E4DChar){
+
+        try{
+
+            await notifyChar.startNotifications();
+
+            notifyChar.addEventListener(
+                'characteristicvaluechanged',
+                handleNotifyACA3
+            );
+
+            log('NOTIFY ACA3 STARTED');
+
+        }catch(e){
+
+            log(
+              'NOTIFY ACA3 ERROR | ' +
+              (e.message || e)
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   RECEIVE 1E4D
+   ========================================================= */
+
+function handleNotify(event){
+
+    const value=event.target.value;
+
+    const data=
         new Uint8Array(
-            event.target.value.buffer
+            value.buffer,
+            value.byteOffset,
+            value.byteLength
         );
 
-
     log(
-        'RX 1E4D: ' +
-        hex(value)
+      'RX 1E4D: ' +
+      hex(data)
     );
 }
 
 
-/* =====================================================
-   GỬI QUA 8841
-===================================================== */
+/* =========================================================
+   RECEIVE ACA3
+   ========================================================= */
 
-async function send8841(bytes) {
+function handleNotifyACA3(event){
 
-    if (!write8841Char) {
+    const value=event.target.value;
+
+    const data=
+        new Uint8Array(
+            value.buffer,
+            value.byteOffset,
+            value.byteLength
+        );
+
+    log(
+      'RX ACA3: ' +
+      hex(data)
+    );
+}
+
+
+/* =========================================================
+   WRITE 8841
+   ========================================================= */
+
+async function send(bytes){
+
+    if(!connected){
+
+        log('TX ERROR | CHƯA KẾT NỐI');
+        return false;
+    }
+
+    if(!write8841Char){
+
+        log('8841 chưa có, đang tìm lại...');
+
+        await scanCharacteristics();
+    }
+
+    if(!write8841Char){
 
         log(
-            '!!! WRITE 8841 CHUA SAN SANG'
+          'TX ERROR | KHÔNG CÓ WRITE 8841'
         );
 
         return false;
     }
 
+    try{
 
-    const data =
-        new Uint8Array(bytes);
+        log(
+          'TX -> 8841 | ' +
+          hex(bytes)
+        );
 
+        if(
+          write8841Char.properties
+            .writeWithoutResponse
+        ){
 
-    log('');
-    log(
-        'TX -> 8841 | ' +
-        hex(data)
-    );
-
-
-    try {
-
-        if (
-            write8841Char
-                .properties
-                .writeWithoutResponse
-        ) {
+            log(
+              'TX METHOD = WRITE WITHOUT RESPONSE'
+            );
 
             await write8841Char
                 .writeValueWithoutResponse(
-                    data
+                    new Uint8Array(bytes)
                 );
 
+        }else if(
+          write8841Char.properties.write
+        ){
 
             log(
-                'TX METHOD = WRITE WITHOUT RESPONSE'
+              'TX METHOD = WRITE'
             );
-
-
-        } else if (
-            write8841Char
-                .properties
-                .write
-        ) {
 
             await write8841Char
                 .writeValue(
-                    data
+                    new Uint8Array(bytes)
                 );
 
+        }else{
 
-            log(
-                'TX METHOD = WRITE'
+            throw new Error(
+              '8841 không có quyền WRITE'
             );
-
-
-        } else {
-
-            log(
-                '!!! 8841 KHONG CO QUYEN WRITE'
-            );
-
-            return false;
         }
-
 
         log('TX OK');
 
         return true;
 
-
-    } catch (error) {
+    }catch(e){
 
         log(
-            'TX ERROR = ' +
-            error
+          'TX ERROR 8841 | ' +
+          (e.message || e)
         );
 
         return false;
@@ -519,60 +705,178 @@ async function send8841(bytes) {
 }
 
 
-/* =====================================================
-   TEST L1
-===================================================== */
+/* =========================================================
+   MODE
+   ========================================================= */
 
-async function testL1_8841() {
+async function setMode(level){
+
+    log('');
+    log(
+      `=== MODE L${level} ===`
+    );
+
+    await send([
+        0xA5,
+        0x02,
+        level,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   SMART
+   ========================================================= */
+
+async function toggleSmart(enable){
+
+    log('');
+    log(
+      `=== SMART ${enable?'ON':'OFF'} ===`
+    );
+
+    await send([
+        0xA5,
+        0x06,
+        enable ? 0x01 : 0x00,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   TURBO
+   ========================================================= */
+
+async function toggleTurbo(enable){
+
+    log('');
+    log(
+      `=== TURBO ${enable?'ON':'OFF'} ===`
+    );
+
+    await send([
+        0xA5,
+        0x03,
+        enable ? 0x01 : 0x00,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   FAN
+   ========================================================= */
+
+async function setFan(percent){
+
+    log('');
+    log(
+      `=== FAN ${percent}% ===`
+    );
+
+    await send([
+        0xA5,
+        0x04,
+        percent,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   LED
+   ========================================================= */
+
+async function setLed(mode){
+
+    log('');
+    log(
+      `=== LED MODE ${mode} ===`
+    );
+
+    await send([
+        0xA5,
+        0x05,
+        mode,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   BRIGHTNESS
+   ========================================================= */
+
+async function setBrightness(value){
+
+    value=parseInt(value);
+
+    log('');
+    log(
+      `=== BRIGHTNESS ${value}% ===`
+    );
+
+    await send([
+        0xA5,
+        0x08,
+        value,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   LED SPEED
+   ========================================================= */
+
+async function setLedSpeed(value){
+
+    value=parseInt(value);
+
+    log('');
+    log(
+      `=== LED SPEED ${value}% ===`
+    );
+
+    await send([
+        0xA5,
+        0x09,
+        value,
+        0x5A
+    ]);
+}
+
+
+/* =========================================================
+   TEST BUTTONS
+   ========================================================= */
+
+async function testL1(){
 
     log('');
     log('==============================');
     log('TEST L1 -> 8841');
     log('==============================');
 
-
-    const command = [
+    await send([
         0xA5,
         0x02,
         0x01,
         0x5A
-    ];
-
-
-    const result =
-        await send8841(command);
-
-
-    if (result) {
-
-        log(
-            '>>> L1 COMMAND SENT'
-        );
-
-        log(
-            '>>> WATCH B3 PRO RESPONSE'
-        );
-
-    } else {
-
-        log(
-            '>>> L1 SEND FAILED'
-        );
-    }
+    ]);
 }
 
 
-/* =====================================================
-   TEST L2
-===================================================== */
-
-async function testL2_8841() {
+async function testL2(){
 
     log('');
+    log('==============================');
     log('TEST L2 -> 8841');
+    log('==============================');
 
-
-    await send8841([
+    await send([
         0xA5,
         0x02,
         0x02,
@@ -581,17 +885,14 @@ async function testL2_8841() {
 }
 
 
-/* =====================================================
-   TEST L3
-===================================================== */
-
-async function testL3_8841() {
+async function testL3(){
 
     log('');
+    log('==============================');
     log('TEST L3 -> 8841');
+    log('==============================');
 
-
-    await send8841([
+    await send([
         0xA5,
         0x02,
         0x03,
@@ -600,17 +901,14 @@ async function testL3_8841() {
 }
 
 
-/* =====================================================
-   TEST TURBO
-===================================================== */
-
-async function testTurbo_8841() {
+async function testTurbo(){
 
     log('');
+    log('==============================');
     log('TEST TURBO -> 8841');
+    log('==============================');
 
-
-    await send8841([
+    await send([
         0xA5,
         0x03,
         0x01,
@@ -619,40 +917,154 @@ async function testTurbo_8841() {
 }
 
 
-/* =====================================================
-   KHỞI ĐỘNG
-===================================================== */
+/* =========================================================
+   READ ALL
+   ========================================================= */
 
-window.addEventListener(
-    'load',
-    function() {
+async function readAll(){
+
+    if(!connected){
+
+        log('READ ERROR | CHƯA KẾT NỐI');
+        return;
+    }
+
+    log('');
+    log('==============================');
+    log('READ ALL START');
+    log('==============================');
+
+    try{
+
+        const services =
+            await bleServer.getPrimaryServices();
+
+        for(const service of services){
+
+            log(
+              'SERVICE ' +
+              service.uuid
+            );
+
+            const chars =
+                await service.getCharacteristics();
+
+            for(const c of chars){
+
+                if(!c.properties.read)
+                    continue;
+
+                try{
+
+                    const value=
+                        await c.readValue();
+
+                    const data=
+                        new Uint8Array(
+                            value.buffer,
+                            value.byteOffset,
+                            value.byteLength
+                        );
+
+                    log(
+                      `READ <- ${c.uuid} | ${hex(data)}`
+                    );
+
+                }catch(e){
+
+                    log(
+                      `READ ERROR ${c.uuid} | ` +
+                      (e.message || e)
+                    );
+                }
+            }
+        }
+
+    }catch(e){
 
         log(
-            'PIVA B3 PRO DEBUG V5 READY'
-        );
-
-        log(
-            'SERVICE = ' +
-            SERVICE_UUID
-        );
-
-        log(
-            'WRITE 8841 = ' +
-            WRITE_8841
-        );
-
-        log(
-            'NOTIFY 1E4D = ' +
-            NOTIFY_1E4D
-        );
-
-        log('');
-
-        log(
-            'CHUA GUI LENH NAO CHO B3 PRO'
+          'READ ALL ERROR | ' +
+          (e.message || e)
         );
     }
+
+    log('READ ALL END');
+}
+
+
+/* =========================================================
+   DISCONNECT
+   ========================================================= */
+
+function disconnect(){
+
+    try{
+
+        if(
+          bleDevice &&
+          bleDevice.gatt &&
+          bleDevice.gatt.connected
+        ){
+
+            bleDevice.gatt.disconnect();
+        }
+
+    }catch(e){}
+
+    cleanup();
+
+    log('BLE DISCONNECTED');
+}
+
+
+function disconnected(){
+
+    cleanup();
+
+    log('BLE DISCONNECTED');
+
+    setStatus(false);
+}
+
+
+function cleanup(){
+
+    connected=false;
+
+    bleServer=null;
+    bleService=null;
+
+    writeChar=null;
+    write8841Char=null;
+
+    notifyChar=null;
+    notify1E4DChar=null;
+
+    setStatus(false);
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+log('PIVA B3 PRO DEBUG V6 READY');
+log(
+  'SERVICE = ' +
+  SERVICE_UUID
 );
+
+log(
+  'WRITE 8841 = ' +
+  WRITE_8841_UUID
+);
+
+log(
+  'NOTIFY 1E4D = ' +
+  NOTIFY_1E4D_UUID
+);
+
+log('CHƯA GỬI LỆNH TỰ ĐỘNG');
 
 </script>
 
