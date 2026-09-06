@@ -58,6 +58,52 @@
         input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
         input[type="color"] { border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; background: transparent; }
 
+        /* THANH TRƯỢT DỌC HẸN GIỜ */
+        .timer-vslider-container { display: flex; justify-content: space-around; align-items: center; height: 160px; margin: 15px 0 10px 0; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; }
+        .vslider-group { display: flex; flex-direction: column; align-items: center; height: 100%; width: 30%; }
+        .vslider-label { font-size: 11px; font-weight: bold; color: var(--subtext); margin-bottom: 6px; }
+        .vslider-val { font-size: 14px; font-weight: bold; color: var(--accent); margin-top: 6px; }
+        .vslider-wrapper { height: 90px; display: flex; align-items: center; justify-content: center; }
+        input[type="range"].vslider {
+            -webkit-appearance: none;
+            width: 90px;
+            height: 6px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+            outline: none;
+            transform: rotate(-90deg);
+            cursor: pointer;
+        }
+        input[type="range"].vslider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* THANH TRƯỢT LED HORIZONTAL */
+        .slider-row { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+        .slider-title-val { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; }
+        input[type="range"].hslider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"].hslider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            cursor: pointer;
+        }
+
         .grid-led { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
         .btn-led { padding: 10px 8px; font-size: 11px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; }
         .btn-led.active { border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(0, 242, 254, 0.1); }
@@ -103,7 +149,7 @@
         </div>
     </div>
 
-    <!-- 3. CHẾ ĐỘ ÉP XUNG & CHỈNH 5 NẤC TỐC ĐỘ QUẠT -->
+    <!-- 3. CHẾ ĐỘ ÉP XUNG & CHỈNH NẤC TỐC ĐỘ QUẠT -->
     <div class="section-box">
         <div class="section-title">Chế độ ép xung (Turbo Overclock)</div>
         <div class="toggle-row">
@@ -150,14 +196,36 @@
     <div class="section-box">
         <div class="section-title">
             <span>⏱️ Hẹn Giờ Tắt Sò Tự Động</span>
-            <span id="timerDisplay" style="color: var(--accent); font-size: 12px; font-weight: bold;">Chưa hẹn giờ</span>
+            <span id="timerDisplay" style="color: var(--accent); font-size: 12px; font-weight: bold;">CHƯA HẸN GIỜ</span>
         </div>
-        <div class="btn-group" style="margin-top:0;">
-            <button class="btn-opt" id="t15" onclick="setTimer(15, 't15')">15p</button>
-            <button class="btn-opt" id="t30" onclick="setTimer(30, 't30')">30p</button>
-            <button class="btn-opt" id="t45" onclick="setTimer(45, 't45')">45p</button>
-            <button class="btn-opt" id="t60" onclick="setTimer(60, 't60')">60p</button>
-            <button class="btn-opt" id="tOff" onclick="setTimer(0, 'tOff')">Tắt giờ</button>
+        
+        <div class="timer-vslider-container">
+            <div class="vslider-group">
+                <span class="vslider-label">GIỜ</span>
+                <div class="vslider-wrapper">
+                    <input type="range" class="vslider" id="sliderHour" min="0" max="23" value="0" oninput="updateSliderLabels()">
+                </div>
+                <span class="vslider-val" id="valHour">00h</span>
+            </div>
+            <div class="vslider-group">
+                <span class="vslider-label">PHÚT</span>
+                <div class="vslider-wrapper">
+                    <input type="range" class="vslider" id="sliderMin" min="0" max="59" value="30" oninput="updateSliderLabels()">
+                </div>
+                <span class="vslider-val" id="valMin">30p</span>
+            </div>
+            <div class="vslider-group">
+                <span class="vslider-label">GIÂY</span>
+                <div class="vslider-wrapper">
+                    <input type="range" class="vslider" id="sliderSec" min="0" max="59" value="0" oninput="updateSliderLabels()">
+                </div>
+                <span class="vslider-val" id="valSec">00s</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-opt" style="background: var(--accent); color: #000; font-weight: bold;" onclick="startCustomTimer()">Kích Hoạt Hẹn Giờ</button>
+            <button class="btn-opt" onclick="cancelTimer()">Hủy Hẹn Giờ</button>
         </div>
     </div>
 
@@ -167,6 +235,7 @@
             <span>🎨 Bộ 10 Chế Độ LED Chuyên Sâu</span>
             <input type="color" id="customColor" value="#00f2fe" onchange="setCustomLedColor(this.value)">
         </div>
+        
         <div class="grid-led">
             <button class="btn-led active" onclick="setLedMode(1, this)">🌈 Rainbow Mode</button>
             <button class="btn-led" onclick="setLedMode(2, this)">🫁 Breathing Glow</button>
@@ -178,6 +247,24 @@
             <button class="btn-led" onclick="setLedMode(8, this)">🟢 Static Green Light</button>
             <button class="btn-led" onclick="setLedMode(9, this)">⚡ Flash Strobe</button>
             <button class="btn-led" onclick="setLedMode(0, this)">🚫 Tắt Đèn LED</button>
+        </div>
+
+        <div style="margin-top: 14px; border-top: 1px solid var(--card-border); padding-top: 10px;">
+            <div class="slider-row">
+                <div class="slider-title-val">
+                    <span>💡 Độ sáng LED</span>
+                    <span id="valBrightness" style="color: var(--accent);">100%</span>
+                </div>
+                <input type="range" class="hslider" id="sliderBrightness" min="0" max="100" value="100" oninput="setLedBrightness(this.value)">
+            </div>
+
+            <div class="slider-row" style="margin-top: 12px;">
+                <div class="slider-title-val">
+                    <span>🔄 Tốc độ xoay LED</span>
+                    <span id="valSpeed" style="color: var(--accent);">50%</span>
+                </div>
+                <input type="range" class="hslider" id="sliderSpeed" min="1" max="100" value="50" oninput="setLedSpeed(this.value)">
+            </div>
         </div>
     </div>
 
@@ -249,7 +336,6 @@
             sendHexBytes([0xA5, 0x03, enable ? 0x01 : 0x00, 0x5A]);
         }
 
-        // ĐIỀU CHỈNH 5 NẤC TỐC ĐỘ QUẠT
         function setFanSpeed(val, btnId) {
             document.querySelectorAll('#fan20, #fan40, #fan60, #fan80, #fan100').forEach(b => b.classList.remove('active'));
             if(btnId) document.getElementById(btnId).classList.add('active');
@@ -269,34 +355,62 @@
             sendHexBytes([0xA5, 0x07, r, g, b, 0x5A]);
         }
 
-        function setTimer(minutes, btnId) {
-            clearInterval(timerInterval);
-            document.querySelectorAll('#t15, #t30, #t45, #t60, #tOff').forEach(b => b.classList.remove('active'));
-            if(btnId) document.getElementById(btnId).classList.add('active');
+        function setLedBrightness(val) {
+            document.getElementById('valBrightness').innerText = val + '%';
+            sendHexBytes([0xA5, 0x08, parseInt(val), 0x5A]);
+        }
 
+        function setLedSpeed(val) {
+            document.getElementById('valSpeed').innerText = val + '%';
+            sendHexBytes([0xA5, 0x09, parseInt(val), 0x5A]);
+        }
+
+        function updateSliderLabels() {
+            let h = document.getElementById('sliderHour').value;
+            let m = document.getElementById('sliderMin').value;
+            let s = document.getElementById('sliderSec').value;
+            document.getElementById('valHour').innerText = (h < 10 ? '0' + h : h) + 'h';
+            document.getElementById('valMin').innerText = (m < 10 ? '0' + m : m) + 'p';
+            document.getElementById('valSec').innerText = (s < 10 ? '0' + s : s) + 's';
+        }
+
+        function startCustomTimer() {
+            clearInterval(timerInterval);
+            let h = parseInt(document.getElementById('sliderHour').value);
+            let m = parseInt(document.getElementById('sliderMin').value);
+            let s = parseInt(document.getElementById('sliderSec').value);
+
+            let totalSeconds = (h * 3600) + (m * 60) + s;
             const display = document.getElementById('timerDisplay');
-            if (minutes === 0) {
-                timerTargetTime = null;
-                display.innerText = "Chưa hẹn giờ";
+
+            if (totalSeconds <= 0) {
+                alert("Vui lòng chọn thời gian hẹn giờ lớn hơn 0 giây.");
                 return;
             }
 
-            timerTargetTime = Date.now() + (minutes * 60 * 1000);
-            
+            timerTargetTime = Date.now() + (totalSeconds * 1000);
+
             timerInterval = setInterval(() => {
                 let remainingMs = timerTargetTime - Date.now();
                 if (remainingMs <= 0) {
                     clearInterval(timerInterval);
                     setMode(0);
-                    display.innerText = "Đã tắt theo hẹn giờ";
+                    display.innerText = "ĐÃ TẮT THEO HẸN GIỜ";
                     alert("⏱️ Hết giờ! Sò tản nhiệt đã tự động tắt.");
                 } else {
                     let totalSec = Math.ceil(remainingMs / 1000);
-                    let m = Math.floor(totalSec / 60);
-                    let s = totalSec % 60;
-                    display.innerText = `Còn lại: ${m}m ${s < 10 ? '0' : ''}${s}s`;
+                    let remH = Math.floor(totalSec / 3600);
+                    let remM = Math.floor((totalSec % 3600) / 60);
+                    let remS = totalSec % 60;
+                    display.innerText = `CÒN LẠI: ${remH < 10 ? '0' : ''}${remH}:${remM < 10 ? '0' : ''}${remM}:${remS < 10 ? '0' : ''}${remS}`;
                 }
             }, 1000);
+        }
+
+        function cancelTimer() {
+            clearInterval(timerInterval);
+            timerTargetTime = null;
+            document.getElementById('timerDisplay').innerText = "CHƯA HẸN GIỜ";
         }
 
         function togglePeltierSafety(enable) { peltierSafetyEnabled = enable; }
@@ -329,7 +443,6 @@
             }, 3000);
         }
 
-        // SW Cập nhật bản v4000
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
                 for (let registration of registrations) {
@@ -338,7 +451,7 @@
             });
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'piva-b3pro-v4000';
+                    const CACHE_NAME = 'piva-b3pro-v7000';
                     self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); self.skipWaiting(); });
                     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null)))); self.clients.claim(); });
                     self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))); });
