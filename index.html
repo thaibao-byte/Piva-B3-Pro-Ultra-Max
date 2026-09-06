@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>PIVA B3 Pro Controller</title>
+<title>PIVA B3 Pro Controller - Bypass Mode</title>
 
 <style>
 *{ box-sizing:border-box; }
@@ -41,21 +41,20 @@ input[type=range]{ width:100%; }
 
 <body>
 
-<h1>❄️ PIVA B3 Pro</h1>
+<h1>❄️ PIVA B3 Pro (Bypass)</h1>
 
 <div id="status" class="status">
   🔴 Chưa kết nối
 </div>
 
 <div class="grid">
-  <button class="primary" onclick="connectBLE()">🔵 Kết nối</button>
+  <button class="primary" onclick="connectBLE()">🔵 Kết nối & Bypass</button>
   <button class="danger" onclick="disconnectBLE()">Ngắt kết nối</button>
 </div>
 
 <div class="warn">
-  BLE channel:<br>
-  <b>6DAA → PIVA B3 Pro (Ghi lệnh Write)</b><br>
-  <b>1E4D → PIVA B3 Pro → Điện thoại (Đọc dữ liệu Notify)</b>
+  Chế độ Bypass Active:<br>
+  Tự động Handshake (Delay 500ms) + Dual Write (6DAA & 8841)
 </div>
 
 <!-- COOLING -->
@@ -97,68 +96,12 @@ input[type=range]{ width:100%; }
   <button onclick="setLED(1)">1</button>
   <button onclick="setLED(2)">2</button>
   <button onclick="setLED(3)">3</button>
-  <button onclick="setLED(4)">4</button>
-  <button onclick="setLED(5)">5</button>
-  <button onclick="setLED(6)">6</button>
-  <button onclick="setLED(7)">7</button>
-  <button onclick="setLED(8)">8</button>
-  <button onclick="setLED(9)">9</button>
-</div>
-
-<!-- RGB -->
-<h2>🎨 Màu LED</h2>
-<div class="grid">
-  <button onclick="setColor(255,0,0)">🔴 Đỏ</button>
-  <button onclick="setColor(0,255,0)">🟢 Xanh lá</button>
-  <button onclick="setColor(0,0,255)">🔵 Xanh dương</button>
-  <button onclick="setColor(255,255,255)">⚪ Trắng</button>
-  <button onclick="setColor(255,0,255)">🟣 Tím</button>
-  <button onclick="setColor(255,255,0)">🟡 Vàng</button>
-</div>
-
-<!-- BRIGHTNESS -->
-<h2>☀️ Brightness</h2>
-<div class="card">
-  <input id="brightness" type="range" min="0" max="100" value="50" oninput="brightnessValue.textContent=this.value">
-  <div class="value">Brightness: <b id="brightnessValue">50</b></div>
-  <button onclick="sendBrightness()">Gửi</button>
-</div>
-
-<!-- LED SPEED -->
-<h2>🌈 LED Speed</h2>
-<div class="card">
-  <input id="ledSpeed" type="range" min="0" max="100" value="50" oninput="speedValue.textContent=this.value">
-  <div class="value">Speed: <b id="speedValue">50</b></div>
-  <button onclick="sendSpeed()">Gửi</button>
-</div>
-
-<!-- TIMER -->
-<h2>⏱ Timer</h2>
-<div class="grid">
-  <button onclick="setTimer(0)">OFF</button>
-  <button onclick="setTimer(15)">15 phút</button>
-  <button onclick="setTimer(30)">30 phút</button>
-  <button onclick="setTimer(60)">60 phút</button>
-</div>
-
-<!-- TEST -->
-<h2>🧪 Test protocol</h2>
-<div class="warn">Test từng lệnh một. Gửi khung Byte Hex chuẩn đến cổng 6DAA.</div>
-<div class="grid">
-  <button onclick="testL1()">TEST L1</button>
-  <button onclick="testL2()">TEST L2</button>
-  <button onclick="testL3()">TEST L3</button>
-  <button onclick="testTurbo()">TEST Turbo</button>
-  <button onclick="testSmart()">TEST Smart</button>
-  <button onclick="testFan()">TEST Fan 40</button>
-  <button onclick="testLED()">TEST LED</button>
 </div>
 
 <!-- DEBUG -->
-<h2>🔧 Debug</h2>
+<h2>🔧 Debug & Manual Bypass</h2>
 <div class="grid">
   <button onclick="scanGatt()">GATT Scan</button>
-  <button onclick="readTX()">Read TX</button>
   <button onclick="clearLog()">Clear log</button>
 </div>
 
@@ -166,12 +109,12 @@ input[type=range]{ width:100%; }
 
 <script>
 /* =====================================================
-   UUID DEFINITION
+   UUID DEFINITIONS
 ===================================================== */
-const SERVICE_UUID = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
-const RX_UUID      = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-const TX_UUID      = "49535343-1e4d-4bd9-ba61-23c647249616";
-const CTRL_UUID    = "49535343-6daa-4d02-abf6-19569aca69fe"; // Cổng ghi lệnh chính của Piva B3 Pro
+const SERVICE_UUID  = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
+const RX_8841_UUID  = "49535343-8841-43f4-a8d4-ecbe34729bb3";
+const TX_1E4D_UUID  = "49535343-1e4d-4bd9-ba61-23c647249616";
+const CTRL_6DAA_UUID= "49535343-6daa-4d02-abf6-19569aca69fe";
 
 /* =====================================================
    RAW HEX COMMANDS (THU THẬP TỪ NRF CONNECT)
@@ -188,8 +131,9 @@ const RAW_COMMANDS = {
 let device = null;
 let server = null;
 let service = null;
-let writeChar = null;
-let notifyChar = null;
+let writeChar6DAA = null;
+let writeChar8841 = null;
+let notifyChar1E4D = null;
 let notifying = false;
 
 /* =====================================================
@@ -213,27 +157,21 @@ function hex(data){
 }
 
 /* =====================================================
-   CHECKSUM
+   CHECKSUM & FRAME CREATOR
 ===================================================== */
 function checksum(bytes){
   let sum = 0;
-  for(const b of bytes){
-    sum = (sum + (b & 0xFF)) & 0xFF;
-  }
+  for(const b of bytes){ sum = (sum + (b & 0xFF)) & 0xFF; }
   return sum;
 }
 
-/* =====================================================
-   PIVA FRAME CREATOR (GENERIC)
-===================================================== */
 function makeFrame(cmd, ...params){
   const body = [0x20, 0xA5, cmd & 0xFF, ...params.map(x => x & 0xFF)];
-  const crc = checksum(body);
-  return new Uint8Array([...body, crc]);
+  return new Uint8Array([...body, checksum(body)]);
 }
 
 /* =====================================================
-   CONNECT
+   CONNECT & BYPASS HANDSHAKE
 ===================================================== */
 async function connectBLE(){
   try{
@@ -242,56 +180,45 @@ async function connectBLE(){
       return;
     }
 
-    log("Mở Bluetooth device picker...");
+    log("Đang tìm kiếm thiết bị...");
     device = await navigator.bluetooth.requestDevice({
       acceptAllDevices: true,
       optionalServices: [SERVICE_UUID]
     });
 
-    log("DEVICE = " + (device.name || "Unknown"));
-    log("ID = " + device.id);
-
+    log("DEVICE: " + (device.name || "Unknown"));
     device.addEventListener("gattserverdisconnected", disconnected);
 
     log("Đang kết nối GATT...");
     server = await device.gatt.connect();
-    log("GATT CONNECTED");
-
     service = await server.getPrimaryService(SERVICE_UUID);
-    log("SERVICE OK");
+    log("GATT & SERVICE OK");
 
-    /* ==============================
-       WRITE CHARACTERISTIC (6DAA)
-    ============================== */
-    try{
-      writeChar = await service.getCharacteristic(CTRL_UUID);
-      log("WRITE CTRL (6DAA) OK");
-    }catch(e){
-      log("WRITE CTRL (6DAA) ERROR: " + e.message);
-    }
-
-    /* ==============================
-       TX CHARACTERISTIC (1E4D - NOTIFY)
-    ============================== */
-    try{
-      notifyChar = await service.getCharacteristic(TX_UUID);
-      log("TX NOTIFY (1E4D) OK");
-
-      if(!notifying){
-        await notifyChar.startNotifications();
-        notifyChar.addEventListener("characteristicvaluechanged", onNotify);
-        notifying = true;
-        log("NOTIFY ENABLED");
-      }
-    }catch(e){
-      log("TX 1E4D ERROR: " + e.message);
-    }
-
-    setStatus(true);
+    // Quét toàn bộ Characteristics
     await scanGatt();
 
+    // LẤY CỔNG NOTIFY 1E4D VÀ KÍCH HOẠT HANDSHAKE
+    if(notifyChar1E4D){
+      try{
+        if(!notifying){
+          await notifyChar1E4D.startNotifications();
+          notifyChar1E4D.addEventListener("characteristicvaluechanged", onNotify);
+          notifying = true;
+          log("🟢 NOTIFY (1E4D) MỞ THÀNH CÔNG");
+        }
+      }catch(e){
+        log("⚠️ Lỗi bật Notify 1E4D: " + e.message);
+      }
+    }
+
+    log("⏳ Đang chờ 500ms để bo mạch mở khóa nhận lệnh...");
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    setStatus(true);
+    log("🚀 ĐÃ SẴN SÀNG GỬI LỆNH BYPASS!");
+
   }catch(e){
-    log("CONNECT ERROR [" + e.name + "] " + e.message);
+    log("❌ CONNECT ERROR: " + e.message);
   }
 }
 
@@ -299,19 +226,16 @@ async function connectBLE(){
    DISCONNECT
 ===================================================== */
 function disconnectBLE(){
-  try{
-    if(device && device.gatt && device.gatt.connected){
-      device.gatt.disconnect();
-    }
-  }catch(e){
-    log("DISCONNECT ERROR: " + e.message);
+  if(device && device.gatt && device.gatt.connected){
+    device.gatt.disconnect();
   }
 }
 
 function disconnected(){
   log("BLE DISCONNECTED");
-  writeChar = null;
-  notifyChar = null;
+  writeChar6DAA = null;
+  writeChar8841 = null;
+  notifyChar1E4D = null;
   service = null;
   server = null;
   notifying = false;
@@ -322,54 +246,66 @@ function setStatus(connected){
   const box = document.getElementById("status");
   if(connected){
     box.className = "status ok";
-    box.textContent = "🟢 PIVA B3 Pro đã kết nối";
+    box.textContent = "🟢 PIVA B3 Pro đã kết nối (Bypass Active)";
   }else{
     box.className = "status";
     box.textContent = "🔴 Chưa kết nối";
   }
 }
 
-/* =====================================================
-   NOTIFY CALLBACK
-===================================================== */
 function onNotify(event){
-  const value = event.target.value;
-  const data = new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
-  log("RX ← " + hex(data));
+  const data = new Uint8Array(event.target.value.buffer);
+  log("RX (1E4D) ← " + hex(data));
 }
 
 /* =====================================================
-   SEND RAW BYTES TO 6DAA
+   BYPASS WRITE (GỬI ĐỒNG THỜI CẢ 6DAA VÀ 8841)
 ===================================================== */
-async function sendRaw(data){
-  if(!writeChar){
-    log("❌ Cổng Ghi (6DAA) chưa sẵn sàng");
-    return false;
-  }
-
+async function writeToChar(charObj, name, bytes){
+  if(!charObj) return false;
   try{
-    const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-    log("TX → " + hex(bytes));
-    await writeChar.writeValueWithoutResponse(bytes);
-    log("TX OK");
+    await charObj.writeValueWithoutResponse(bytes);
+    log(`TX → [${name}] WriteWithoutResponse OK: ${hex(bytes)}`);
     return true;
   }catch(e){
-    log("TX ERROR [" + e.name + "] " + e.message);
-    return false;
+    try{
+      await charObj.writeValue(bytes);
+      log(`TX → [${name}] WriteWithResponse OK: ${hex(bytes)}`);
+      return true;
+    }catch(err){
+      log(`❌ [${name}] Lỗi: ${err.message}`);
+      return false;
+    }
   }
 }
 
-/* =====================================================
-   SEND DYNAMIC COMMAND
-===================================================== */
+async function sendRaw(data){
+  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
+  let ok6DAA = false;
+  let ok8841 = false;
+
+  if(writeChar6DAA){
+    ok6DAA = await writeToChar(writeChar6DAA, "6DAA", bytes);
+  }
+  if(writeChar8841){
+    ok8841 = await writeToChar(writeChar8841, "8841", bytes);
+  }
+
+  if(!ok6DAA && !ok8841){
+    log("❌ Gửi lệnh thất bại trên cả 2 cổng.");
+    return false;
+  }
+  return true;
+}
+
 async function command(name, cmd, ...params){
   const frame = makeFrame(cmd, ...params);
-  log("COMMAND " + name + " = " + hex(frame));
+  log("COMMAND: " + name);
   return await sendRaw(frame);
 }
 
 /* =====================================================
-   COOLING CONTROL
+   FUNCTIONS
 ===================================================== */
 function setMode(level){
   if(level === 1) sendRaw(RAW_COMMANDS.L1);
@@ -377,112 +313,43 @@ function setMode(level){
   else if(level === 3) sendRaw(RAW_COMMANDS.L3);
 }
 
-function setTurbo(value){
-  command(value ? "TURBO ON" : "TURBO OFF", 0x03, value);
-}
-
-function setSmart(value){
-  command(value ? "SMART ON" : "SMART OFF", 0x06, value);
-}
-
-/* =====================================================
-   FAN / LED / OTHER CONTROLS
-===================================================== */
+function setTurbo(value){ command(value ? "TURBO ON" : "TURBO OFF", 0x03, value); }
+function setSmart(value){ command(value ? "SMART ON" : "SMART OFF", 0x06, value); }
 function sendFan(){
-  const value = Number(document.getElementById("fan").value);
-  command("FAN " + value, 0x04, value);
+  const val = Number(document.getElementById("fan").value);
+  command("FAN " + val, 0x04, val);
 }
-
-function setLED(mode){
-  command("LED " + mode, 0x05, mode);
-}
-
-function setColor(r,g,b){
-  command("RGB", 0x07, r, g, b);
-}
-
-function sendBrightness(){
-  const value = Number(document.getElementById("brightness").value);
-  command("BRIGHTNESS " + value, 0x08, value);
-}
-
-function sendSpeed(){
-  const value = Number(document.getElementById("ledSpeed").value);
-  command("LED SPEED " + value, 0x09, value);
-}
-
-function setTimer(minutes){
-  command("TIMER " + minutes, 0x0A, minutes);
-}
-
-/* =====================================================
-   TEST PROTOCOL
-===================================================== */
-function testL1(){ sendRaw(RAW_COMMANDS.L1); }
-function testL2(){ sendRaw(RAW_COMMANDS.L2); }
-function testL3(){ sendRaw(RAW_COMMANDS.L3); }
-function testTurbo(){ command("TEST TURBO", 0x03, 0x01); }
-function testSmart(){ command("TEST SMART", 0x06, 0x01); }
-function testFan(){ command("TEST FAN 40", 0x04, 40); }
-function testLED(){ command("TEST LED 1", 0x05, 1); }
+function setLED(mode){ command("LED " + mode, 0x05, mode); }
 
 /* =====================================================
    GATT SCAN
 ===================================================== */
 async function scanGatt(){
-  if(!service){
-    log("Không có service");
-    return;
-  }
+  if(!service) return;
   try{
     const chars = await service.getCharacteristics();
     log("===== GATT SCAN =====");
 
     for(const c of chars){
-      log(c.uuid + " | " + Array.from(c.properties).join(", "));
       const uuid = c.uuid.replace(/-/g,"").toLowerCase();
-
       if(uuid === "495353436daa4d02abf619569aca69fe"){
-        writeChar = c;
-        log(">>> FOUND WRITE CTRL 6DAA");
+        writeChar6DAA = c;
+        log("Found 6DAA (Write Target 1)");
       }
-
+      if(uuid === "49535343884143f4a8d4ecbe34729bb3"){
+        writeChar8841 = c;
+        log("Found 8841 (Write Target 2)");
+      }
       if(uuid === "495353431e4d4bd9ba6123c647249616"){
-        notifyChar = c;
-        log(">>> FOUND TX NOTIFY 1E4D");
+        notifyChar1E4D = c;
+        log("Found 1E4D (Notify Target)");
       }
     }
-    log("===== END GATT =====");
+    log("=====================");
   }catch(e){
-    log("GATT SCAN ERROR: " + e.message);
+    log("Scan error: " + e.message);
   }
 }
-
-/* =====================================================
-   READ TX
-===================================================== */
-async function readTX(){
-  if(!notifyChar){
-    log("TX 1E4D chưa có");
-    return;
-  }
-  try{
-    const value = await notifyChar.readValue();
-    const data = new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
-    log("READ ← " + hex(data));
-  }catch(e){
-    log("READ ERROR: " + e.message);
-  }
-}
-
-/* =====================================================
-   STARTUP
-===================================================== */
-log("PIVA B3 Pro Controller loaded");
-log("SERVICE = " + SERVICE_UUID);
-log("WRITE   = " + CTRL_UUID + " (6DAA)");
-log("NOTIFY  = " + TX_UUID + " (1E4D)");
-log("Sẵn sàng.");
 </script>
 </body>
 </html>
