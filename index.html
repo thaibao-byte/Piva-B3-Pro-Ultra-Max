@@ -85,11 +85,10 @@
 
   <div class="hero">
     <div class="fan-ring" id="fanRing"></div>
-    <!-- Ảnh quạt được cập nhật đường dẫn chính xác -->
-    <img class="fan-img" src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=300&auto=format&fit=crop" alt="Piva B3 Pro">
+    <img class="fan-img" src="https://img.lazcdn.com/g/p/b9c8b73fdbbc14fa35bfa3d8ef4927f1.jpg" alt="Piva B3 Pro">
   </div>
 
-  <!-- BẢNG THÔNG SỐ BAN ĐẦU ĐỂ TRỐNG (---) KHI CHƯA KẾT NỐI -->
+  <!-- BẢNG THÔNG SỐ -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt độ Sò</div>
@@ -117,7 +116,7 @@
     </div>
   </div>
 
-  <!-- CẤP ĐỘ LÀM LẠNH L1 - L2 - L3 -->
+  <!-- CẤP ĐỘ LÀM LẠNH -->
   <div class="section-title">Chế độ Làm Lạnh (Level)</div>
   <div class="panel-card">
     <div class="level-grid">
@@ -179,11 +178,11 @@
 
     <div class="slider-container">
       <span>Độ sáng LED:</span>
-      <input type="range" min="10" max="100" value="100" class="range-slider" onchange="adjustBrightness(this.value)">
+      <input type="range" min="10" max="100" value="100" class="range-slider" id="brightRange" onchange="adjustBrightness(this.value)">
     </div>
     <div class="slider-container">
       <span>Tốc độ LED:</span>
-      <input type="range" min="1" max="10" value="5" class="range-slider" onchange="adjustSpeed(this.value)">
+      <input type="range" min="1" max="10" value="5" class="range-slider" id="speedRange" onchange="adjustSpeed(this.value)">
     </div>
   </div>
 
@@ -194,7 +193,20 @@
     let isSmartMode = false;
     let isTurboMode = false;
 
+    // Kiểm tra và cảnh báo nếu chưa kết nối
+    function checkConnection() {
+      if (!writeChar) {
+        alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước khi thao tác!");
+        return false;
+      }
+      return true;
+    }
+
     async function connectBLE() {
+      if (!navigator.bluetooth) {
+        alert("Trình duyệt của bạn chưa hỗ trợ Bluetooth. Hãy dùng Chrome hoặc Edge!");
+        return;
+      }
       try {
         const device = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
@@ -208,15 +220,20 @@
         document.getElementById('status').classList.add('connected');
         document.getElementById('btnConnect').style.display = "none";
 
-        // Mặc định chọn L1 sau khi kết nối thành công
-        document.querySelector('.level-grid .btn-action').classList.add('active');
-        document.querySelector('.led-modes-10 .mode-btn').classList.add('active');
+        // Cập nhật trạng thái mặc định ban đầu
+        const defaultBtn = document.querySelector('.level-grid .btn-action');
+        if (defaultBtn) defaultBtn.classList.add('active');
+        
+        const defaultLed = document.querySelector('.led-modes-10 .mode-btn');
+        if (defaultLed) defaultLed.classList.add('active');
+
         document.getElementById('protocolVal').innerText = "PD 9V/3A";
         updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM");
 
         startSafetyMonitor();
       } catch (e) {
-        alert("Chưa kết nối thiết bị Bluetooth!");
+        console.log(e);
+        alert("Không thể kết nối với thiết bị Bluetooth!");
       }
     }
 
@@ -231,7 +248,7 @@
     }
 
     function setCoolingLevel(lvl, btn) {
-      if (!writeChar) { alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
+      if (!checkConnection()) return;
       
       if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
       if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
@@ -246,7 +263,10 @@
     }
 
     function toggleSmartMode(enable) {
-      if (!writeChar) { document.getElementById('smartToggle').checked = false; alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
+      if (!checkConnection()) { 
+        document.getElementById('smartToggle').checked = false; 
+        return; 
+      }
       isSmartMode = enable;
       if (enable) {
         if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
@@ -258,7 +278,10 @@
     }
 
     function toggleTurboMode(enable) {
-      if (!writeChar) { document.getElementById('turboToggle').checked = false; alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
+      if (!checkConnection()) { 
+        document.getElementById('turboToggle').checked = false; 
+        return; 
+      }
       isTurboMode = enable;
       if (enable) {
         if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
@@ -274,7 +297,7 @@
     }
 
     function adjustFanSpeed(val) {
-      if (writeChar) {
+      if (checkConnection()) {
         document.getElementById('rpmVal').innerText = val + " RPM";
         sendCmd(`FAN_SPEED_${val}`);
       }
@@ -316,23 +339,29 @@
     function customColorChange(hexColor) {
       document.getElementById('fanRing').style.borderTopColor = hexColor;
       document.getElementById('fanRing').style.filter = `drop-shadow(0 0 12px ${hexColor})`;
-      if (writeChar) {
-        const r = parseInt(hexColor.substr(1,2), 16);
-        const g = parseInt(hexColor.substr(3,2), 16);
-        const b = parseInt(hexColor.substr(5,2), 16);
+      if (checkConnection()) {
+        const cleanHex = hexColor.replace('#', '');
+        const r = parseInt(cleanHex.substring(0,2), 16);
+        const g = parseInt(cleanHex.substring(2,4), 16);
+        const b = parseInt(cleanHex.substring(4,6), 16);
         sendCmd(`RGB_${r}_${g}_${b}`);
       }
     }
 
     function setLEDMode(modeIndex, btnElement) {
-      if (!writeChar) { alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
+      if (!checkConnection()) return;
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
       btnElement.classList.add('active');
       sendCmd(`LED_MODE_${modeIndex}`);
     }
 
-    function adjustBrightness(val) { sendCmd(`LED_BRIGHT_${val}`); }
-    function adjustSpeed(val) { sendCmd(`LED_SPEED_${val}`); }
+    function adjustBrightness(val) { 
+      if (checkConnection()) sendCmd(`LED_BRIGHT_${val}`); 
+    }
+    
+    function adjustSpeed(val) { 
+      if (checkConnection()) sendCmd(`LED_SPEED_${val}`); 
+    }
   </script>
 </body>
 </html>
