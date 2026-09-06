@@ -1,452 +1,671 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>PIVA B3 Pro DEBUG V5</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin: 6px 0;
+        border: 0;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    #log {
+        margin-top: 15px;
+        padding: 12px;
+        height: 450px;
+        overflow-y: auto;
+        background: #000;
+        color: #00ff66;
+        border-radius: 10px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: monospace;
+        font-size: 13px;
+    }
+
+    .danger {
+        background: #ffcc00;
+        color: #000;
+    }
+
+    .normal {
+        background: #333;
+        color: white;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>PIVA B3 Pro DEBUG V5</h1>
+
+<button class="normal" onclick="connectBLE()">
+    🔵 KẾT NỐI B3 PRO
+</button>
+
+<button class="danger" onclick="testL1_8841()">
+    ⚡ TEST L1 → 8841
+</button>
+
+<button class="normal" onclick="testL2_8841()">
+    TEST L2 → 8841
+</button>
+
+<button class="normal" onclick="testL3_8841()">
+    TEST L3 → 8841
+</button>
+
+<button class="normal" onclick="testTurbo_8841()">
+    TEST TURBO → 8841
+</button>
+
+<pre id="log"></pre>
+
+
 <script>
+
+/* =========================================================
+   UUID
+========================================================= */
+
 const SERVICE_UUID =
-  '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+    '49535343-fe7d-4ae5-8fa9-9fafd205e455';
 
 const WRITE_6DAA =
-  '49535343-6daa-4d02-abf6-19569aca69fe';
+    '49535343-6daa-4d02-abf6-19569aca69fe';
 
 const WRITE_8841 =
-  '49535343-8841-43f4-a8d4-ecbe34729bb3';
+    '49535343-8841-43f4-a8d4-ecbe34729bb3';
 
 const NOTIFY_1E4D =
-  '49535343-1e4d-4ae5-8fa9-9fafd205e455';
+    '49535343-1e4d-4ae5-8fa9-9fafd205e455';
+
+
+/* =========================================================
+   GLOBALS
+========================================================= */
 
 let bleDevice = null;
 let gattServer = null;
 
-let writeChar = null;
+let service = null;
+
+let write6DAAChar = null;
 let write8841Char = null;
-let notifyChar = null;
+let notify1E4DChar = null;
 
 
-/* =========================
+/* =========================================================
    LOG
-========================= */
+========================================================= */
 
-function log(msg) {
-  const box = document.getElementById('log');
+function log(text) {
 
-  if (!box) {
-    console.log(msg);
-    return;
-  }
+    const box = document.getElementById('log');
 
-  box.textContent += msg + '\n';
-  box.scrollTop = box.scrollHeight;
+    const time =
+        new Date().toLocaleTimeString();
 
-  console.log(msg);
+    box.textContent +=
+        '[' + time + '] ' + text + '\n';
+
+    box.scrollTop =
+        box.scrollHeight;
+
+    console.log(text);
 }
 
 
-/* =========================
+/* =========================================================
    HEX
-========================= */
+========================================================= */
 
-function hex(bytes) {
-  return Array.from(bytes)
-    .map(x => x.toString(16).padStart(2, '0').toUpperCase())
-    .join(' ');
+function hex(data) {
+
+    return Array.from(data)
+        .map(
+            b =>
+                b.toString(16)
+                 .padStart(2, '0')
+                 .toUpperCase()
+        )
+        .join(' ');
 }
 
 
-/* =========================
+/* =========================================================
    CONNECT
-========================= */
+========================================================= */
 
 async function connectBLE() {
-  try {
-    log('REQUESTING DEVICE...');
 
-    bleDevice = await navigator.bluetooth.requestDevice({
-      filters: [
-        { namePrefix: 'B3PRO' },
-        { namePrefix: 'B3' },
-        { namePrefix: 'PIVA' }
-      ],
-      optionalServices: [SERVICE_UUID]
-    });
+    try {
 
-    log('DEVICE = ' + (bleDevice.name || '(unknown)'));
+        log('');
+        log('==============================');
+        log('REQUESTING BLUETOOTH DEVICE');
+        log('==============================');
 
-    gattServer = await bleDevice.gatt.connect();
+        bleDevice =
+            await navigator.bluetooth.requestDevice({
 
-    log('GATT CONNECTED');
+                filters: [
+                    { namePrefix: 'B3PRO' },
+                    { namePrefix: 'B3' },
+                    { namePrefix: 'PIVA' }
+                ],
 
-    await scanGatt();
+                optionalServices: [
+                    SERVICE_UUID
+                ]
+            });
 
-  } catch (err) {
-    log('CONNECT ERROR: ' + err);
-  }
+
+        log(
+            'DEVICE = ' +
+            (bleDevice.name || '(unknown)')
+        );
+
+
+        bleDevice.addEventListener(
+            'gattserverdisconnected',
+            () => {
+
+                log('BLE DISCONNECTED');
+
+            }
+        );
+
+
+        gattServer =
+            await bleDevice.gatt.connect();
+
+
+        log('BLE CONNECTED');
+
+
+        await scanGatt();
+
+
+    } catch (error) {
+
+        log(
+            'CONNECT ERROR = ' +
+            error
+        );
+
+    }
 }
 
 
-/* =========================
-   GATT SCAN
-========================= */
+/* =========================================================
+   SCAN GATT
+========================================================= */
 
 async function scanGatt() {
 
-  writeChar = null;
-  write8841Char = null;
-  notifyChar = null;
+    write6DAAChar = null;
+    write8841Char = null;
+    notify1E4DChar = null;
 
-  const service =
-    await gattServer.getPrimaryService(SERVICE_UUID);
 
-  log('PRIMARY SERVICE = ' + service.uuid);
+    service =
+        await gattServer
+            .getPrimaryService(
+                SERVICE_UUID
+            );
 
-  const characteristics =
-    await service.getCharacteristics();
-
-  log('GATT SCAN:');
-
-  for (const c of characteristics) {
-
-    const uuid = c.uuid.toLowerCase();
-
-    const props = [];
-
-    if (c.properties.read)
-      props.push('READ');
-
-    if (c.properties.write)
-      props.push('WRITE');
-
-    if (c.properties.writeWithoutResponse)
-      props.push('WRITE_NO_RESPONSE');
-
-    if (c.properties.notify)
-      props.push('NOTIFY');
 
     log(
-      c.uuid.substring(24).toUpperCase() +
-      ' | ' +
-      props.join(', ')
+        'PRIMARY SERVICE = ' +
+        service.uuid
     );
 
 
-    /*
-     * 6DAA
-     */
-    if (uuid === WRITE_6DAA) {
-
-      writeChar = c;
-
-      log(
-        '>>> WRITE 6DAA FOUND = ' +
-        c.uuid
-      );
-    }
+    const characteristics =
+        await service.getCharacteristics();
 
 
-    /*
-     * 8841
-     *
-     * ĐÂY LÀ KÊNH TEST CHÍNH
-     */
-    if (uuid === WRITE_8841) {
-
-      write8841Char = c;
-
-      log(
-        '>>> WRITE 8841 FOUND = ' +
-        c.uuid
-      );
-
-      log(
-        '>>> 8841 PROPERTIES = ' +
-        JSON.stringify(c.properties)
-      );
-    }
+    log('');
+    log('GATT SCAN:');
 
 
-    /*
-     * 1E4D
-     *
-     * Kênh nhận dữ liệu / notify
-     */
-    if (uuid === NOTIFY_1E4D) {
-
-      notifyChar = c;
-
-      log(
-        '>>> NOTIFY 1E4D FOUND = ' +
-        c.uuid
-      );
-
-      if (c.properties.notify) {
-
-        await c.startNotifications();
-
-        c.addEventListener(
-          'characteristicvaluechanged',
-          onNotify
-        );
-
-        log('>>> 1E4D NOTIFICATIONS STARTED');
-      }
-    }
-  }
-
-
-  if (!write8841Char) {
-
-    log(
-      '!!! KHÔNG TÌM THẤY WRITE 8841'
-    );
-
-  } else {
-
-    log(
-      '=== WRITE 8841 READY ==='
-    );
-  }
-}
-
-
-/* =========================
-   NOTIFY
-========================= */
-
-function onNotify(event) {
-
-  const value =
-    new Uint8Array(
-      event.target.value.buffer
-    );
-
-  log(
-    'RX 1E4D: ' +
-    hex(value)
-  );
-}
-
-
-/* =========================
-   WRITE 8841
-========================= */
-
-async function send8841(bytes) {
-
-  if (!write8841Char) {
-
-    log(
-      '!!! WRITE 8841 CHƯA SẴN SÀNG'
-    );
-
-    return false;
-  }
-
-
-  log(
-    'TX -> 8841 | ' +
-    hex(bytes)
-  );
-
-
-  try {
-
-    if (
-      write8841Char.properties
-        .writeWithoutResponse
+    for (
+        const c of characteristics
     ) {
 
-      await write8841Char
-        .writeValueWithoutResponse(
-          new Uint8Array(bytes)
+        const uuid =
+            c.uuid.toLowerCase();
+
+
+        let props = [];
+
+
+        if (c.properties.read)
+            props.push('READ');
+
+
+        if (c.properties.write)
+            props.push('WRITE');
+
+
+        if (c.properties.writeWithoutResponse)
+            props.push('WRITE_NO_RESPONSE');
+
+
+        if (c.properties.notify)
+            props.push('NOTIFY');
+
+
+        log(
+            'CHAR ' +
+            c.uuid +
+            ' | ' +
+            props.join(', ')
         );
 
-      log(
-        'TX METHOD = WRITE WITHOUT RESPONSE'
-      );
+
+        /* -----------------------------------------
+           6DAA
+        ----------------------------------------- */
+
+        if (
+            uuid ===
+            WRITE_6DAA
+        ) {
+
+            write6DAAChar = c;
+
+            log(
+                '>>> WRITE 6DAA FOUND'
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           8841
+        ----------------------------------------- */
+
+        if (
+            uuid ===
+            WRITE_8841
+        ) {
+
+            write8841Char = c;
+
+            log(
+                '>>> WRITE 8841 FOUND = ' +
+                c.uuid
+            );
+
+            log(
+                '>>> 8841 WRITE = ' +
+                c.properties.write
+            );
+
+            log(
+                '>>> 8841 WRITE_NO_RESPONSE = ' +
+                c.properties.writeWithoutResponse
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           1E4D
+        ----------------------------------------- */
+
+        if (
+            uuid ===
+            NOTIFY_1E4D
+        ) {
+
+            notify1E4DChar = c;
+
+            log(
+                '>>> NOTIFY 1E4D FOUND'
+            );
+
+
+            if (
+                c.properties.notify
+            ) {
+
+                try {
+
+                    await c.startNotifications();
+
+
+                    c.addEventListener(
+                        'characteristicvaluechanged',
+                        onNotify1E4D
+                    );
+
+
+                    log(
+                        '>>> 1E4D NOTIFICATIONS STARTED'
+                    );
+
+
+                } catch (error) {
+
+                    log(
+                        'NOTIFY ERROR = ' +
+                        error
+                    );
+
+                }
+            }
+        }
+    }
+
+
+    log('');
+    log('==============================');
+
+
+    if (write8841Char) {
+
+        log(
+            '=== WRITE 8841 READY ==='
+        );
 
     } else {
 
-      await write8841Char
-        .writeValue(
-          new Uint8Array(bytes)
+        log(
+            '!!! KHONG TIM THAY WRITE 8841'
         );
 
-      log(
-        'TX METHOD = WRITE'
-      );
     }
 
 
-    log('TX OK');
+    if (notify1E4DChar) {
 
-    return true;
+        log(
+            '=== NOTIFY 1E4D READY ==='
+        );
 
-  } catch (err) {
+    } else {
 
-    log(
-      'TX ERROR = ' + err
-    );
+        log(
+            '!!! KHONG TIM THAY NOTIFY 1E4D'
+        );
 
-    return false;
-  }
+    }
+
+
+    log('==============================');
 }
 
 
-/* =========================
+/* =========================================================
+   NOTIFY
+========================================================= */
+
+function onNotify1E4D(event) {
+
+    const value =
+        new Uint8Array(
+            event.target.value.buffer
+        );
+
+
+    log(
+        'RX 1E4D: ' +
+        hex(value)
+    );
+}
+
+
+/* =========================================================
+   SEND THROUGH 8841
+========================================================= */
+
+async function send8841(bytes) {
+
+    if (!write8841Char) {
+
+        log(
+            '!!! WRITE 8841 CHUA SAN SANG'
+        );
+
+        return false;
+    }
+
+
+    const data =
+        new Uint8Array(bytes);
+
+
+    log('');
+    log(
+        'TX -> 8841 | ' +
+        hex(data)
+    );
+
+
+    try {
+
+        if (
+            write8841Char
+                .properties
+                .writeWithoutResponse
+        ) {
+
+            await write8841Char
+                .writeValueWithoutResponse(
+                    data
+                );
+
+
+            log(
+                'TX METHOD = WRITE WITHOUT RESPONSE'
+            );
+
+
+        } else if (
+            write8841Char
+                .properties
+                .write
+        ) {
+
+            await write8841Char
+                .writeValue(
+                    data
+                );
+
+
+            log(
+                'TX METHOD = WRITE'
+            );
+
+
+        } else {
+
+            log(
+                '!!! 8841 KHONG CO QUYEN WRITE'
+            );
+
+            return false;
+        }
+
+
+        log('TX OK');
+
+        return true;
+
+
+    } catch (error) {
+
+        log(
+            'TX ERROR = ' +
+            error
+        );
+
+        return false;
+    }
+}
+
+
+/* =========================================================
    TEST L1
-========================= */
+========================================================= */
 
 async function testL1_8841() {
 
-  log('');
-  log('==============================');
-  log('TEST L1 -> WRITE 8841');
-  log('==============================');
+    log('');
+    log('==============================');
+    log('TEST L1 -> 8841');
+    log('==============================');
 
-  const command = [
-    0xA5,
-    0x02,
-    0x01,
-    0x5A
-  ];
 
-  const ok =
-    await send8841(command);
+    const command = [
+        0xA5,
+        0x02,
+        0x01,
+        0x5A
+    ];
 
-  if (ok) {
 
-    log(
-      'L1 COMMAND SENT'
-    );
+    const result =
+        await send8841(
+            command
+        );
 
-    log(
-      '>>> HÃY XEM PELTIER CÓ PHẢN ỨNG KHÔNG'
-    );
 
-  } else {
+    if (result) {
 
-    log(
-      'L1 COMMAND FAILED'
-    );
-  }
+        log(
+            '>>> L1 COMMAND SENT'
+        );
+
+        log(
+            '>>> WATCH DEVICE RESPONSE'
+        );
+
+    } else {
+
+        log(
+            '>>> L1 SEND FAILED'
+        );
+    }
 }
 
 
-/* =========================
+/* =========================================================
    TEST L2
-========================= */
+========================================================= */
 
 async function testL2_8841() {
 
-  const command = [
-    0xA5,
-    0x02,
-    0x02,
-    0x5A
-  ];
+    log('');
+    log('TEST L2 -> 8841');
 
-  await send8841(command);
+
+    await send8841([
+        0xA5,
+        0x02,
+        0x02,
+        0x5A
+    ]);
 }
 
 
-/* =========================
+/* =========================================================
    TEST L3
-========================= */
+========================================================= */
 
 async function testL3_8841() {
 
-  const command = [
-    0xA5,
-    0x02,
-    0x03,
-    0x5A
-  ];
+    log('');
+    log('TEST L3 -> 8841');
 
-  await send8841(command);
+
+    await send8841([
+        0xA5,
+        0x02,
+        0x03,
+        0x5A
+    ]);
 }
 
 
-/* =========================
+/* =========================================================
    TEST TURBO
-========================= */
+========================================================= */
 
 async function testTurbo_8841() {
 
-  const command = [
-    0xA5,
-    0x03,
-    0x01,
-    0x5A
-  ];
+    log('');
+    log('TEST TURBO -> 8841');
 
-  await send8841(command);
+
+    await send8841([
+        0xA5,
+        0x03,
+        0x01,
+        0x5A
+    ]);
 }
 
 
-/* =========================
-   UI
-========================= */
-
-function makeButtons() {
-
-  const container =
-    document.getElementById('controls');
-
-  if (!container)
-    return;
-
-
-  container.innerHTML = `
-
-    <button onclick="connectBLE()">
-      KẾT NỐI BLUETOOTH
-    </button>
-
-    <br><br>
-
-    <button onclick="testL1_8841()">
-      TEST L1 → 8841
-    </button>
-
-    <button onclick="testL2_8841()">
-      TEST L2 → 8841
-    </button>
-
-    <button onclick="testL3_8841()">
-      TEST L3 → 8841
-    </button>
-
-    <button onclick="testTurbo_8841()">
-      TEST TURBO → 8841
-    </button>
-
-  `;
-}
-
-
-/* =========================
-   INIT
-========================= */
+/* =========================================================
+   STARTUP
+========================================================= */
 
 window.addEventListener(
-  'load',
-  () => {
+    'load',
+    () => {
 
-    log('PIVA B3 PRO DEBUG V5 READY');
+        log(
+            'PIVA B3 PRO DEBUG V5 READY'
+        );
 
-    log(
-      'SERVICE = ' +
-      SERVICE_UUID
-    );
+        log(
+            'SERVICE = ' +
+            SERVICE_UUID
+        );
 
-    log(
-      'WRITE 8841 = ' +
-      WRITE_8841
-    );
+        log(
+            'WRITE 8841 = ' +
+            WRITE_8841
+        );
 
-    log(
-      'NOTIFY 1E4D = ' +
-      NOTIFY_1E4D
-    );
+        log(
+            'NOTIFY 1E4D = ' +
+            NOTIFY_1E4D
+        );
 
-    makeButtons();
-  }
+        log('');
+        log(
+            'CHUA GUI LENH NAO CHO B3 PRO'
+        );
+    }
 );
 
 </script>
+
+</body>
+</html>
