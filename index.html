@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>PIVA B3 Pro Controller - Bypass Mode</title>
-
+<title>PIVA B3 Pro Protocol Analyzer</title>
 <style>
 *{ box-sizing:border-box; }
 body{
@@ -12,343 +11,152 @@ body{
   background:#111; color:#fff;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-h1{ font-size:24px; margin:0 0 15px; }
-h2{ font-size:18px; margin:24px 0 10px; }
+h1{ font-size:22px; margin:0 0 15px; }
+h2{ font-size:16px; margin:20px 0 10px; color:#1683ff; }
 button{
-  border:0; border-radius:12px; padding:13px 16px; margin:4px;
-  background:#292929; color:white; font-size:15px; font-weight:600;
+  border:0; border-radius:10px; padding:12px 14px; margin:4px;
+  background:#292929; color:white; font-size:14px; font-weight:600;
 }
 button:active{ transform:scale(.96); }
 .primary{ background:#1683ff; }
 .danger{ background:#9b2525; }
-.status{ padding:13px; border-radius:12px; background:#242424; margin-bottom:12px; }
+.status{ padding:12px; border-radius:10px; background:#242424; margin-bottom:12px; }
 .status.ok{ background:#123d23; }
 .grid{ display:flex; flex-wrap:wrap; }
-.card{ background:#1c1c1c; border-radius:15px; padding:13px; margin-top:10px; }
-input[type=range]{ width:100%; }
-.value{ font-size:17px; margin:6px 0 10px; }
-.warn{
-  background:#3c300d; color:#ffd96a; padding:12px;
-  border-radius:12px; margin:12px 0; line-height:1.45;
-}
+.card{ background:#1c1c1c; border-radius:12px; padding:12px; margin-top:8px; }
+.warn{ background:#3c300d; color:#ffd96a; padding:10px; border-radius:10px; margin:10px 0; font-size:13px; }
 #log{
-  background:#050505; color:#69ff69; border-radius:12px; padding:12px;
-  height:300px; overflow:auto; white-space:pre-wrap; word-break:break-word;
-  font:12px monospace;
+  background:#050505; color:#69ff69; border-radius:10px; padding:10px;
+  height:280px; overflow:auto; white-space:pre-wrap; word-break:break-word;
+  font:11px monospace;
 }
 </style>
 </head>
 
 <body>
 
-<h1>❄️ PIVA B3 Pro (Bypass)</h1>
+<h1>❄️ PIVA B3 Pro Protocol Fixer</h1>
 
-<div id="status" class="status">
-  🔴 Chưa kết nối
-</div>
+<div id="status" class="status">🔴 Chưa kết nối</div>
 
 <div class="grid">
-  <button class="primary" onclick="connectBLE()">🔵 Kết nối & Bypass</button>
+  <button class="primary" onclick="connectBLE()">🔵 Kết nối BLE</button>
   <button class="danger" onclick="disconnectBLE()">Ngắt kết nối</button>
 </div>
 
-<div class="warn">
-  Chế độ Bypass Active:<br>
-  Tự động Handshake (Delay 500ms) + Dual Write (6DAA & 8841)
-</div>
-
-<!-- COOLING -->
-<h2>❄️ Cooling</h2>
-<div class="card">
-  <div class="grid">
-    <button onclick="setMode(1)">L1</button>
-    <button onclick="setMode(2)">L2</button>
-    <button onclick="setMode(3)">L3</button>
-  </div>
-</div>
-
-<!-- TURBO -->
-<h2>🚀 Turbo</h2>
+<h2>🧪 1. Bán khung Byte tĩnh thu được từ nRF</h2>
+<div class="warn">Gửi chính xác 100% chuỗi Byte thu được khi nhấn nút trên quạt</div>
 <div class="grid">
-  <button onclick="setTurbo(1)">Turbo ON</button>
-  <button onclick="setTurbo(0)">Turbo OFF</button>
+  <button onclick="sendRawStatic(RAW_L1)">Gửi L1 Chuẩn (20A50709...)</button>
+  <button onclick="sendRawStatic(RAW_L2)">Gửi L2 Chuẩn (20A50716...)</button>
+  <button onclick="sendRawStatic(RAW_L3)">Gửi L3 Chuẩn (20A5071A...)</button>
 </div>
 
-<!-- SMART -->
-<h2>🤖 Smart</h2>
+<h2>🛠️ 2. Thử nghiệm các loại Checksum khác nhau</h2>
+<div class="warn">Nếu khung tĩnh không phản ứng, bấm thử các thuật toán Checksum dưới đây để tìm thuật toán quạt nhận diện:</div>
 <div class="grid">
-  <button onclick="setSmart(1)">Smart ON</button>
-  <button onclick="setSmart(0)">Smart OFF</button>
+  <button onclick="testChecksumAlgo('SUM')">Gửi L1 (Checksum Sum)</button>
+  <button onclick="testChecksumAlgo('XOR')">Gửi L1 (Checksum XOR)</button>
+  <button onclick="testChecksumAlgo('COMPLEMENT')">Gửi L1 (Checksum 2's Comp)</button>
 </div>
 
-<!-- FAN -->
-<h2>🌀 Fan</h2>
-<div class="card">
-  <input id="fan" type="range" min="0" max="100" value="40" oninput="fanValue.textContent=this.value+'%'">
-  <div class="value">Fan: <b id="fanValue">40%</b></div>
-  <button onclick="sendFan()">Gửi Fan</button>
-</div>
-
-<!-- LED -->
-<h2>💡 LED</h2>
-<div class="grid">
-  <button onclick="setLED(0)">OFF</button>
-  <button onclick="setLED(1)">1</button>
-  <button onclick="setLED(2)">2</button>
-  <button onclick="setLED(3)">3</button>
-</div>
-
-<!-- DEBUG -->
-<h2>🔧 Debug & Manual Bypass</h2>
-<div class="grid">
-  <button onclick="scanGatt()">GATT Scan</button>
-  <button onclick="clearLog()">Clear log</button>
-</div>
-
+<h2>🔧 Debug Log</h2>
+<button onclick="clearLog()">Clear log</button>
 <pre id="log"></pre>
 
 <script>
-/* =====================================================
-   UUID DEFINITIONS
-===================================================== */
 const SERVICE_UUID  = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
-const RX_8841_UUID  = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-const TX_1E4D_UUID  = "49535343-1e4d-4bd9-ba61-23c647249616";
 const CTRL_6DAA_UUID= "49535343-6daa-4d02-abf6-19569aca69fe";
+const TX_1E4D_UUID  = "49535343-1e4d-4bd9-ba61-23c647249616";
 
-/* =====================================================
-   RAW HEX COMMANDS (THU THẬP TỪ NRF CONNECT)
-===================================================== */
-const RAW_COMMANDS = {
-  L1: [0x20, 0xA5, 0x07, 0x09, 0x0A, 0x2D, 0x40, 0x0B, 0x38, 0x00, 0x8F],
-  L2: [0x20, 0xA5, 0x07, 0x16, 0x07, 0x2E, 0xB2, 0x11, 0x58, 0x00, 0x32],
-  L3: [0x20, 0xA5, 0x07, 0x1A, 0x09, 0x2E, 0x72, 0x15, 0x61, 0x00, 0x05]
-};
+// Chuỗi 11 Byte tĩnh chụp được từ nRF Connect
+const RAW_L1 = [0x20, 0xA5, 0x07, 0x09, 0x0A, 0x2D, 0x40, 0x0B, 0x38, 0x00, 0x8F];
+const RAW_L2 = [0x20, 0xA5, 0x07, 0x16, 0x07, 0x2E, 0xB2, 0x11, 0x58, 0x00, 0x32];
+const RAW_L3 = [0x20, 0xA5, 0x07, 0x1A, 0x09, 0x2E, 0x72, 0x15, 0x61, 0x00, 0x05];
 
-/* =====================================================
-   BLE OBJECTS
-===================================================== */
-let device = null;
-let server = null;
-let service = null;
-let writeChar6DAA = null;
-let writeChar8841 = null;
-let notifyChar1E4D = null;
-let notifying = false;
+let device, server, service, writeChar, notifyChar;
 
-/* =====================================================
-   LOG HELPER
-===================================================== */
 function log(text){
   const box = document.getElementById("log");
-  const time = new Date().toLocaleTimeString();
-  box.textContent += "[" + time + "] " + text + "\n";
+  box.textContent += "[" + new Date().toLocaleTimeString() + "] " + text + "\n";
   box.scrollTop = box.scrollHeight;
 }
+function clearLog(){ document.getElementById("log").textContent = ""; }
+function hex(data){ return Array.from(data).map(b => b.toString(16).padStart(2,"0").toUpperCase()).join(" "); }
 
-function clearLog(){
-  document.getElementById("log").textContent = "";
-}
-
-function hex(data){
-  return Array.from(data)
-    .map(b => b.toString(16).padStart(2,"0").toUpperCase())
-    .join(" ");
-}
-
-/* =====================================================
-   CHECKSUM & FRAME CREATOR
-===================================================== */
-function checksum(bytes){
-  let sum = 0;
-  for(const b of bytes){ sum = (sum + (b & 0xFF)) & 0xFF; }
-  return sum;
-}
-
-function makeFrame(cmd, ...params){
-  const body = [0x20, 0xA5, cmd & 0xFF, ...params.map(x => x & 0xFF)];
-  return new Uint8Array([...body, checksum(body)]);
-}
-
-/* =====================================================
-   CONNECT & BYPASS HANDSHAKE
-===================================================== */
 async function connectBLE(){
   try{
-    if(!navigator.bluetooth){
-      alert("Trình duyệt không hỗ trợ Web Bluetooth.");
-      return;
-    }
-
-    log("Đang tìm kiếm thiết bị...");
+    log("Mở trình chọn Bluetooth...");
     device = await navigator.bluetooth.requestDevice({
       acceptAllDevices: true,
       optionalServices: [SERVICE_UUID]
     });
-
-    log("DEVICE: " + (device.name || "Unknown"));
-    device.addEventListener("gattserverdisconnected", disconnected);
-
-    log("Đang kết nối GATT...");
+    
     server = await device.gatt.connect();
     service = await server.getPrimaryService(SERVICE_UUID);
-    log("GATT & SERVICE OK");
+    
+    writeChar = await service.getCharacteristic(CTRL_6DAA_UUID);
+    notifyChar = await service.getCharacteristic(TX_1E4D_UUID);
+    
+    await notifyChar.startNotifications();
+    notifyChar.addEventListener("characteristicvaluechanged", (e) => {
+      log("RX ← " + hex(new Uint8Array(e.target.value.buffer)));
+    });
 
-    // Quét toàn bộ Characteristics
-    await scanGatt();
-
-    // LẤY CỔNG NOTIFY 1E4D VÀ KÍCH HOẠT HANDSHAKE
-    if(notifyChar1E4D){
-      try{
-        if(!notifying){
-          await notifyChar1E4D.startNotifications();
-          notifyChar1E4D.addEventListener("characteristicvaluechanged", onNotify);
-          notifying = true;
-          log("🟢 NOTIFY (1E4D) MỞ THÀNH CÔNG");
-        }
-      }catch(e){
-        log("⚠️ Lỗi bật Notify 1E4D: " + e.message);
-      }
-    }
-
-    log("⏳ Đang chờ 500ms để bo mạch mở khóa nhận lệnh...");
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    setStatus(true);
-    log("🚀 ĐÃ SẴN SÀNG GỬI LỆNH BYPASS!");
-
+    document.getElementById("status").className = "status ok";
+    document.getElementById("status").textContent = "🟢 Đã kết nối " + device.name;
+    log("KẾT NỐI VÀ MỞ NOTIFY THÀNH CÔNG");
   }catch(e){
-    log("❌ CONNECT ERROR: " + e.message);
+    log("❌ Lỗi: " + e.message);
   }
 }
 
-/* =====================================================
-   DISCONNECT
-===================================================== */
 function disconnectBLE(){
-  if(device && device.gatt && device.gatt.connected){
-    device.gatt.disconnect();
-  }
+  if(device && device.gatt.connected) device.gatt.disconnect();
+  document.getElementById("status").className = "status";
+  document.getElementById("status").textContent = "🔴 Chưa kết nối";
 }
 
-function disconnected(){
-  log("BLE DISCONNECTED");
-  writeChar6DAA = null;
-  writeChar8841 = null;
-  notifyChar1E4D = null;
-  service = null;
-  server = null;
-  notifying = false;
-  setStatus(false);
-}
-
-function setStatus(connected){
-  const box = document.getElementById("status");
-  if(connected){
-    box.className = "status ok";
-    box.textContent = "🟢 PIVA B3 Pro đã kết nối (Bypass Active)";
-  }else{
-    box.className = "status";
-    box.textContent = "🔴 Chưa kết nối";
-  }
-}
-
-function onNotify(event){
-  const data = new Uint8Array(event.target.value.buffer);
-  log("RX (1E4D) ← " + hex(data));
-}
-
-/* =====================================================
-   BYPASS WRITE (GỬI ĐỒNG THỜI CẢ 6DAA VÀ 8841)
-===================================================== */
-async function writeToChar(charObj, name, bytes){
-  if(!charObj) return false;
+async function sendRawStatic(bytesArray){
+  if(!writeChar){ log("❌ Chưa kết nối!"); return; }
   try{
-    await charObj.writeValueWithoutResponse(bytes);
-    log(`TX → [${name}] WriteWithoutResponse OK: ${hex(bytes)}`);
-    return true;
+    const data = new Uint8Array(bytesArray);
+    log("TX (Static) → " + hex(data));
+    await writeChar.writeValueWithoutResponse(data);
+    log("TX SUCCESS");
   }catch(e){
-    try{
-      await charObj.writeValue(bytes);
-      log(`TX → [${name}] WriteWithResponse OK: ${hex(bytes)}`);
-      return true;
-    }catch(err){
-      log(`❌ [${name}] Lỗi: ${err.message}`);
-      return false;
-    }
+    log("TX FAIL: " + e.message);
   }
 }
 
-async function sendRaw(data){
-  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-  let ok6DAA = false;
-  let ok8841 = false;
-
-  if(writeChar6DAA){
-    ok6DAA = await writeToChar(writeChar6DAA, "6DAA", bytes);
+// CÁC THUẬT TOÁN CALCULATE CHECKSUM
+function calcChecksum(body, type){
+  if(type === 'SUM'){
+    let sum = 0;
+    for(let b of body) sum = (sum + b) & 0xFF;
+    return sum;
   }
-  if(writeChar8841){
-    ok8841 = await writeToChar(writeChar8841, "8841", bytes);
+  if(type === 'XOR'){
+    let xor = 0;
+    for(let b of body) xor = xor ^ b;
+    return xor;
   }
-
-  if(!ok6DAA && !ok8841){
-    log("❌ Gửi lệnh thất bại trên cả 2 cổng.");
-    return false;
+  if(type === 'COMPLEMENT'){
+    let sum = 0;
+    for(let b of body) sum += b;
+    return (~sum + 1) & 0xFF;
   }
-  return true;
+  return 0;
 }
 
-async function command(name, cmd, ...params){
-  const frame = makeFrame(cmd, ...params);
-  log("COMMAND: " + name);
-  return await sendRaw(frame);
-}
-
-/* =====================================================
-   FUNCTIONS
-===================================================== */
-function setMode(level){
-  if(level === 1) sendRaw(RAW_COMMANDS.L1);
-  else if(level === 2) sendRaw(RAW_COMMANDS.L2);
-  else if(level === 3) sendRaw(RAW_COMMANDS.L3);
-}
-
-function setTurbo(value){ command(value ? "TURBO ON" : "TURBO OFF", 0x03, value); }
-function setSmart(value){ command(value ? "SMART ON" : "SMART OFF", 0x06, value); }
-function sendFan(){
-  const val = Number(document.getElementById("fan").value);
-  command("FAN " + val, 0x04, val);
-}
-function setLED(mode){ command("LED " + mode, 0x05, mode); }
-
-/* =====================================================
-   GATT SCAN
-===================================================== */
-async function scanGatt(){
-  if(!service) return;
-  try{
-    const chars = await service.getCharacteristics();
-    log("===== GATT SCAN =====");
-
-    for(const c of chars){
-      const uuid = c.uuid.replace(/-/g,"").toLowerCase();
-      if(uuid === "495353436daa4d02abf619569aca69fe"){
-        writeChar6DAA = c;
-        log("Found 6DAA (Write Target 1)");
-      }
-      if(uuid === "49535343884143f4a8d4ecbe34729bb3"){
-        writeChar8841 = c;
-        log("Found 8841 (Write Target 2)");
-      }
-      if(uuid === "495353431e4d4bd9ba6123c647249616"){
-        notifyChar1E4D = c;
-        log("Found 1E4D (Notify Target)");
-      }
-    }
-    log("=====================");
-  }catch(e){
-    log("Scan error: " + e.message);
-  }
+async function testChecksumAlgo(algoType){
+  // Body khung L1 bỏ byte cuối: [0x20, 0xA5, 0x07, 0x09, 0x0A, 0x2D, 0x40, 0x0B, 0x38, 0x00]
+  const body = [0x20, 0xA5, 0x07, 0x09, 0x0A, 0x2D, 0x40, 0x0B, 0x38, 0x00];
+  const crc = calcChecksum(body, algoType);
+  const fullFrame = new Uint8Array([...body, crc]);
+  
+  log(`Gửi Test Algo [${algoType}] CRC=0x${crc.toString(16).toUpperCase()}`);
+  await sendRawStatic(fullFrame);
 }
 </script>
 </body>
