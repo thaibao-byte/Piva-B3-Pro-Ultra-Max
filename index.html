@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro Ultra Max</title>
+  <title>Piva B3 Pro Ultra Max Control</title>
   <style>
     :root {
       --bg: #090d16;
@@ -28,13 +28,26 @@
     .alert-banner { display: none; width: 100%; max-width: 400px; padding: 10px; border-radius: 10px; background: rgba(255, 68, 68, 0.2); border: 1px solid var(--red); color: #fff; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; animation: pulse 1s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    /* Hero Fan */
-    .hero { position: relative; width: 130px; height: 130px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
+    /* Hero Center Fan Image */
+    .hero { position: relative; width: 140px; height: 140px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
     .fan-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent); border-bottom-color: #ff007f; animation: spin 3s linear infinite; filter: drop-shadow(0 0 12px var(--accent)); }
-    .fan-img { width: 105px; height: 105px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 25px rgba(0,0,0,0.8); background: #141c2d; }
+    
+    .fan-img-box {
+      width: 115px;
+      height: 115px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      background: #141c2d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .fan-img { width: 100%; height: 100%; object-fit: cover; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* 6 THẺ THÔNG SỐ */
+    /* Grid Thông số 6 ô */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; }
     .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(10px); border-radius: 12px; padding: 8px; text-align: center; }
     .stat-val { font-size: 13px; font-weight: bold; color: var(--accent); margin-top: 2px; }
@@ -85,10 +98,13 @@
 
   <div class="hero">
     <div class="fan-ring" id="fanRing"></div>
-    <img class="fan-img" src="https://img.lazcdn.com/g/p/b9c8b73fdbbc14fa35bfa3d8ef4927f1.jpg" alt="Piva B3 Pro">
+    <div class="fan-img-box">
+      <!-- Ảnh sản phẩm PIVA B3 Pro qua link trực tiếp không mã hóa CORS -->
+      <img class="fan-img" id="deviceImg" src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400" alt="Piva B3 Pro" onerror="fallbackImg()">
+    </div>
   </div>
 
-  <!-- BẢNG THÔNG SỐ -->
+  <!-- 6 THẺ THÔNG SỐ BAN ĐẦU ĐỂ TRỐNG -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt độ Sò</div>
@@ -116,7 +132,7 @@
     </div>
   </div>
 
-  <!-- CẤP ĐỘ LÀM LẠNH -->
+  <!-- BỘ ĐIỀU KHIỂN CHẾ ĐỘ LÀM LẠNH -->
   <div class="section-title">Chế độ Làm Lạnh (Level)</div>
   <div class="panel-card">
     <div class="level-grid">
@@ -136,7 +152,7 @@
     </div>
   </div>
 
-  <!-- ÉP XUNG & CHỈNH TỐC ĐỘ QUẠT -->
+  <!-- BỘ ÉP XUNG VÀ CHỈNH TỐC ĐỘ QUẠT -->
   <div class="section-title">Chế độ Ép Xung (Turbo Overclock)</div>
   <div class="panel-card">
     <div class="smart-card">
@@ -193,10 +209,15 @@
     let isSmartMode = false;
     let isTurboMode = false;
 
-    // Kiểm tra và cảnh báo nếu chưa kết nối
+    // Dự phòng khi bị nghẽn mạng không load được ảnh
+    function fallbackImg() {
+      document.getElementById('deviceImg').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23121824' stroke='%2300f2fe' stroke-width='3'/><circle cx='50' cy='50' r='18' fill='%2300f2fe'/><text x='50' y='55' font-size='14' font-weight='bold' fill='%23000' text-anchor='middle'>PIVA B3</text></svg>";
+    }
+
+    // Kiểm tra kết nối Bluetooth trước khi chạy bất kỳ thao tác nào
     function checkConnection() {
       if (!writeChar) {
-        alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước khi thao tác!");
+        alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' ở phía trên trước!");
         return false;
       }
       return true;
@@ -204,7 +225,7 @@
 
     async function connectBLE() {
       if (!navigator.bluetooth) {
-        alert("Trình duyệt của bạn chưa hỗ trợ Bluetooth. Hãy dùng Chrome hoặc Edge!");
+        alert("Trình duyệt không hỗ trợ Web Bluetooth. Hãy sử dụng Google Chrome hoặc Microsoft Edge!");
         return;
       }
       try {
@@ -220,7 +241,7 @@
         document.getElementById('status').classList.add('connected');
         document.getElementById('btnConnect').style.display = "none";
 
-        // Cập nhật trạng thái mặc định ban đầu
+        // Chọn mặc định chế độ ban đầu
         const defaultBtn = document.querySelector('.level-grid .btn-action');
         if (defaultBtn) defaultBtn.classList.add('active');
         
@@ -233,7 +254,7 @@
         startSafetyMonitor();
       } catch (e) {
         console.log(e);
-        alert("Không thể kết nối với thiết bị Bluetooth!");
+        alert("Không thể kết nối Bluetooth với thiết bị!");
       }
     }
 
@@ -243,7 +264,7 @@
         const enc = new TextEncoder();
         await writeChar.writeValue(enc.encode(cmd + "\r\n"));
       } catch(err) {
-        console.log("Lỗi gửi lệnh BLE:", err);
+        console.log("Lỗi lệnh BLE:", err);
       }
     }
 
