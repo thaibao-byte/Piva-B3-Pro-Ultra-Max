@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piva B3 Pro</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #000; color: #fff; text-align: center; padding: 50px 20px; }
+    .card { background: #1c1c1e; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    button { background: #0a84ff; color: white; border: none; padding: 16px 30px; border-radius: 12px; font-size: 16px; font-weight: bold; width: 100%; margin-top: 15px; }
+    p { color: #8e8e93; font-size: 15px; margin-top: 15px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Piva B3 Pro Controller</h2>
+    <p id="status">Trạng thái: Sẵn sàng kết nối</p>
+    <button onclick="connectBLE()">KẾT NỐI B3PRO</button>
+  </div>
+
+  <script>
+    const SERVICE_UUID = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
+    const WRITE_UUID   = "49535343-6daa-4d02-abf6-19569aca69fe";
+
+    async function connectBLE() {
+      try {
+        document.getElementById('status').innerText = "Đang tìm B3PRO...";
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'B3PRO' }],
+          optionalServices: [SERVICE_UUID]
+        });
+
+        document.getElementById('status').innerText = "Đang kết nối...";
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        window.writeChar = await service.getCharacteristic(WRITE_UUID);
+
+        document.getElementById('status').innerText = "Đã kết nối thành công!";
+      } catch (err) {
+        document.getElementById('status').innerText = "Lỗi: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
