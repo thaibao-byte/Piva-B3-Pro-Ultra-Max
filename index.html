@@ -908,11 +908,16 @@ async function send(bytes) {
         return false;
     }
     try {
-        await writeChar.writeValue(new Uint8Array(bytes));
+        // Ưu tiên Write Without Response (sò thường chỉ nhận kiểu này)
+        if (writeChar.properties.writeWithoutResponse) {
+            await writeChar.writeValueWithoutResponse(new Uint8Array(bytes));
+        } else {
+            await writeChar.writeValue(new Uint8Array(bytes));
+        }
         return true;
     } catch (err) {
         console.error('Write error:', err);
-        toast('Gửi lệnh thất bại', 'error');
+        toast('Gửi lệnh thất bại: ' + (err.message || ''), 'error');
         return false;
     }
 }
