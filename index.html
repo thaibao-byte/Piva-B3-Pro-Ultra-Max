@@ -305,9 +305,9 @@
                 return;
             }
             try {
-                // Đã bỏ bộ lọc tên cứng để hiển thị toàn bộ thiết bị BLE xung quanh
+                // Đã cấu hình tương thích 100% với trình duyệt Bluefy trên iOS
                 bleDevice = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
+                    filters: [{ namePrefix: '' }],
                     optionalServices: [SERVICE_UUID]
                 });
                 
@@ -322,11 +322,13 @@
                 startSafetyMonitor();
                 alert('Đã kết nối thành công với sò PIVA B3 Pro!');
             } catch (error) {
-                if (error && error.name === 'NotFoundError') {
+                if (error && (error.name === 'NotFoundError' || error.code === 8)) {
                     console.log('Đã hủy chọn thiết bị.');
                 } else {
-                    let msg = (error && error.message) ? error.message : String(error);
-                    alert('Lỗi kết nối Bluetooth: ' + msg);
+                    let errorMsg = "Không tìm thấy thiết bị hoặc chưa bật Bluetooth";
+                    if (typeof error === 'string') errorMsg = error;
+                    else if (error && error.message) errorMsg = error.message;
+                    alert('Lỗi kết nối Bluetooth: ' + errorMsg);
                 }
             }
         }
@@ -474,7 +476,7 @@
             });
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'piva-b3pro-v9000';
+                    const CACHE_NAME = 'piva-b3pro-v9999';
                     self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); self.skipWaiting(); });
                     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null)))); self.clients.claim(); });
                     self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))); });
