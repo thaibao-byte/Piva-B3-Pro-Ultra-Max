@@ -2,491 +2,1058 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIVA B3 PRO ULTRA CONTROL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#07090f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>PIVA B3 PRO ULTRA · Control</title>
     <style>
         :root {
-            --bg: #0b0d17;
-            --card-bg: rgba(20, 24, 45, 0.75);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --accent: #00f2fe;
-            --accent-glow: rgba(0, 242, 254, 0.35);
+            --bg: #07090f;
+            --surface: rgba(16, 20, 36, 0.72);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.14);
+            --accent: #00e5ff;
+            --accent-2: #7c5cff;
             --green: #00e676;
-            --red: #ff3366;
+            --red: #ff3d71;
             --orange: #ff9100;
-            --text: #ffffff;
-            --subtext: #8a99ad;
+            --text: #f4f7ff;
+            --muted: #8b97b0;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+            --glow: 0 0 24px rgba(0, 229, 255, 0.25);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        html, body { 
-            background: var(--bg); 
-            color: var(--text); 
-            padding: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            overflow-y: auto !important; 
-            -webkit-overflow-scrolling: touch;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        header h1 { font-size: 18px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .status-badge { font-size: 12px; padding: 5px 12px; border-radius: 20px; background: rgba(255, 51, 102, 0.15); color: var(--red); border: 1px solid rgba(255, 51, 102, 0.3); }
-        .status-badge.connected { background: rgba(0, 230, 118, 0.15); color: var(--green); border-color: rgba(0, 230, 118, 0.3); }
-
-        .btn-connect { width: 100%; max-width: 480px; padding: 14px; margin-bottom: 12px; border-radius: 12px; background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; font-weight: bold; border: none; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px var(--accent-glow); cursor: pointer; }
-
-        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 480px; margin-bottom: 12px; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 10px 6px; border-radius: 10px; text-align: center; }
-        .stat-card .label { font-size: 10px; color: var(--subtext); margin-bottom: 2px; }
-        .stat-card .value { font-size: 13px; font-weight: bold; color: var(--accent); }
-
-        .acc-card { width: 100%; max-width: 480px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; transition: all 0.3s ease; }
-        .acc-header { padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .acc-header-title { font-size: 13px; font-weight: bold; color: var(--text); display: flex; align-items: center; gap: 8px; }
-        .acc-icon { font-size: 12px; color: var(--subtext); transition: transform 0.3s ease; }
-        .acc-card.open .acc-icon { transform: rotate(180deg); color: var(--accent); }
-        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out, padding 0.35s ease; padding: 0 14px; }
-        .acc-card.open .acc-content { max-height: 600px; padding: 0 14px 14px 14px; border-top: 1px solid rgba(255,255,255,0.05); }
-
-        .btn-group { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-        .btn-opt { flex: 1; min-width: 50px; padding: 9px 2px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
-        .btn-opt.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .toggle-row span { font-size: 12px; font-weight: 600; }
-        .toggle-sub { font-size: 10px; color: var(--subtext); display: block; }
-
-        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
-        input[type="color"] { border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; background: transparent; }
-
-        .timer-vslider-container { display: flex; justify-content: space-around; align-items: center; height: 150px; margin: 10px 0; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; }
-        .vslider-group { display: flex; flex-direction: column; align-items: center; height: 100%; width: 30%; }
-        .vslider-label { font-size: 11px; font-weight: bold; color: var(--subtext); margin-bottom: 4px; }
-        .vslider-val { font-size: 13px; font-weight: bold; color: var(--accent); margin-top: 4px; }
-        .vslider-wrapper { height: 85px; display: flex; align-items: center; justify-content: center; }
-        input[type="range"].vslider {
-            -webkit-appearance: none;
-            width: 85px;
-            height: 5px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 3px;
-            outline: none;
-            transform: rotate(-90deg);
-            cursor: pointer;
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100%;
+            overflow-x: hidden;
         }
-        input[type="range"].vslider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
+
+        body {
+            padding: 18px 16px 40px;
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.12), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(124, 92, 255, 0.08), transparent);
+        }
+
+        .app {
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .logo h1 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            background: linear-gradient(105deg, #00e5ff 0%, #7c5cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 61, 113, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(255, 61, 113, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .status-pill.connected {
+            background: rgba(0, 230, 118, 0.12);
+            color: var(--green);
+            border-color: rgba(0, 230, 118, 0.3);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 6px var(--accent);
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
         }
 
-        .slider-row { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
-        .slider-title-val { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; }
-        input[type="range"].hslider {
-            -webkit-appearance: none;
+        .status-pill.connected .status-dot {
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.55; transform: scale(0.85); }
+        }
+
+        .btn-connect {
             width: 100%;
-            height: 5px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 3px;
+            padding: 15px;
+            border: none;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 50%, #7c5cff 100%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: var(--glow), var(--shadow);
+            margin-bottom: 14px;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-connect:active { transform: scale(0.98); }
+
+        .btn-connect.connected {
+            background: linear-gradient(135deg, #00c853, #00a040);
+            box-shadow: 0 0 24px rgba(0, 230, 118, 0.25), var(--shadow);
+        }
+
+        .btn-connect.loading {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .stat .label {
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .stat .value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .card-header .title {
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header .chevron {
+            font-size: 11px;
+            color: var(--muted);
+            transition: transform 0.3s ease, color 0.2s;
+        }
+
+        .card.open .chevron {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+
+        .card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 16px;
+        }
+
+        .card.open .card-body {
+            max-height: 720px;
+            padding: 0 16px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 56px;
+            padding: 10px 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            text-align: center;
+        }
+
+        .btn:active { transform: scale(0.96); }
+
+        .btn.active {
+            background: var(--accent);
+            color: #041018;
+            border-color: var(--accent);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.3);
+            font-weight: 700;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            gap: 12px;
+        }
+
+        .toggle-row + .toggle-row {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-info { flex: 1; }
+
+        .toggle-info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .toggle-info .desc {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+
+        .switch {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.25s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .switch input:checked + .slider {
+            background: var(--accent);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(20px);
+        }
+
+        .led-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .led-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: left;
+        }
+
+        .led-btn.active {
+            border-color: var(--accent);
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+        }
+
+        .led-btn .icon { font-size: 14px; }
+
+        .slider-block { margin-top: 14px; }
+
+        .slider-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .slider-head span:last-child {
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
             outline: none;
         }
-        input[type="range"].hslider::-webkit-slider-thumb {
+
+        input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: var(--accent);
-            box-shadow: 0 0 6px var(--accent);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
             cursor: pointer;
+            border: 2px solid #fff;
         }
 
-        .grid-led { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 10px; }
-        .btn-led { padding: 9px 6px; font-size: 11px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; }
-        .btn-led.active { border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(0, 242, 254, 0.1); }
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
 
-        .alert-banner { display: none; width: 100%; max-width: 480px; padding: 10px; border-radius: 10px; background: rgba(255, 145, 0, 0.2); border: 1px solid var(--orange); color: var(--orange); font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 12px; }
+        input[type="color"] {
+            -webkit-appearance: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .timer-display {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.3px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .timer-controls .btn {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .btn-danger {
+            background: rgba(255, 61, 113, 0.15);
+            border-color: rgba(255, 61, 113, 0.35);
+            color: var(--red);
+        }
+
+        .alert {
+            display: none;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 145, 0, 0.15);
+            border: 1px solid rgba(255, 145, 0, 0.4);
+            color: var(--orange);
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: rgba(20, 24, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-strong);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow);
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-color: rgba(0, 230, 118, 0.4); }
+        .toast.error { border-color: rgba(255, 61, 113, 0.4); }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            opacity: 0.7;
+        }
+
+        .controls-disabled {
+            opacity: 0.45;
+            pointer-events: none;
+            filter: grayscale(0.3);
+            transition: opacity 0.3s, filter 0.3s;
+        }
+
+        .controls-enabled {
+            opacity: 1;
+            pointer-events: auto;
+            filter: none;
+        }
     </style>
 </head>
 <body>
-
+<div class="app">
     <header>
-        <h1>PIVA B3 PRO ULTRA</h1>
-        <div id="status" class="status-badge">Ngắt kết nối</div>
+        <div class="logo">
+            <h1>PIVA B3 PRO ULTRA</h1>
+            <span>Web Bluetooth Controller</span>
+        </div>
+        <div id="statusPill" class="status-pill">
+            <span class="status-dot"></span>
+            <span id="statusText">Ngắt kết nối</span>
+        </div>
     </header>
 
-    <div id="alertBanner" class="alert-banner">⚠️ CẢNH BÁO BẢO VỆ TỰ ĐỘNG!</div>
+    <div id="alertBanner" class="alert"></div>
 
-    <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI TỰ ĐỘNG</button>
+    <button id="btnConnect" class="btn-connect" onclick="toggleConnection()">
+        KẾT NỐI BLUETOOTH
+    </button>
 
-    <div class="grid-stats">
-        <div class="stat-card"><div class="label">Nhiệt độ Sò</div><div class="value" id="tempFan">-- °C</div></div>
-        <div class="stat-card"><div class="label">Nhiệt Củ Sạc</div><div class="value" id="tempCharger">-- °C</div></div>
-        <div class="stat-card"><div class="label">Tốc độ quạt</div><div class="value" id="fanRpm">-- RPM</div></div>
-        <div class="stat-card"><div class="label">Công suất</div><div class="value" id="power">-- W</div></div>
-        <div class="stat-card"><div class="label">Giao thức sạc</div><div class="value" id="protocol">--</div></div>
-        <div class="stat-card"><div class="label">Điện áp / Dòng</div><div class="value" id="voltAmp">-- V / -- A</div></div>
-    </div>
-
-    <div class="acc-card open">
-        <div class="acc-header" onclick="toggleAccordion(this)">
-            <span class="acc-header-title">❄️ CHẾ ĐỘ LÀM LẠNH & THÔNG MINH</span>
-            <span class="acc-icon">▼</span>
+    <div class="stats">
+        <div class="stat">
+            <div class="label">Nhiệt độ Sò</div>
+            <div class="value" id="tempFan">-- °C</div>
         </div>
-        <div class="acc-content">
-            <div class="btn-group">
-                <button class="btn-opt active" id="btnL1" onclick="setMode(1, 'btnL1')">❄️ L1 (Êm)</button>
-                <button class="btn-opt" id="btnL2" onclick="setMode(2, 'btnL2')">❄️ L2 (Vừa)</button>
-                <button class="btn-opt" id="btnL3" onclick="setMode(3, 'btnL3')">❄️ L3 (Mạnh)</button>
-            </div>
-            <div class="toggle-row" style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 10px;">
-                <div>
-                    <span>🧠 Chế độ Thông Minh</span>
-                    <span class="toggle-sub">Tự tăng/giảm công suất theo nhiệt độ thực tế</span>
-                </div>
-                <input type="checkbox" id="smartToggle" onchange="toggleSmartMode(this.checked)">
-            </div>
+        <div class="stat">
+            <div class="label">Nhiệt Củ Sạc</div>
+            <div class="value" id="tempCharger">-- °C</div>
         </div>
-    </div>
-
-    <div class="acc-card">
-        <div class="acc-header" onclick="toggleAccordion(this)">
-            <span class="acc-header-title">🔥 CHẾ ĐỘ ÉP XUNG & TỐC ĐỘ QUẠT</span>
-            <span class="acc-icon">▼</span>
+        <div class="stat">
+            <div class="label">Tốc độ quạt</div>
+            <div class="value" id="fanRpm">-- RPM</div>
         </div>
-        <div class="acc-content">
-            <div class="toggle-row">
-                <div>
-                    <span>🔥 Bật Siêu Ép Xung</span>
-                    <span class="toggle-sub">Làm lạnh công suất tối đa</span>
-                </div>
-                <input type="checkbox" id="turboToggle" onchange="toggleTurbo(this.checked)">
-            </div>
-            <div style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 10px;">
-                <span style="font-size: 12px; font-weight: 600;">🌀 Tốc độ quạt cố định:</span>
-                <div class="btn-group">
-                    <button class="btn-opt" id="fan20" onclick="setFanSpeed(20, 'fan20')">20%</button>
-                    <button class="btn-opt" id="fan40" onclick="setFanSpeed(40, 'fan40')">40%</button>
-                    <button class="btn-opt" id="fan60" onclick="setFanSpeed(60, 'fan60')">60%</button>
-                    <button class="btn-opt active" id="fan80" onclick="setFanSpeed(80, 'fan80')">80%</button>
-                    <button class="btn-opt" id="fan100" onclick="setFanSpeed(100, 'fan100')">100%</button>
-                </div>
-            </div>
+        <div class="stat">
+            <div class="label">Công suất</div>
+            <div class="value" id="power">-- W</div>
+        </div>
+        <div class="stat">
+            <div class="label">Giao thức</div>
+            <div class="value" id="protocol">--</div>
+        </div>
+        <div class="stat">
+            <div class="label">Điện áp / Dòng</div>
+            <div class="value" id="voltAmp">-- V / -- A</div>
         </div>
     </div>
 
-    <div class="acc-card">
-        <div class="acc-header" onclick="toggleAccordion(this)">
-            <span class="acc-header-title">🛡️ CƠ CHẾ BẢO VỆ AN TOÀN</span>
-            <span class="acc-icon">▼</span>
-        </div>
-        <div class="acc-content">
-            <div class="toggle-row">
-                <div>
-                    <span>❄️ Protection Sò (>65°C hoặc <2°C)</span>
-                    <span class="toggle-sub">Chống cháy sò quá nhiệt & đọng nước</span>
-                </div>
-                <input type="checkbox" id="peltierSafety" checked onchange="togglePeltierSafety(this.checked)">
+    <div id="controls" class="controls-disabled">
+        <!-- Cooling Modes -->
+        <div class="card open">
+            <div class="card-header" onclick="toggleCard(this)">
+                <span class="title">❄️ Chế độ làm lạnh</span>
+                <span class="chevron">▼</span>
             </div>
-            <div class="toggle-row" style="margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
-                <div>
-                    <span>🔌 Protection Củ Sạc (>60°C)</span>
-                    <span class="toggle-sub">Chống ngắt nguồn/cháy nổ củ sạc</span>
+            <div class="card-body">
+                <div class="btn-row">
+                    <button class="btn active" id="btnL1" onclick="setMode(1)">L1 · Êm</button>
+                    <button class="btn" id="btnL2" onclick="setMode(2)">L2 · Vừa</button>
+                    <button class="btn" id="btnL3" onclick="setMode(3)">L3 · Mạnh</button>
                 </div>
-                <input type="checkbox" id="chargerSafety" checked onchange="toggleChargerSafety(this.checked)">
-            </div>
-        </div>
-    </div>
 
-    <div class="acc-card">
-        <div class="acc-header" onclick="toggleAccordion(this)">
-            <span class="acc-header-title">⏱️ HẸN GIỜ TẮT SÒ TỰ ĐỘNG</span>
-            <span id="timerDisplay" style="color: var(--accent); font-size: 11px; font-weight: bold;">CHƯA HẸN GIỜ</span>
-        </div>
-        <div class="acc-content">
-            <div class="timer-vslider-container">
-                <div class="vslider-group">
-                    <span class="vslider-label">GIỜ</span>
-                    <div class="vslider-wrapper">
-                        <input type="range" class="vslider" id="sliderHour" min="0" max="23" value="0" oninput="updateSliderLabels()">
+                <div class="toggle-row" style="margin-top: 8px;">
+                    <div class="toggle-info">
+                        <div class="name">🧠 Chế độ Thông minh</div>
+                        <div class="desc">Tự điều chỉnh công suất theo nhiệt độ thực tế</div>
                     </div>
-                    <span class="vslider-val" id="valHour">00h</span>
-                </div>
-                <div class="vslider-group">
-                    <span class="vslider-label">PHÚT</span>
-                    <div class="vslider-wrapper">
-                        <input type="range" class="vslider" id="sliderMin" min="0" max="59" value="30" oninput="updateSliderLabels()">
-                    </div>
-                    <span class="vslider-val" id="valMin">30p</span>
-                </div>
-                <div class="vslider-group">
-                    <span class="vslider-label">GIÂY</span>
-                    <div class="vslider-wrapper">
-                        <input type="range" class="vslider" id="sliderSec" min="0" max="59" value="0" oninput="updateSliderLabels()">
-                    </div>
-                    <span class="vslider-val" id="valSec">00s</span>
+                    <label class="switch">
+                        <input type="checkbox" id="smartToggle" onchange="toggleSmart(this.checked)">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
+        </div>
 
-            <div class="btn-group">
-                <button class="btn-opt" style="background: var(--accent); color: #000; font-weight: bold;" onclick="startCustomTimer()">Kích Hoạt</button>
-                <button class="btn-opt" onclick="cancelTimer()">Hủy</button>
+        <!-- Turbo & Fan -->
+        <div class="card">
+            <div class="card-header" onclick="toggleCard(this)">
+                <span class="title">🔥 Ép xung & Quạt</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="card-body">
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="name">🔥 Siêu ép xung</div>
+                        <div class="desc">Công suất làm lạnh tối đa</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="turboToggle" onchange="toggleTurbo(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin-top: 6px;">
+                    <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">Tốc độ quạt cố định</div>
+                    <div class="btn-row">
+                        <button class="btn" id="fan20" onclick="setFan(20)">20%</button>
+                        <button class="btn" id="fan40" onclick="setFan(40)">40%</button>
+                        <button class="btn" id="fan60" onclick="setFan(60)">60%</button>
+                        <button class="btn active" id="fan80" onclick="setFan(80)">80%</button>
+                        <button class="btn" id="fan100" onclick="setFan(100)">100%</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety -->
+        <div class="card">
+            <div class="card-header" onclick="toggleCard(this)">
+                <span class="title">🛡️ Bảo vệ an toàn</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="card-body">
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="name">❄️ Bảo vệ Sò</div>
+                        <div class="desc">Tự hạ công suất nếu &gt;65°C hoặc &lt;2°C</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="peltierSafety" checked onchange="peltierSafety = this.checked">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="name">🔌 Bảo vệ Củ sạc</div>
+                        <div class="desc">Tự hạ công suất nếu củ sạc &gt;60°C</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chargerSafety" checked onchange="chargerSafety = this.checked">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="card">
+            <div class="card-header" onclick="toggleCard(this)">
+                <span class="title">⏱️ Hẹn giờ tắt</span>
+                <span class="timer-display" id="timerDisplay">Chưa hẹn giờ</span>
+            </div>
+            <div class="card-body">
+                <div class="slider-block">
+                    <div class="slider-head">
+                        <span>Giờ</span>
+                        <span id="valHour">0h</span>
+                    </div>
+                    <input type="range" id="sliderHour" min="0" max="12" value="0" oninput="updateTimerLabels()">
+                </div>
+                <div class="slider-block">
+                    <div class="slider-head">
+                        <span>Phút</span>
+                        <span id="valMin">30p</span>
+                    </div>
+                    <input type="range" id="sliderMin" min="0" max="59" value="30" oninput="updateTimerLabels()">
+                </div>
+                <div class="slider-block">
+                    <div class="slider-head">
+                        <span>Giây</span>
+                        <span id="valSec">0s</span>
+                    </div>
+                    <input type="range" id="sliderSec" min="0" max="59" value="0" oninput="updateTimerLabels()">
+                </div>
+                <div class="timer-controls">
+                    <button class="btn btn-primary" onclick="startTimer()">Kích hoạt</button>
+                    <button class="btn btn-danger" onclick="cancelTimer()">Hủy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LED -->
+        <div class="card">
+            <div class="card-header" onclick="toggleCard(this)">
+                <span class="title">🎨 LED chuyên sâu</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="card-body">
+                <div class="led-grid">
+                    <button class="led-btn" onclick="setLed(1, this)"><span class="icon">🌈</span> Rainbow</button>
+                    <button class="led-btn" onclick="setLed(2, this)"><span class="icon">🫁</span> Breathing</button>
+                    <button class="led-btn" onclick="setLed(3, this)"><span class="icon">🔀</span> Spectrum</button>
+                    <button class="led-btn" onclick="setLed(4, this)"><span class="icon">🌊</span> Wave</button>
+                    <button class="led-btn" onclick="setLed(5, this)"><span class="icon">🔴</span> Static Red</button>
+                    <button class="led-btn" onclick="setLed(6, this)"><span class="icon">🔵</span> Static Blue</button>
+                    <button class="led-btn" onclick="setLed(7, this)"><span class="icon">🟢</span> Static Green</button>
+                    <button class="led-btn" onclick="setLed(8, this)"><span class="icon">⚡</span> Strobe</button>
+                    <button class="led-btn" onclick="setLed(9, this)"><span class="icon">🎨</span> Custom</button>
+                    <button class="led-btn" onclick="setLed(0, this)"><span class="icon">🚫</span> Tắt LED</button>
+                </div>
+
+                <div class="color-row">
+                    <input type="color" id="customColor" value="#00e5ff" onchange="setCustomColor(this.value)">
+                    <span style="font-size: 12px; color: var(--muted);">Chọn màu tùy chỉnh (Custom)</span>
+                </div>
+
+                <div class="slider-block">
+                    <div class="slider-head">
+                        <span>Độ sáng LED</span>
+                        <span id="valBrightness">100%</span>
+                    </div>
+                    <input type="range" id="sliderBrightness" min="1" max="100" value="100" oninput="setBrightness(this.value)">
+                </div>
+
+                <div class="slider-block">
+                    <div class="slider-head">
+                        <span>Tốc độ hiệu ứng</span>
+                        <span id="valSpeed">50%</span>
+                    </div>
+                    <input type="range" id="sliderSpeed" min="1" max="100" value="50" oninput="setLedSpeed(this.value)">
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="acc-card" style="margin-bottom: 30px;">
-        <div class="acc-header" onclick="toggleAccordion(this)">
-            <span class="acc-header-title">🎨 BỘ 10 CHẾ ĐỘ LED CHUYÊN SÂU</span>
-            <input type="color" id="customColor" value="#00f2fe" onclick="event.stopPropagation();" onchange="setCustomLedColor(this.value)">
-        </div>
-        <div class="acc-content">
-            <div class="grid-led">
-                <button class="btn-led active" onclick="setLedMode(1, this)">🌈 Rainbow Mode</button>
-                <button class="btn-led" onclick="setLedMode(2, this)">🫁 Breathing Glow</button>
-                <button class="btn-led" onclick="setLedMode(3, this)">🔀 Spectrum Cycle</button>
-                <button class="btn-led" onclick="setLedMode(4, this)">🎨 Custom RGB Color</button>
-                <button class="btn-led" onclick="setLedMode(5, this)">🌊 Wave Flow Effect</button>
-                <button class="btn-led" onclick="setLedMode(6, this)">🔴 Static Red Light</button>
-                <button class="btn-led" onclick="setLedMode(7, this)">🔵 Static Blue Light</button>
-                <button class="btn-led" onclick="setLedMode(8, this)">🟢 Static Green Light</button>
-                <button class="btn-led" onclick="setLedMode(9, this)">⚡ Flash Strobe</button>
-                <button class="btn-led" onclick="setLedMode(0, this)">🚫 Tắt Đèn LED</button>
-            </div>
+    <footer>
+        PIVA B3 Pro Ultra Controller · Web Bluetooth<br>
+        Tối ưu cho Chrome / Edge / Bluefy
+    </footer>
+</div>
 
-            <div style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 8px;">
-                <div class="slider-row">
-                    <div class="slider-title-val">
-                        <span>💡 Độ sáng LED</span>
-                        <span id="valBrightness" style="color: var(--accent);">100%</span>
-                    </div>
-                    <input type="range" class="hslider" id="sliderBrightness" min="0" max="100" value="100" oninput="setLedBrightness(this.value)">
-                </div>
+<div id="toast" class="toast"></div>
 
-                <div class="slider-row" style="margin-top: 10px;">
-                    <div class="slider-title-val">
-                        <span>🔄 Tốc độ xoay LED</span>
-                        <span id="valSpeed" style="color: var(--accent);">50%</span>
-                    </div>
-                    <input type="range" class="hslider" id="sliderSpeed" min="1" max="100" value="50" oninput="setLedSpeed(this.value)">
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+/* ===================== CONFIG ===================== */
+const SERVICE_UUID = '49535343-fe7d-4350-a8d4-26080b4e5670';
+const WRITE_UUID   = '49535343-6daa-4d02-abf6-19569aca69fe';
+const NOTIFY_UUID  = '49535343-1e4d-4bd9-ba61-23c647249616';
 
-    <script>
-        let bleDevice = null;
-        let writeCharacteristic = null;
-        let timerTargetTime = null;
-        let timerInterval = null;
-        let safetyInterval = null;
+/* ===================== STATE ===================== */
+let bleDevice = null;
+let writeChar = null;
+let notifyChar = null;
+let isConnected = false;
+let isConnecting = false;
 
-        let peltierSafetyEnabled = true;
-        let chargerSafetyEnabled = true;
-        let smartModeEnabled = false;
+let peltierSafety = true;
+let chargerSafety = true;
+let smartMode = false;
 
-        const SERVICE_UUID = '49535343-fe7d-4350-a8d4-26080b4e5670';
-        const WRITE_UUID   = '49535343-6daa-4d02-abf6-19569aca69fe';
+let timerTarget = null;
+let timerInterval = null;
+let safetyInterval = null;
 
-        function toggleAccordion(headerElem) {
-            const card = headerElem.parentElement;
-            card.classList.toggle('open');
+/* ===================== UI HELPERS ===================== */
+function toast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + type;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function setStatus(connected, text) {
+    const pill = document.getElementById('statusPill');
+    const txt = document.getElementById('statusText');
+    const btn = document.getElementById('btnConnect');
+    const controls = document.getElementById('controls');
+
+    isConnected = connected;
+    txt.textContent = text || (connected ? 'Đã kết nối' : 'Ngắt kết nối');
+
+    if (connected) {
+        pill.classList.add('connected');
+        btn.classList.add('connected');
+        btn.textContent = 'NGẮT KẾT NỐI';
+        controls.classList.remove('controls-disabled');
+        controls.classList.add('controls-enabled');
+    } else {
+        pill.classList.remove('connected');
+        btn.classList.remove('connected');
+        btn.textContent = 'KẾT NỐI BLUETOOTH';
+        controls.classList.add('controls-disabled');
+        controls.classList.remove('controls-enabled');
+    }
+}
+
+function toggleCard(header) {
+    header.parentElement.classList.toggle('open');
+}
+
+function setActive(groupSelector, activeId) {
+    document.querySelectorAll(groupSelector).forEach(b => b.classList.remove('active'));
+    const el = document.getElementById(activeId);
+    if (el) el.classList.add('active');
+}
+
+/* ===================== BLUETOOTH ===================== */
+async function toggleConnection() {
+    if (isConnecting) return;
+    if (isConnected) {
+        await disconnect();
+        return;
+    }
+    await connect();
+}
+
+async function connect() {
+    if (!navigator.bluetooth) {
+        toast('Trình duyệt không hỗ trợ Web Bluetooth. Dùng Chrome/Edge (Android) hoặc Bluefy (iOS)', 'error');
+        return;
+    }
+
+    isConnecting = true;
+    const btn = document.getElementById('btnConnect');
+    btn.classList.add('loading');
+    btn.textContent = 'ĐANG TÌM THIẾT BỊ...';
+
+    try {
+        bleDevice = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: [SERVICE_UUID]
+        });
+
+        bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+        const server = await bleDevice.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        writeChar = await service.getCharacteristic(WRITE_UUID);
+
+        try {
+            notifyChar = await service.getCharacteristic(NOTIFY_UUID);
+            await notifyChar.startNotifications();
+            notifyChar.addEventListener('characteristicvaluechanged', handleNotify);
+        } catch (e) {
+            notifyChar = null;
         }
 
-        async function connectBLE() {
-            if (!navigator.bluetooth) {
-                alert("Mở web này bằng trình duyệt BLUEFY trên App Store để hỗ trợ Bluetooth!");
-                return;
-            }
-            try {
-                // Đã cấu hình tương thích 100% với trình duyệt Bluefy trên iOS
-                bleDevice = await navigator.bluetooth.requestDevice({
-                    filters: [{ namePrefix: '' }],
-                    optionalServices: [SERVICE_UUID]
-                });
-                
-                const server = await bleDevice.gatt.connect();
-                const service = await server.getPrimaryService(SERVICE_UUID);
-                writeCharacteristic = await service.getCharacteristic(WRITE_UUID);
+        setStatus(true, 'Đã kết nối');
+        toast('Kết nối thành công với PIVA B3 Pro!', 'success');
+        startSafetyMonitor();
 
-                const statusBadge = document.getElementById('status');
-                statusBadge.innerText = 'Đã kết nối';
-                statusBadge.classList.add('connected');
-                
-                startSafetyMonitor();
-                alert('Đã kết nối thành công với sò PIVA B3 Pro!');
-            } catch (error) {
-                if (error && (error.name === 'NotFoundError' || error.code === 8)) {
-                    console.log('Đã hủy chọn thiết bị.');
-                } else {
-                    let errorMsg = "Không tìm thấy thiết bị hoặc chưa bật Bluetooth";
-                    if (typeof error === 'string') errorMsg = error;
-                    else if (error && error.message) errorMsg = error.message;
-                    alert('Lỗi kết nối Bluetooth: ' + errorMsg);
-                }
-            }
+        await send([0xA5, 0x02, 0x01, 0x5A]);
+
+    } catch (err) {
+        if (err.name === 'NotFoundError') {
+            // User cancelled
+        } else {
+            console.error(err);
+            toast('Lỗi: ' + (err.message || 'Không thể kết nối'), 'error');
         }
+        setStatus(false);
+    } finally {
+        isConnecting = false;
+        btn.classList.remove('loading');
+        if (!isConnected) btn.textContent = 'KẾT NỐI BLUETOOTH';
+    }
+}
 
-        async function sendHexBytes(byteArray) {
-            if (!writeCharacteristic) return;
-            try {
-                await writeCharacteristic.writeValue(new Uint8Array(byteArray));
-            } catch (err) {
-                console.error("Lỗi gửi Hex:", err);
-            }
+async function disconnect() {
+    try {
+        if (bleDevice && bleDevice.gatt.connected) {
+            await bleDevice.gatt.disconnect();
         }
+    } catch (e) {}
+    cleanup();
+    setStatus(false);
+    toast('Đã ngắt kết nối');
+}
 
-        function setMode(level, btnId) {
-            document.querySelectorAll('#btnL1, #btnL2, #btnL3').forEach(b => b.classList.remove('active'));
-            if(btnId) document.getElementById(btnId).classList.add('active');
-            if (smartModeEnabled && btnId) {
-                document.getElementById('smartToggle').checked = false;
-                smartModeEnabled = false;
-            }
-            sendHexBytes([0xA5, 0x02, level, 0x5A]);
-        }
+function onDisconnected() {
+    cleanup();
+    setStatus(false);
+    toast('Mất kết nối Bluetooth', 'error');
+}
 
-        function toggleSmartMode(enable) {
-            smartModeEnabled = enable;
-            sendHexBytes([0xA5, 0x06, enable ? 0x01 : 0x00, 0x5A]);
-        }
+function cleanup() {
+    writeChar = null;
+    notifyChar = null;
+    bleDevice = null;
+    clearInterval(safetyInterval);
+    clearInterval(timerInterval);
+}
 
-        function toggleTurbo(enable) {
-            sendHexBytes([0xA5, 0x03, enable ? 0x01 : 0x00, 0x5A]);
-        }
+/* ===================== PROTOCOL ===================== */
+async function send(bytes) {
+    if (!writeChar || !isConnected) {
+        toast('Chưa kết nối thiết bị', 'error');
+        return false;
+    }
+    try {
+        await writeChar.writeValue(new Uint8Array(bytes));
+        return true;
+    } catch (err) {
+        console.error('Write error:', err);
+        toast('Gửi lệnh thất bại', 'error');
+        return false;
+    }
+}
 
-        function setFanSpeed(val, btnId) {
-            document.querySelectorAll('#fan20, #fan40, #fan60, #fan80, #fan100').forEach(b => b.classList.remove('active'));
-            if(btnId) document.getElementById(btnId).classList.add('active');
-            sendHexBytes([0xA5, 0x04, parseInt(val), 0x5A]);
-        }
+function setMode(level) {
+    setActive('#btnL1, #btnL2, #btnL3', 'btnL' + level);
+    if (smartMode) {
+        document.getElementById('smartToggle').checked = false;
+        smartMode = false;
+    }
+    send([0xA5, 0x02, level, 0x5A]);
+}
 
-        function setLedMode(modeId, btnElem) {
-            document.querySelectorAll('.btn-led').forEach(b => b.classList.remove('active'));
-            if(btnElem) btnElem.classList.add('active');
-            sendHexBytes([0xA5, 0x05, modeId, 0x5A]);
-        }
+function toggleSmart(enable) {
+    smartMode = enable;
+    send([0xA5, 0x06, enable ? 0x01 : 0x00, 0x5A]);
+}
 
-        function setCustomLedColor(hexColor) {
-            let r = parseInt(hexColor.slice(1, 3), 16);
-            let g = parseInt(hexColor.slice(3, 5), 16);
-            let b = parseInt(hexColor.slice(5, 7), 16);
-            sendHexBytes([0xA5, 0x07, r, g, b, 0x5A]);
-        }
+function toggleTurbo(enable) {
+    send([0xA5, 0x03, enable ? 0x01 : 0x00, 0x5A]);
+}
 
-        function setLedBrightness(val) {
-            document.getElementById('valBrightness').innerText = val + '%';
-            sendHexBytes([0xA5, 0x08, parseInt(val), 0x5A]);
-        }
+function setFan(percent) {
+    setActive('#fan20, #fan40, #fan60, #fan80, #fan100', 'fan' + percent);
+    send([0xA5, 0x04, percent, 0x5A]);
+}
 
-        function setLedSpeed(val) {
-            document.getElementById('valSpeed').innerText = val + '%';
-            sendHexBytes([0xA5, 0x09, parseInt(val), 0x5A]);
-        }
+function setLed(modeId, btn) {
+    document.querySelectorAll('.led-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    send([0xA5, 0x05, modeId, 0x5A]);
+}
 
-        function updateSliderLabels() {
-            let h = document.getElementById('sliderHour').value;
-            let m = document.getElementById('sliderMin').value;
-            let s = document.getElementById('sliderSec').value;
-            document.getElementById('valHour').innerText = (h < 10 ? '0' + h : h) + 'h';
-            document.getElementById('valMin').innerText = (m < 10 ? '0' + m : m) + 'p';
-            document.getElementById('valSec').innerText = (s < 10 ? '0' + s : s) + 's';
-        }
+function setCustomColor(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    send([0xA5, 0x07, r, g, b, 0x5A]);
+}
 
-        function startCustomTimer() {
+function setBrightness(val) {
+    document.getElementById('valBrightness').textContent = val + '%';
+    send([0xA5, 0x08, parseInt(val), 0x5A]);
+}
+
+function setLedSpeed(val) {
+    document.getElementById('valSpeed').textContent = val + '%';
+    send([0xA5, 0x09, parseInt(val), 0x5A]);
+}
+
+/* ===================== NOTIFY ===================== */
+function handleNotify(event) {
+    const data = new Uint8Array(event.target.value.buffer);
+    // Khi có packet thật từ sò, parse ở đây để hiện nhiệt độ / RPM
+}
+
+/* ===================== TIMER ===================== */
+function updateTimerLabels() {
+    const h = document.getElementById('sliderHour').value;
+    const m = document.getElementById('sliderMin').value;
+    const s = document.getElementById('sliderSec').value;
+    document.getElementById('valHour').textContent = h + 'h';
+    document.getElementById('valMin').textContent = m + 'p';
+    document.getElementById('valSec').textContent = s + 's';
+}
+
+function startTimer() {
+    const h = parseInt(document.getElementById('sliderHour').value) || 0;
+    const m = parseInt(document.getElementById('sliderMin').value) || 0;
+    const s = parseInt(document.getElementById('sliderSec').value) || 0;
+    const total = h * 3600 + m * 60 + s;
+
+    if (total <= 0) {
+        toast('Vui lòng chọn thời gian > 0', 'error');
+        return;
+    }
+
+    clearInterval(timerInterval);
+    timerTarget = Date.now() + total * 1000;
+    const display = document.getElementById('timerDisplay');
+
+    timerInterval = setInterval(() => {
+        const remain = timerTarget - Date.now();
+        if (remain <= 0) {
             clearInterval(timerInterval);
-            let h = parseInt(document.getElementById('sliderHour').value);
-            let m = parseInt(document.getElementById('sliderMin').value);
-            let s = parseInt(document.getElementById('sliderSec').value);
+            setMode(1);
+            display.textContent = 'Đã tắt theo hẹn giờ';
+            toast('⏱️ Hết giờ! Đã hạ công suất sò', 'success');
+            return;
+        }
+        const sec = Math.ceil(remain / 1000);
+        const rh = Math.floor(sec / 3600);
+        const rm = Math.floor((sec % 3600) / 60);
+        const rs = sec % 60;
+        display.textContent = `Còn ${String(rh).padStart(2,'0')}:${String(rm).padStart(2,'0')}:${String(rs).padStart(2,'0')}`;
+    }, 250);
 
-            let totalSeconds = (h * 3600) + (m * 60) + s;
-            const display = document.getElementById('timerDisplay');
+    toast('Đã bật hẹn giờ');
+}
 
-            if (totalSeconds <= 0) {
-                alert("Vui lòng chọn thời gian hẹn giờ lớn hơn 0 giây.");
-                return;
-            }
+function cancelTimer() {
+    clearInterval(timerInterval);
+    timerTarget = null;
+    document.getElementById('timerDisplay').textContent = 'Chưa hẹn giờ';
+    toast('Đã hủy hẹn giờ');
+}
 
-            timerTargetTime = Date.now() + (totalSeconds * 1000);
+/* ===================== SAFETY MONITOR ===================== */
+function startSafetyMonitor() {
+    clearInterval(safetyInterval);
+    safetyInterval = setInterval(() => {
+        const tempFan = parseFloat(document.getElementById('tempFan').textContent) || 25;
+        const tempCharger = parseFloat(document.getElementById('tempCharger').textContent) || 30;
+        const banner = document.getElementById('alertBanner');
+        let msg = '';
 
-            timerInterval = setInterval(() => {
-                let remainingMs = timerTargetTime - Date.now();
-                if (remainingMs <= 0) {
-                    clearInterval(timerInterval);
-                    setMode(0);
-                    display.innerText = "ĐÃ TẮT THEO HẸN GIỜ";
-                    alert("⏱️ Hết giờ! Sò tản nhiệt đã tự động tắt.");
-                } else {
-                    let totalSec = Math.ceil(remainingMs / 1000);
-                    let remH = Math.floor(totalSec / 3600);
-                    let remM = Math.floor((totalSec % 3600) / 60);
-                    let remS = totalSec % 60;
-                    display.innerText = `CÒN LẠI: ${remH < 10 ? '0' : ''}${remH}:${remM < 10 ? '0' : ''}${remM}:${remS < 10 ? '0' : ''}${remS}`;
-                }
-            }, 1000);
+        if (peltierSafety) {
+            if (tempFan > 65) msg = '⚠️ Sò quá nhiệt (>65°C) — đã tự hạ công suất';
+            else if (tempFan < 2) msg = '❄️ Sò quá lạnh (<2°C) — đã hạ công suất tránh đọng nước';
+        }
+        if (chargerSafety && tempCharger > 60) {
+            msg = '🔌 Củ sạc quá nhiệt (>60°C) — đã hạ công suất bảo vệ';
         }
 
-        function cancelTimer() {
-            clearInterval(timerInterval);
-            timerTargetTime = null;
-            document.getElementById('timerDisplay').innerText = "CHƯA HẸN GIỜ";
+        if (msg) {
+            banner.style.display = 'block';
+            banner.textContent = msg;
+            setMode(1);
+        } else {
+            banner.style.display = 'none';
         }
+    }, 3000);
+}
 
-        function togglePeltierSafety(enable) { peltierSafetyEnabled = enable; }
-        function toggleChargerSafety(enable) { chargerSafetyEnabled = enable; }
+/* ===================== INIT ===================== */
+updateTimerLabels();
+setStatus(false);
 
-        function startSafetyMonitor() {
-            clearInterval(safetyInterval);
-            safetyInterval = setInterval(() => {
-                let tempFan = parseFloat(document.getElementById('tempFan').innerText) || 25;
-                let tempCharger = parseFloat(document.getElementById('tempCharger').innerText) || 30;
-                const banner = document.getElementById('alertBanner');
-                let warningText = "";
-
-                if (peltierSafetyEnabled) {
-                    if (tempFan > 65) warningText = "⚠️ Quá nhiệt Sò (>65°C)! Đã tự động hạ công suất!";
-                    else if (tempFan < 2) warningText = "❄️ Đóng băng (<2°C)! Đã hạ công suất tránh đọng nước!";
-                }
-
-                if (chargerSafetyEnabled && tempCharger > 60) {
-                    warningText = "🔌 Quá nhiệt Củ Sạc (>60°C)! Đã hạ công suất bảo vệ nguồn!";
-                }
-
-                if (warningText !== "") {
-                    banner.style.display = 'block';
-                    banner.innerText = warningText;
-                    setMode(1, 'btnL1');
-                } else {
-                    banner.style.display = 'none';
-                }
-            }, 3000);
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.unregister();
-                }
-            });
-            window.addEventListener('load', () => {
-                const swCode = `
-                    const CACHE_NAME = 'piva-b3pro-v9999';
-                    self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); self.skipWaiting(); });
-                    self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null)))); self.clients.claim(); });
-                    self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))); });
-                `;
-                try {
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-                } catch (e) {}
-            });
-        }
-    </script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+    });
+}
+</script>
 </body>
 </html>
