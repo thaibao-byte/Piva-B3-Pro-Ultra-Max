@@ -2,57 +2,56 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PIVA B3 Pro DEBUG V5</title>
 
 <style>
-    body {
-        margin: 0;
-        padding: 20px;
-        background: #111;
-        color: white;
-        font-family: Arial, sans-serif;
-    }
+body {
+    margin: 0;
+    padding: 20px;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+}
 
-    h1 {
-        font-size: 22px;
-    }
+h1 {
+    font-size: 22px;
+}
 
-    button {
-        width: 100%;
-        padding: 14px;
-        margin: 6px 0;
-        border: 0;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: bold;
-    }
+button {
+    width: 100%;
+    padding: 14px;
+    margin: 6px 0;
+    border: 0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
 
-    #log {
-        margin-top: 15px;
-        padding: 12px;
-        height: 450px;
-        overflow-y: auto;
-        background: #000;
-        color: #00ff66;
-        border-radius: 10px;
-        white-space: pre-wrap;
-        word-break: break-word;
-        font-family: monospace;
-        font-size: 13px;
-    }
+.connect {
+    background: #333;
+    color: white;
+}
 
-    .danger {
-        background: #ffcc00;
-        color: #000;
-    }
+.test {
+    background: #ffcc00;
+    color: black;
+}
 
-    .normal {
-        background: #333;
-        color: white;
-    }
+#log {
+    margin-top: 15px;
+    padding: 12px;
+    height: 450px;
+    overflow-y: auto;
+    background: #000;
+    color: #00ff66;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: monospace;
+    font-size: 13px;
+}
 </style>
 </head>
 
@@ -60,34 +59,33 @@
 
 <h1>PIVA B3 Pro DEBUG V5</h1>
 
-<button class="normal" onclick="connectBLE()">
-    🔵 KẾT NỐI B3 PRO
+<button class="connect" onclick="connectBLE()">
+🔵 KẾT NỐI B3 PRO
 </button>
 
-<button class="danger" onclick="testL1_8841()">
-    ⚡ TEST L1 → 8841
+<button class="test" onclick="testL1_8841()">
+⚡ TEST L1 → 8841
 </button>
 
-<button class="normal" onclick="testL2_8841()">
-    TEST L2 → 8841
+<button class="connect" onclick="testL2_8841()">
+TEST L2 → 8841
 </button>
 
-<button class="normal" onclick="testL3_8841()">
-    TEST L3 → 8841
+<button class="connect" onclick="testL3_8841()">
+TEST L3 → 8841
 </button>
 
-<button class="normal" onclick="testTurbo_8841()">
-    TEST TURBO → 8841
+<button class="connect" onclick="testTurbo_8841()">
+TEST TURBO → 8841
 </button>
 
 <pre id="log"></pre>
 
-
 <script>
 
-/* =========================================================
-   UUID
-========================================================= */
+/* =====================================================
+   UUID CỦA PIVA B3 PRO
+===================================================== */
 
 const SERVICE_UUID =
     '49535343-fe7d-4ae5-8fa9-9fafd205e455';
@@ -98,17 +96,19 @@ const WRITE_6DAA =
 const WRITE_8841 =
     '49535343-8841-43f4-a8d4-ecbe34729bb3';
 
+/*
+   UUID 1E4D THỰC TẾ CỦA B3 PRO
+*/
 const NOTIFY_1E4D =
-    '49535343-1e4d-4ae5-8fa9-9fafd205e455';
+    '49535343-1e4d-4bd9-ba61-23c647249616';
 
 
-/* =========================================================
-   GLOBALS
-========================================================= */
+/* =====================================================
+   BIẾN
+===================================================== */
 
 let bleDevice = null;
 let gattServer = null;
-
 let service = null;
 
 let write6DAAChar = null;
@@ -116,9 +116,9 @@ let write8841Char = null;
 let notify1E4DChar = null;
 
 
-/* =========================================================
+/* =====================================================
    LOG
-========================================================= */
+===================================================== */
 
 function log(text) {
 
@@ -137,9 +137,9 @@ function log(text) {
 }
 
 
-/* =========================================================
+/* =====================================================
    HEX
-========================================================= */
+===================================================== */
 
 function hex(data) {
 
@@ -154,9 +154,9 @@ function hex(data) {
 }
 
 
-/* =========================================================
+/* =====================================================
    CONNECT
-========================================================= */
+===================================================== */
 
 async function connectBLE() {
 
@@ -190,10 +190,8 @@ async function connectBLE() {
 
         bleDevice.addEventListener(
             'gattserverdisconnected',
-            () => {
-
+            function() {
                 log('BLE DISCONNECTED');
-
             }
         );
 
@@ -214,14 +212,13 @@ async function connectBLE() {
             'CONNECT ERROR = ' +
             error
         );
-
     }
 }
 
 
-/* =========================================================
-   SCAN GATT
-========================================================= */
+/* =====================================================
+   GATT SCAN
+===================================================== */
 
 async function scanGatt() {
 
@@ -286,13 +283,12 @@ async function scanGatt() {
         );
 
 
-        /* -----------------------------------------
+        /* ==============================
            6DAA
-        ----------------------------------------- */
+        ============================== */
 
         if (
-            uuid ===
-            WRITE_6DAA
+            uuid === WRITE_6DAA
         ) {
 
             write6DAAChar = c;
@@ -300,17 +296,15 @@ async function scanGatt() {
             log(
                 '>>> WRITE 6DAA FOUND'
             );
-
         }
 
 
-        /* -----------------------------------------
+        /* ==============================
            8841
-        ----------------------------------------- */
+        ============================== */
 
         if (
-            uuid ===
-            WRITE_8841
+            uuid === WRITE_8841
         ) {
 
             write8841Char = c;
@@ -329,23 +323,22 @@ async function scanGatt() {
                 '>>> 8841 WRITE_NO_RESPONSE = ' +
                 c.properties.writeWithoutResponse
             );
-
         }
 
 
-        /* -----------------------------------------
+        /* ==============================
            1E4D
-        ----------------------------------------- */
+        ============================== */
 
         if (
-            uuid ===
-            NOTIFY_1E4D
+            uuid === NOTIFY_1E4D
         ) {
 
             notify1E4DChar = c;
 
             log(
-                '>>> NOTIFY 1E4D FOUND'
+                '>>> NOTIFY 1E4D FOUND = ' +
+                c.uuid
             );
 
 
@@ -375,7 +368,6 @@ async function scanGatt() {
                         'NOTIFY ERROR = ' +
                         error
                     );
-
                 }
             }
         }
@@ -397,7 +389,6 @@ async function scanGatt() {
         log(
             '!!! KHONG TIM THAY WRITE 8841'
         );
-
     }
 
 
@@ -412,7 +403,6 @@ async function scanGatt() {
         log(
             '!!! KHONG TIM THAY NOTIFY 1E4D'
         );
-
     }
 
 
@@ -420,9 +410,9 @@ async function scanGatt() {
 }
 
 
-/* =========================================================
-   NOTIFY
-========================================================= */
+/* =====================================================
+   NHẬN DỮ LIỆU 1E4D
+===================================================== */
 
 function onNotify1E4D(event) {
 
@@ -439,9 +429,9 @@ function onNotify1E4D(event) {
 }
 
 
-/* =========================================================
-   SEND THROUGH 8841
-========================================================= */
+/* =====================================================
+   GỬI QUA 8841
+===================================================== */
 
 async function send8841(bytes) {
 
@@ -529,9 +519,9 @@ async function send8841(bytes) {
 }
 
 
-/* =========================================================
+/* =====================================================
    TEST L1
-========================================================= */
+===================================================== */
 
 async function testL1_8841() {
 
@@ -550,9 +540,7 @@ async function testL1_8841() {
 
 
     const result =
-        await send8841(
-            command
-        );
+        await send8841(command);
 
 
     if (result) {
@@ -562,7 +550,7 @@ async function testL1_8841() {
         );
 
         log(
-            '>>> WATCH DEVICE RESPONSE'
+            '>>> WATCH B3 PRO RESPONSE'
         );
 
     } else {
@@ -574,9 +562,9 @@ async function testL1_8841() {
 }
 
 
-/* =========================================================
+/* =====================================================
    TEST L2
-========================================================= */
+===================================================== */
 
 async function testL2_8841() {
 
@@ -593,9 +581,9 @@ async function testL2_8841() {
 }
 
 
-/* =========================================================
+/* =====================================================
    TEST L3
-========================================================= */
+===================================================== */
 
 async function testL3_8841() {
 
@@ -612,9 +600,9 @@ async function testL3_8841() {
 }
 
 
-/* =========================================================
+/* =====================================================
    TEST TURBO
-========================================================= */
+===================================================== */
 
 async function testTurbo_8841() {
 
@@ -631,13 +619,13 @@ async function testTurbo_8841() {
 }
 
 
-/* =========================================================
-   STARTUP
-========================================================= */
+/* =====================================================
+   KHỞI ĐỘNG
+===================================================== */
 
 window.addEventListener(
     'load',
-    () => {
+    function() {
 
         log(
             'PIVA B3 PRO DEBUG V5 READY'
@@ -659,6 +647,7 @@ window.addEventListener(
         );
 
         log('');
+
         log(
             'CHUA GUI LENH NAO CHO B3 PRO'
         );
