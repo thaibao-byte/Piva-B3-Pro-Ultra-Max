@@ -99,12 +99,11 @@
   <div class="hero">
     <div class="fan-ring" id="fanRing"></div>
     <div class="fan-img-box">
-      <!-- Ảnh sản phẩm PIVA B3 Pro qua link trực tiếp không mã hóa CORS -->
       <img class="fan-img" id="deviceImg" src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400" alt="Piva B3 Pro" onerror="fallbackImg()">
     </div>
   </div>
 
-  <!-- 6 THẺ THÔNG SỐ BAN ĐẦU ĐỂ TRỐNG -->
+  <!-- 6 THẺ THÔNG SỐ -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt độ Sò</div>
@@ -132,7 +131,7 @@
     </div>
   </div>
 
-  <!-- BỘ ĐIỀU KHIỂN CHẾ ĐỘ LÀM LẠNH -->
+  <!-- BỘ ĐIỀU KHIỂN LÀM LẠNH -->
   <div class="section-title">Chế độ Làm Lạnh (Level)</div>
   <div class="panel-card">
     <div class="level-grid">
@@ -209,12 +208,10 @@
     let isSmartMode = false;
     let isTurboMode = false;
 
-    // Dự phòng khi bị nghẽn mạng không load được ảnh
     function fallbackImg() {
       document.getElementById('deviceImg').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23121824' stroke='%2300f2fe' stroke-width='3'/><circle cx='50' cy='50' r='18' fill='%2300f2fe'/><text x='50' y='55' font-size='14' font-weight='bold' fill='%23000' text-anchor='middle'>PIVA B3</text></svg>";
     }
 
-    // Kiểm tra kết nối Bluetooth trước khi chạy bất kỳ thao tác nào
     function checkConnection() {
       if (!writeChar) {
         alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' ở phía trên trước!");
@@ -225,14 +222,20 @@
 
     async function connectBLE() {
       if (!navigator.bluetooth) {
-        alert("Trình duyệt không hỗ trợ Web Bluetooth. Hãy sử dụng Google Chrome hoặc Microsoft Edge!");
+        alert("Trình duyệt không hỗ trợ Web Bluetooth. Hãy dùng Google Chrome hoặc Edge!");
         return;
       }
       try {
+        // Lọc trực tiếp theo Service UUID để tránh hiện nhiều dãy mã linh tinh
         const device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
+          filters: [
+            { services: [SERVICE_UUID] },
+            { namePrefix: 'Piva' },
+            { namePrefix: 'B3' }
+          ],
           optionalServices: [SERVICE_UUID]
         });
+        
         const server = await device.gatt.connect();
         const service = await server.getPrimaryService(SERVICE_UUID);
         writeChar = await service.getCharacteristic(WRITE_UUID);
@@ -241,7 +244,6 @@
         document.getElementById('status').classList.add('connected');
         document.getElementById('btnConnect').style.display = "none";
 
-        // Chọn mặc định chế độ ban đầu
         const defaultBtn = document.querySelector('.level-grid .btn-action');
         if (defaultBtn) defaultBtn.classList.add('active');
         
@@ -254,7 +256,24 @@
         startSafetyMonitor();
       } catch (e) {
         console.log(e);
-        alert("Không thể kết nối Bluetooth với thiết bị!");
+        // Nếu lọc thất bại thì mở quét lại bình thường
+        try {
+          const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: [SERVICE_UUID]
+          });
+          const server = await device.gatt.connect();
+          const service = await server.getPrimaryService(SERVICE_UUID);
+          writeChar = await service.getCharacteristic(WRITE_UUID);
+          
+          document.getElementById('status').innerText = "Đã kết nối";
+          document.getElementById('status').classList.add('connected');
+          document.getElementById('btnConnect').style.display = "none";
+          updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM");
+          startSafetyMonitor();
+        } catch(err) {
+          alert("Không thể kết nối với thiết bị Bluetooth!");
+        }
       }
     }
 
