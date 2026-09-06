@@ -574,7 +574,6 @@
     </div>
 
     <div id="controls" class="controls-disabled">
-        <!-- Cooling Modes -->
         <div class="card open">
             <div class="card-header" onclick="toggleCard(this)">
                 <span class="title">❄️ Chế độ làm lạnh</span>
@@ -600,7 +599,6 @@
             </div>
         </div>
 
-        <!-- Turbo & Fan -->
         <div class="card">
             <div class="card-header" onclick="toggleCard(this)">
                 <span class="title">🔥 Ép xung & Quạt</span>
@@ -631,7 +629,6 @@
             </div>
         </div>
 
-        <!-- Safety -->
         <div class="card">
             <div class="card-header" onclick="toggleCard(this)">
                 <span class="title">🛡️ Bảo vệ an toàn</span>
@@ -661,7 +658,6 @@
             </div>
         </div>
 
-        <!-- Timer -->
         <div class="card">
             <div class="card-header" onclick="toggleCard(this)">
                 <span class="title">⏱️ Hẹn giờ tắt</span>
@@ -696,7 +692,6 @@
             </div>
         </div>
 
-        <!-- LED -->
         <div class="card">
             <div class="card-header" onclick="toggleCard(this)">
                 <span class="title">🎨 LED chuyên sâu</span>
@@ -834,17 +829,30 @@ async function connect() {
     btn.textContent = 'ĐANG TÌM THIẾT BỊ...';
 
     try {
+        // Ưu tiên tìm theo tên B3PRO
         bleDevice = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
+            filters: [
+                { name: 'B3PRO' },
+                { namePrefix: 'B3' },
+                { namePrefix: 'PIVA' }
+            ],
             optionalServices: [SERVICE_UUID]
         });
 
         bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
-        const server = await bleDevice.gatt.connect();
+        // Nếu đã connected sẵn thì cố gắng dùng luôn
+        let server;
+        if (bleDevice.gatt.connected) {
+            server = bleDevice.gatt;
+        } else {
+            server = await bleDevice.gatt.connect();
+        }
+
         const service = await server.getPrimaryService(SERVICE_UUID);
         writeChar = await service.getCharacteristic(WRITE_UUID);
 
+        // Thử notify (không bắt buộc)
         try {
             notifyChar = await service.getCharacteristic(NOTIFY_UUID);
             await notifyChar.startNotifications();
@@ -860,12 +868,9 @@ async function connect() {
         await send([0xA5, 0x02, 0x01, 0x5A]);
 
     } catch (err) {
-        if (err.name === 'NotFoundError') {
-            // User cancelled
-        } else {
-            console.error(err);
-            toast('Lỗi: ' + (err.message || 'Không thể kết nối'), 'error');
-        }
+        console.error('Connect error:', err);
+        const realMsg = err.message || err.name || 'Không thể kết nối';
+        toast('Lỗi: ' + realMsg, 'error');
         setStatus(false);
     } finally {
         isConnecting = false;
