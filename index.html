@@ -1,425 +1,180 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro Ultra Control</title>
-  <style>
-    :root {
-      --bg: #090d16;
-      --card-bg: rgba(20, 28, 45, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent: #00f2fe;
-      --accent-glow: rgba(0, 242, 254, 0.35);
-      --green: #00e676;
-      --red: #ff4444;
-      --text: #ffffff;
-      --subtext: #8a99ad;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piva B3 Pro Ultra Control</title>
+    <style>
+        :root {
+            --bg: #0b0d17;
+            --card-bg: rgba(20, 24, 45, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.35);
+            --green: #00e676;
+            --red: #ff3366;
+            --text: #ffffff;
+            --subtext: #8a99ad;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    
-    .header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .header h1 { font-size: 18px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, #00f2fe, #ff007f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: rgba(255, 68, 68, 0.2); color: var(--red); border: 1px solid rgba(255, 68, 68, 0.3); }
-    .status-badge.connected { background: rgba(0, 230, 118, 0.15); color: var(--green); border-color: rgba(0, 230, 118, 0.3); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
 
-    .alert-banner { display: none; width: 100%; max-width: 400px; padding: 10px; border-radius: 10px; background: rgba(255, 68, 68, 0.2); border: 1px solid var(--red); color: #fff; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        header h1 { font-size: 18px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .status-badge { font-size: 12px; padding: 5px 12px; border-radius: 20px; background: rgba(255, 51, 102, 0.15); color: var(--red); border: 1px solid rgba(255, 51, 102, 0.3); }
+        .status-badge.connected { background: rgba(0, 230, 118, 0.15); color: var(--green); border-color: rgba(0, 230, 118, 0.3); }
 
-    /* Hero Fan PIVA B3 PRO */
-    .hero { position: relative; width: 150px; height: 150px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
-    .fan-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent); border-bottom-color: #ff007f; animation: spin 3s linear infinite; filter: drop-shadow(0 0 12px var(--accent)); }
-    
-    .piva-img-box {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,0.9);
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .piva-svg { width: 100%; height: 100%; }
+        .btn-connect { width: 100%; max-width: 480px; padding: 14px; margin-bottom: 16px; border-radius: 12px; background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; font-weight: bold; border: none; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px var(--accent-glow); cursor: pointer; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 480px; margin-bottom: 16px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 8px; border-radius: 12px; text-align: center; }
+        .stat-card .label { font-size: 11px; color: var(--subtext); margin-bottom: 4px; }
+        .stat-card .value { font-size: 14px; font-weight: bold; color: var(--accent); }
 
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+        .section-box { width: 100%; max-width: 480px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
+        .section-title { font-size: 12px; font-weight: bold; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
 
-    /* Grid Thông số */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(10px); border-radius: 12px; padding: 8px; text-align: center; }
-    .stat-val { font-size: 13px; font-weight: bold; color: var(--accent); margin-top: 2px; }
-    .stat-lbl { font-size: 10px; color: var(--subtext); }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        .btn-opt { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-opt.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-    .section-title { width: 100%; max-width: 400px; font-size: 12px; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; margin: 10px 0 6px; }
-    .panel-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; width: 100%; max-width: 400px; margin-bottom: 12px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .toggle-row span { font-size: 13px; font-weight: 600; }
+        .toggle-sub { font-size: 11px; color: var(--subtext); display: block; }
 
-    .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-    .btn-action { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
-    .btn-action:active, .btn-action.active { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-
-    .smart-card { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    
-    .led-modes-10 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
-    .mode-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-    .mode-btn:active, .mode-btn.active { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-
-    .slider-container { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-    .slider-container span { font-size: 11px; color: var(--subtext); min-width: 75px; }
-    .range-slider { flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px; background: #2a3547; outline: none; }
-    .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-
-    .color-picker-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .color-input { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; background: none; }
-    .color-input::-webkit-color-swatch { border: 2px solid #fff; border-radius: 50%; }
-
-    .switch { position: relative; width: 36px; height: 20px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2a3547; transition: .3s; border-radius: 20px; }
-    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-    input:checked + .slider { background-color: var(--green); }
-    input:checked + .slider:before { transform: translateX(16px); }
-
-    .btn-connect { width: 100%; max-width: 400px; padding: 12px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; font-size: 14px; font-weight: bold; margin-bottom: 12px; box-shadow: 0 4px 15px var(--accent-glow); cursor: pointer; }
-  </style>
+        input[type="range"] { width: 100%; margin-top: 8px; }
+    </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>PIVA B3 PRO ULTRA</h1>
-    <span id="status" class="status-badge">Ngắt kết nối</span>
-  </div>
+    <header>
+        <h1>PIVA B3 PRO ULTRA</h1>
+        <div id="status" class="status-badge">Ngắt kết nối</div>
+    </header>
 
-  <div id="alertBanner" class="alert-banner">🚨 CẢNH BÁO AN TOÀN</div>
+    <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI TỰ ĐỘNG</button>
 
-  <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI TỰ ĐỘNG</button>
-
-  <div class="hero">
-    <div class="fan-ring" id="fanRing"></div>
-    <div class="piva-img-box">
-      <svg class="piva-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="95" fill="#1c2331" stroke="#333" stroke-width="4"/>
-        <circle cx="100" cy="100" r="82" fill="none" stroke="url(#rgbGradient)" stroke-width="8" opacity="0.9"/>
-        <circle cx="100" cy="100" r="70" fill="#0d1117" stroke="#2a3547" stroke-width="2"/>
-        <path d="M100,30 L100,170 M30,100 L170,100 M50,50 L150,150 M50,150 L150,50" stroke="#1f293d" stroke-width="2" opacity="0.5"/>
-        <circle cx="100" cy="100" r="50" fill="none" stroke="#2a3547" stroke-width="1.5"/>
-        <circle cx="100" cy="100" r="32" fill="#161b26" stroke="#ffd700" stroke-width="2"/>
-        <polygon points="100,78 84,115 116,115" fill="#ffd700"/>
-        <polygon points="100,92 92,110 108,110" fill="#161b26"/>
-        
-        <defs>
-          <linearGradient id="rgbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#00f2fe"/>
-            <stop offset="33%" stop-color="#ff007f"/>
-            <stop offset="66%" stop-color="#ffd700"/>
-            <stop offset="100%" stop-color="#00e676"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-lbl">Nhiệt độ Sò</div>
-      <div class="stat-val" id="tempPlate">-- °C</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Nhiệt Củ Sạc</div>
-      <div class="stat-val" id="tempCharger">-- °C</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Tốc độ quạt</div>
-      <div class="stat-val" id="rpmVal">-- RPM</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Công suất</div>
-      <div class="stat-val" id="powerVal">-- W</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Giao thức sạc</div>
-      <div class="stat-val" id="protocolVal">--</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Điện áp / Dòng</div>
-      <div class="stat-val" id="voltVal">-- V / -- A</div>
-    </div>
-  </div>
-
-  <div class="section-title">Chế độ Làm Lạnh (Level)</div>
-  <div class="panel-card">
-    <div class="level-grid">
-      <button class="btn-action" onclick="setCoolingLevel('L1', this)">❄️ L1 (Êm)</button>
-      <button class="btn-action" onclick="setCoolingLevel('L2', this)">❄️ L2 (Vừa)</button>
-      <button class="btn-action" onclick="setCoolingLevel('L3', this)">❄️ L3 (Mạnh)</button>
-    </div>
-    <div class="smart-card" style="margin-top: 10px;">
-      <div>
-        <div style="font-size: 13px; font-weight: 600;">🧠 Chế độ Thông Minh</div>
-        <div style="font-size: 10px; color: var(--subtext);">Tự tăng/giảm công suất theo nhiệt độ</div>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="smartToggle" onchange="toggleSmartMode(this.checked)">
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <div class="section-title">Chế độ Ép Xung (Turbo Overclock)</div>
-  <div class="panel-card">
-    <div class="smart-card">
-      <div>
-        <div style="font-size: 13px; font-weight: 600;">🔥 Bật Siêu Ép Xung</div>
-        <div style="font-size: 10px; color: var(--subtext);">Làm lạnh công suất tối đa</div>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="turboToggle" onchange="toggleTurboMode(this.checked)">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="slider-container">
-      <span>Tốc độ quạt:</span>
-      <input type="range" min="3000" max="7500" step="100" value="5400" class="range-slider" id="fanSpeedRange" oninput="adjustFanSpeed(this.value)">
-    </div>
-  </div>
-
-  <div class="section-title">Bộ 10 Chế Độ LED Chuyên Sâu</div>
-  <div class="panel-card">
-    <div class="color-picker-row">
-      <span style="font-size: 12px; font-weight:600;">Chọn màu tùy chỉnh:</span>
-      <input type="color" id="htmlColorPicker" class="color-input" value="#00f2fe" onchange="customColorChange(this.value)">
+    <div class="grid-stats">
+        <div class="stat-card"><div class="label">Nhiệt độ Sò</div><div class="value" id="tempFan">-- °C</div></div>
+        <div class="stat-card"><div class="label">Nhiệt Củ Sạc</div><div class="value" id="tempCharger">-- °C</div></div>
+        <div class="stat-card"><div class="label">Tốc độ quạt</div><div class="value" id="fanRpm">-- RPM</div></div>
+        <div class="stat-card"><div class="label">Công suất</div><div class="value" id="power">-- W</div></div>
+        <div class="stat-card"><div class="label">Giao thức sạc</div><div class="value" id="protocol">--</div></div>
+        <div class="stat-card"><div class="label">Điện áp / Dòng</div><div class="value" id="voltAmp">-- V / -- A</div></div>
     </div>
 
-    <div class="led-modes-10">
-      <button class="mode-btn" onclick="setLEDMode(1, this)">🌈 1. Rainbow</button>
-      <button class="mode-btn" onclick="setLEDMode(2, this)">💓 2. Breathing</button>
-      <button class="mode-btn" onclick="setLEDMode(3, this)">⚡ 3. Strobe</button>
-      <button class="mode-btn" onclick="setLEDMode(4, this)">🌊 4. Ocean Wave</button>
-      <button class="mode-btn" onclick="setLEDMode(5, this)">🔥 5. Fire Flame</button>
-      <button class="mode-btn" onclick="setLEDMode(6, this)">🌌 6. Aurora</button>
-      <button class="mode-btn" onclick="setLEDMode(7, this)">🌟 7. Sparkle</button>
-      <button class="mode-btn" onclick="setLEDMode(8, this)">🎶 8. Music Sync</button>
-      <button class="mode-btn" onclick="setLEDMode(9, this)">💡 9. Static Color</button>
-      <button class="mode-btn" onclick="setLEDMode(10, this)">🌙 10. Tắt LED</button>
+    <div class="section-box">
+        <div class="section-title">Chế độ làm lạnh (Level)</div>
+        <div class="btn-group">
+            <button class="btn-opt" onclick="setMode(1)">❄️ L1 (Êm)</button>
+            <button class="btn-opt" onclick="setMode(2)">❄️ L2 (Vừa)</button>
+            <button class="btn-opt" onclick="setMode(3)">❄️ L3 (Mạnh)</button>
+        </div>
     </div>
 
-    <div class="slider-container">
-      <span>Độ sáng LED:</span>
-      <input type="range" min="10" max="100" value="100" class="range-slider" id="brightRange" onchange="adjustBrightness(this.value)">
+    <div class="section-box">
+        <div class="section-title">Chế độ ép xung (Turbo Overclock)</div>
+        <div class="toggle-row">
+            <div>
+                <span>🔥 Bật Siêu Ép Xung</span>
+                <span class="toggle-sub">Làm lạnh công suất tối đa</span>
+            </div>
+            <input type="checkbox" id="turboToggle" onchange="toggleTurbo(this.checked)">
+        </div>
+        <div style="margin-top: 12px;">
+            <span style="font-size: 12px; color: var(--subtext);">Tốc độ quạt:</span>
+            <input type="range" min="0" max="100" value="80" onchange="setFanSpeed(this.value)">
+        </div>
     </div>
-    <div class="slider-container">
-      <span>Tốc độ LED:</span>
-      <input type="range" min="1" max="10" value="5" class="range-slider" id="speedRange" onchange="adjustSpeed(this.value)">
-    </div>
-  </div>
 
-  <script>
-    const SERVICE_UUID = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
-    const WRITE_UUID   = "49535343-6daa-4d02-abf6-19569aca69fe";
-    let writeChar = null;
-    let isSmartMode = false;
-    let isTurboMode = false;
+    <script>
+        let bleDevice = null;
+        let writeCharacteristic = null;
 
-    // Tự động kết nối lại khi tải trang nếu đã ghép đôi trước đó
-    window.addEventListener('DOMContentLoaded', () => {
-      autoConnectPreviousDevice();
-    });
+        // Chuẩn UUID của Piva B3 Pro
+        const SERVICE_UUID = '49535343-fe7d-4350-a8d4-26080b4e5670';
+        const WRITE_UUID   = '49535343-6daa-4d02-abf6-19569aca69fe';
 
-    async function autoConnectPreviousDevice() {
-      if (!navigator.bluetooth || !navigator.bluetooth.getDevices) return;
-      try {
-        const devices = await navigator.bluetooth.getDevices();
-        if (devices.length > 0) {
-          setupDeviceConnection(devices[0]);
-        }
-      } catch (err) {
-        console.log("Auto-connect Error:", err);
-      }
-    }
+        // 1. KẾT NỐI BLUETOOTH
+        async function connectBLE() {
+            if (!navigator.bluetooth) {
+                alert("Trình duyệt không hỗ trợ Web Bluetooth! Hãy dùng Bluefy trên iOS.");
+                return;
+            }
+            try {
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'PIVA' }, { namePrefix: 'B3' }],
+                    optionalServices: [SERVICE_UUID]
+                });
+                
+                const server = await bleDevice.gatt.connect();
+                const service = await server.getPrimaryService(SERVICE_UUID);
+                writeCharacteristic = await service.getCharacteristic(WRITE_UUID);
 
-    async function setupDeviceConnection(device) {
-      try {
-        document.getElementById('status').innerText = "Đang nối...";
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(SERVICE_UUID);
-        writeChar = await service.getCharacteristic(WRITE_UUID);
-
-        document.getElementById('status').innerText = "Đã kết nối";
-        document.getElementById('status').classList.add('connected');
-        document.getElementById('btnConnect').style.display = "none";
-
-        const defaultBtn = document.querySelector('.level-grid .btn-action');
-        if (defaultBtn) defaultBtn.classList.add('active');
-        
-        const defaultLed = document.querySelector('.led-modes-10 .mode-btn');
-        if (defaultLed) defaultLed.classList.add('active');
-
-        document.getElementById('protocolVal').innerText = "PD 9V/3A";
-        updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM");
-
-        startSafetyMonitor();
-      } catch (e) {
-        document.getElementById('status').innerText = "Thất bại";
-      }
-    }
-
-    async function connectBLE() {
-      if (!navigator.bluetooth) {
-        alert("Trình duyệt không hỗ trợ Web Bluetooth!");
-        return;
-      }
-
-      // Thử dùng thiết bị đã nhớ trước
-      if (navigator.bluetooth.getDevices) {
-        const devices = await navigator.bluetooth.getDevices();
-        if (devices.length > 0) {
-          await setupDeviceConnection(devices[0]);
-          if (writeChar) return;
-        }
-      }
-
-      // Nếu chưa ghép đôi bao giờ thì mở cửa sổ chọn 1 lần duy nhất
-      try {
-        const device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: [SERVICE_UUID]
-        });
-        await setupDeviceConnection(device);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    function checkConnection() {
-      if (!writeChar) {
-        alert("Chưa kết nối Bluetooth với Sò B3 Pro!");
-        return false;
-      }
-      return true;
-    }
-
-    async function sendCmd(cmd) {
-      if (!writeChar) return;
-      try {
-        const enc = new TextEncoder();
-        await writeChar.writeValue(enc.encode(cmd + "\r\n"));
-      } catch(err) {
-        console.log("Lỗi lệnh BLE:", err);
-      }
-    }
-
-    function setCoolingLevel(lvl, btn) {
-      if (!checkConnection()) return;
-      
-      if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
-      if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
-
-      document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      sendCmd(`LEVEL_${lvl}`);
-      
-      if(lvl === 'L1') { updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM"); }
-      if(lvl === 'L2') { updatePowerUI(18.0, "9.1V - 2.0A", "5200 RPM"); }
-      if(lvl === 'L3') { updatePowerUI(24.5, "9.1V - 2.7A", "6500 RPM"); }
-    }
-
-    function toggleSmartMode(enable) {
-      if (!checkConnection()) { document.getElementById('smartToggle').checked = false; return; }
-      isSmartMode = enable;
-      if (enable) {
-        if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
-        document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
-        sendCmd("MODE_SMART_ON");
-      } else {
-        sendCmd("MODE_SMART_OFF");
-      }
-    }
-
-    function toggleTurboMode(enable) {
-      if (!checkConnection()) { document.getElementById('turboToggle').checked = false; return; }
-      isTurboMode = enable;
-      if (enable) {
-        if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
-        document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
-        
-        const fanSpeed = document.getElementById('fanSpeedRange').value;
-        sendCmd("TURBO_ON");
-        sendCmd(`FAN_SPEED_${fanSpeed}`);
-        updatePowerUI(27.0, "9.2V - 2.9A", fanSpeed + " RPM");
-      } else {
-        sendCmd("TURBO_OFF");
-      }
-    }
-
-    function adjustFanSpeed(val) {
-      if (checkConnection()) {
-        document.getElementById('rpmVal').innerText = val + " RPM";
-        sendCmd(`FAN_SPEED_${val}`);
-      }
-    }
-
-    function updatePowerUI(watt, voltAmp, rpm) {
-      document.getElementById('powerVal').innerText = watt + " W";
-      document.getElementById('voltVal').innerText = voltAmp;
-      document.getElementById('rpmVal').innerText = rpm;
-    }
-
-    function startSafetyMonitor() {
-      setInterval(() => {
-        if (!writeChar) return;
-        let tCharger = Math.floor(Math.random() * 4) + 36;
-        let tPlate = Math.floor(Math.random() * 5) + 2;
-
-        document.getElementById('tempCharger').innerText = tCharger + "°C";
-        document.getElementById('tempPlate').innerText = tPlate + "°C";
-
-        if (isSmartMode && !isTurboMode) {
-          if (tPlate > 20) { updatePowerUI(24.5, "9.1V - 2.7A", "6800 RPM"); sendCmd("LEVEL_L3"); }
-          else if (tPlate > 10) { updatePowerUI(18.0, "9.1V - 2.0A", "5200 RPM"); sendCmd("LEVEL_L2"); }
-          else { updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM"); sendCmd("LEVEL_L1"); }
+                document.getElementById('status').innerText = 'Đã kết nối';
+                document.getElementById('status').classList.add('connected');
+                alert('Đã kết nối thành công với sò PIVA B3 Pro!');
+            } catch (error) {
+                console.error(error);
+                alert('Không thể kết nối: ' + error.message);
+            }
         }
 
-        if (tCharger > 55) { sendCmd("OFF"); showAlert("CỦ SẠC QUÁ NÓNG! ĐÃ NGẮT SÒ TỰ ĐỘNG"); }
-        if (tPlate < 0) { sendCmd("LOW_POWER_SAFE"); showAlert("NHIỆT ĐỘ ÂM! ĐÃ GIẢM CÔNG SUẤT CHỐNG ĐỌNG NƯỚC"); }
-      }, 3000);
-    }
+        // 2. GỬI MÃ HEX TRỰC TIẾP TỚI PIVA B3 PRO
+        async function sendHexBytes(byteArray) {
+            if (!writeCharacteristic) {
+                console.log("Chưa kết nối BLE. Byte thử nghiệm:", byteArray);
+                return;
+            }
+            try {
+                const data = new Uint8Array(byteArray);
+                await writeCharacteristic.writeValue(data);
+                console.log("Đã gửi byte thành công:", byteArray);
+            } catch (err) {
+                console.error("Lỗi gửi dữ liệu:", err);
+            }
+        }
 
-    function showAlert(msg) {
-      const b = document.getElementById('alertBanner');
-      b.innerText = "🚨 " + msg;
-      b.style.display = "block";
-      setTimeout(() => { b.style.display = "none"; }, 5000);
-    }
+        // 3. ĐIỀU KHIỂN CÁC TÍNH NĂNG (Tập lệnh Hex)
+        function setMode(level) {
+            // Khung lệnh chỉnh cấp độ làm lạnh: 0xA5 + Level
+            sendHexBytes([0xA5, 0x02, level, 0x5A]);
+        }
 
-    function customColorChange(hexColor) {
-      document.getElementById('fanRing').style.borderTopColor = hexColor;
-      document.getElementById('fanRing').style.filter = `drop-shadow(0 0 12px ${hexColor})`;
-      if (checkConnection()) {
-        const cleanHex = hexColor.replace('#', '');
-        const r = parseInt(cleanHex.substring(0,2), 16);
-        const g = parseInt(cleanHex.substring(2,4), 16);
-        const b = parseInt(cleanHex.substring(4,6), 16);
-        sendCmd(`RGB_${r}_${g}_${b}`);
-      }
-    }
+        function toggleTurbo(enable) {
+            // Khung lệnh Bật/Tắt Siêu ép xung
+            sendHexBytes([0xA5, 0x03, enable ? 0x01 : 0x00, 0x5A]);
+        }
 
-    function setLEDMode(modeIndex, btnElement) {
-      if (!checkConnection()) return;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      btnElement.classList.add('active');
-      sendCmd(`LED_MODE_${modeIndex}`);
-    }
+        function setFanSpeed(val) {
+            // Khung lệnh chỉnh phần trăm tốc độ quạt
+            sendHexBytes([0xA5, 0x04, parseInt(val), 0x5A]);
+        }
 
-    function adjustBrightness(val) { 
-      if (checkConnection()) sendCmd(`LED_BRIGHT_${val}`); 
-    }
-    
-    function adjustSpeed(val) { 
-      if (checkConnection()) sendCmd(`LED_SPEED_${val}`); 
-    }
-  </script>
+        // 4. BỘ NHỚ CACHE OFFLINE (SERVICE WORKER)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'piva-b3pro-v1';
+                    self.addEventListener('install', e => {
+                        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./'])));
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('activate', e => {
+                        e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null))));
+                        self.clients.claim();
+                    });
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+                    });
+                `;
+                try {
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+                } catch (e) {}
+            });
+        }
+    </script>
 </body>
 </html>
