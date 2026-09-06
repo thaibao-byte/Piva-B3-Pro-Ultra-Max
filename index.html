@@ -20,7 +20,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* Đã mở khóa thuộc tính cuộn trang */
         html, body { 
             background: var(--bg); 
             color: var(--text); 
@@ -49,7 +48,7 @@
         .section-title { font-size: 12px; font-weight: bold; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
         .btn-group { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .btn-opt { flex: 1; min-width: 70px; padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+        .btn-opt { flex: 1; min-width: 65px; padding: 10px 4px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
         .btn-opt.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
         .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
@@ -60,9 +59,9 @@
         input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
         input[type="color"] { border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; background: transparent; }
 
-        .grid-led { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
-        .btn-led { padding: 8px 2px; font-size: 10px; border-radius: 6px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; text-align: center; }
-        .btn-led.active { border-color: var(--accent); color: var(--accent); font-weight: bold; }
+        .grid-led { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+        .btn-led { padding: 10px 8px; font-size: 11px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; }
+        .btn-led.active { border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(0, 242, 254, 0.1); }
 
         .alert-banner { display: none; width: 100%; max-width: 480px; padding: 10px; border-radius: 10px; background: rgba(255, 145, 0, 0.2); border: 1px solid var(--orange); color: var(--orange); font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 16px; }
     </style>
@@ -74,17 +73,17 @@
         <div id="status" class="status-badge">Ngắt kết nối</div>
     </header>
 
-    <div id="alertBanner" class="alert-banner">⚠️ CẢNH BÁO BẢO VỆ: ĐÃ TỰ ĐỘNG HẠ TẢI SÒ!</div>
+    <div id="alertBanner" class="alert-banner">⚠️ CẢNH BÁO BẢO VỆ TỰ ĐỘNG!</div>
 
     <button id="btnConnect" class="btn-connect" onclick="connectBLE()">KẾT NỐI TỰ ĐỘNG</button>
 
-    <!-- 1. HIỂN THỊ THÔNG SỐ -->
+    <!-- 1. HIỂN THỊ THÔNG SỐ (SẠCH CÁC GIÁ TRỊ) -->
     <div class="grid-stats">
         <div class="stat-card"><div class="label">Nhiệt độ Sò</div><div class="value" id="tempFan">-- °C</div></div>
         <div class="stat-card"><div class="label">Nhiệt Củ Sạc</div><div class="value" id="tempCharger">-- °C</div></div>
         <div class="stat-card"><div class="label">Tốc độ quạt</div><div class="value" id="fanRpm">-- RPM</div></div>
         <div class="stat-card"><div class="label">Công suất</div><div class="value" id="power">-- W</div></div>
-        <div class="stat-card"><div class="label">Giao thức sạc</div><div class="value" id="protocol">PD 3.0</div></div>
+        <div class="stat-card"><div class="label">Giao thức sạc</div><div class="value" id="protocol">--</div></div>
         <div class="stat-card"><div class="label">Điện áp / Dòng</div><div class="value" id="voltAmp">-- V / -- A</div></div>
     </div>
 
@@ -99,7 +98,7 @@
         <div class="toggle-row" style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 10px;">
             <div>
                 <span>🧠 Chế độ Thông Minh</span>
-                <span class="toggle-sub">Tự điều chỉnh công suất theo nhiệt độ</span>
+                <span class="toggle-sub">Tự tăng/giảm công suất theo nhiệt độ thực tế</span>
             </div>
             <input type="checkbox" id="smartToggle" onchange="toggleSmartMode(this.checked)">
         </div>
@@ -121,61 +120,73 @@
         </div>
     </div>
 
-    <!-- 4. TỰ ĐỘNG BẢO VỆ -->
+    <!-- 4. TÁCH BIỆT BẢO VỆ SÒ VÀ BẢO VỆ CỦ SẠC -->
     <div class="section-box">
         <div class="section-title">
-            <span>🛡️ Bảo Vệ Quá Nhiệt & Băng Ngưng</span>
-            <span id="safetyStatus" style="color: var(--green); font-size: 11px;">Đang bật</span>
+            <span>🛡️ Cơ Chế Bảo Vệ An Toàn</span>
         </div>
+        
         <div class="toggle-row">
             <div>
-                <span>Chống Cháy Sò (>65°C) & Đọng Nước (<2°C)</span>
-                <span class="toggle-sub">Tự ngắt/hạ cấp khi nhiệt độ bất thường</span>
+                <span>❄️ Protection Sò (>65°C hoặc <2°C)</span>
+                <span class="toggle-sub">Chống cháy sò quá nhiệt & đọng nước</span>
             </div>
-            <input type="checkbox" id="safetyToggle" checked onchange="toggleSafety(this.checked)">
+            <input type="checkbox" id="peltierSafety" checked onchange="togglePeltierSafety(this.checked)">
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 10px;">
+            <div>
+                <span>🔌 Protection Củ Sạc (>60°C)</span>
+                <span class="toggle-sub">Chống ngắt nguồn/cháy nổ củ sạc</span>
+            </div>
+            <input type="checkbox" id="chargerSafety" checked onchange="toggleChargerSafety(this.checked)">
         </div>
     </div>
 
-    <!-- 5. HẸN GIỜ TẮT SÒ -->
+    <!-- 5. HẸN GIỜ TẮT SÒ (KHÁCH QUAN & CHUẨN XÁC DÙNG TIMESTAMP) -->
     <div class="section-box">
         <div class="section-title">
-            <span>⏱️ Hẹn Giờ Tắt Sò</span>
-            <span id="timerDisplay" style="color: var(--accent); font-size: 11px;">Tắt</span>
+            <span>⏱️ Hẹn Giờ Tắt Sò Tự Động</span>
+            <span id="timerDisplay" style="color: var(--accent); font-size: 12px; font-weight: bold;">Chưa hẹn giờ</span>
         </div>
         <div class="btn-group">
-            <button class="btn-opt" id="t15" onclick="setTimer(15, 't15')">15 phút</button>
-            <button class="btn-opt" id="t30" onclick="setTimer(30, 't30')">30 phút</button>
-            <button class="btn-opt" id="t60" onclick="setTimer(60, 't60')">1 Giờ</button>
+            <button class="btn-opt" id="t15" onclick="setTimer(15, 't15')">15p</button>
+            <button class="btn-opt" id="t30" onclick="setTimer(30, 't30')">30p</button>
+            <button class="btn-opt" id="t45" onclick="setTimer(45, 't45')">45p</button>
+            <button class="btn-opt" id="t60" onclick="setTimer(60, 't60')">60p</button>
             <button class="btn-opt" id="tOff" onclick="setTimer(0, 'tOff')">Tắt giờ</button>
         </div>
     </div>
 
-    <!-- 6. BỘ 10 CHẾ ĐỘ LED CHUYÊN SÂU -->
+    <!-- 6. BỘ 10 CHẾ ĐỘ LED CHUYÊN SÂU KÈM ICON TRỰC QUAN -->
     <div class="section-box" style="margin-bottom: 40px;">
         <div class="section-title">
             <span>🎨 Bộ 10 Chế Độ LED Chuyên Sâu</span>
             <input type="color" id="customColor" value="#00f2fe" onchange="setCustomLedColor(this.value)">
         </div>
         <div class="grid-led">
-            <button class="btn-led active" onclick="setLedMode(1, this)">Rainbow</button>
-            <button class="btn-led" onclick="setLedMode(2, this)">Breathing</button>
-            <button class="btn-led" onclick="setLedMode(3, this)">Spectrum</button>
-            <button class="btn-led" onclick="setLedMode(4, this)">Pulse</button>
-            <button class="btn-led" onclick="setLedMode(5, this)">Wave</button>
-            <button class="btn-led" onclick="setLedMode(6, this)">Static Red</button>
-            <button class="btn-led" onclick="setLedMode(7, this)">Static Blue</button>
-            <button class="btn-led" onclick="setLedMode(8, this)">Static Green</button>
-            <button class="btn-led" onclick="setLedMode(9, this)">Flash</button>
-            <button class="btn-led" onclick="setLedMode(0, this)">Tắt LED</button>
+            <button class="btn-led active" onclick="setLedMode(1, this)">🌈 Rainbow Mode</button>
+            <button class="btn-led" onclick="setLedMode(2, this)">🫁 Breathing Glow</button>
+            <button class="btn-led" onclick="setLedMode(3, this)">🔀 Spectrum Cycle</button>
+            <button class="btn-led" onclick="setLedMode(4, this)">🎨 Custom RGB Color</button>
+            <button class="btn-led" onclick="setLedMode(5, this)">🌊 Wave Flow Effect</button>
+            <button class="btn-led" onclick="setLedMode(6, this)">🔴 Static Red Light</button>
+            <button class="btn-led" onclick="setLedMode(7, this)">🔵 Static Blue Light</button>
+            <button class="btn-led" onclick="setLedMode(8, this)">🟢 Static Green Light</button>
+            <button class="btn-led" onclick="setLedMode(9, this)">⚡ Flash Strobe</button>
+            <button class="btn-led" onclick="setLedMode(0, this)">🚫 Tắt Đèn LED</button>
         </div>
     </div>
 
     <script>
         let bleDevice = null;
         let writeCharacteristic = null;
+        let timerTargetTime = null;
         let timerInterval = null;
         let safetyInterval = null;
-        let safetyEnabled = true;
+
+        let peltierSafetyEnabled = true;
+        let chargerSafetyEnabled = true;
         let smartModeEnabled = false;
 
         const SERVICE_UUID = '49535343-fe7d-4350-a8d4-26080b4e5670';
@@ -183,7 +194,7 @@
 
         async function connectBLE() {
             if (!navigator.bluetooth) {
-                alert("Hãy dùng ứng dụng Bluefy trên iOS.");
+                alert("Hãy sử dụng ứng dụng Bluefy trên iOS để hỗ trợ Web Bluetooth.");
                 return;
             }
             try {
@@ -252,53 +263,63 @@
             sendHexBytes([0xA5, 0x07, r, g, b, 0x5A]);
         }
 
+        // HẸN GIỜ KHÁCH QUAN BẰNG TIMESTAMP (KHÔNG BỊ TRỆCH GIỜ KHI ẨN APP)
         function setTimer(minutes, btnId) {
             clearInterval(timerInterval);
-            document.querySelectorAll('#t15, #t30, #t60, #tOff').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#t15, #t30, #t45, #t60, #tOff').forEach(b => b.classList.remove('active'));
             if(btnId) document.getElementById(btnId).classList.add('active');
 
             const display = document.getElementById('timerDisplay');
             if (minutes === 0) {
-                display.innerText = "Tắt";
+                timerTargetTime = null;
+                display.innerText = "Chưa hẹn giờ";
                 return;
             }
-            let secondsLeft = minutes * 60;
+
+            timerTargetTime = Date.now() + (minutes * 60 * 1000);
+            
             timerInterval = setInterval(() => {
-                secondsLeft--;
-                let m = Math.floor(secondsLeft / 60);
-                let s = secondsLeft % 60;
-                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                
-                if (secondsLeft <= 0) {
+                let remainingMs = timerTargetTime - Date.now();
+                if (remainingMs <= 0) {
                     clearInterval(timerInterval);
                     setMode(0);
                     display.innerText = "Đã tắt theo hẹn giờ";
                     alert("⏱️ Hết giờ! Sò tản nhiệt đã tự động tắt.");
+                } else {
+                    let totalSec = Math.ceil(remainingMs / 1000);
+                    let m = Math.floor(totalSec / 60);
+                    let s = totalSec % 60;
+                    display.innerText = `Còn lại: ${m}m ${s < 10 ? '0' : ''}${s}s`;
                 }
             }, 1000);
         }
 
-        function toggleSafety(enable) {
-            safetyEnabled = enable;
-            document.getElementById('safetyStatus').innerText = enable ? "Đang bật" : "Đã tắt";
-        }
+        function togglePeltierSafety(enable) { peltierSafetyEnabled = enable; }
+        function toggleChargerSafety(enable) { chargerSafetyEnabled = enable; }
 
+        // BẢO VỆ ĐỘC LẬP TỪNG PHẦN
         function startSafetyMonitor() {
             clearInterval(safetyInterval);
             safetyInterval = setInterval(() => {
-                if (!safetyEnabled) return;
-
                 let tempFan = parseFloat(document.getElementById('tempFan').innerText) || 25;
                 let tempCharger = parseFloat(document.getElementById('tempCharger').innerText) || 30;
                 const banner = document.getElementById('alertBanner');
+                let warningText = "";
 
-                if (tempFan > 65 || tempCharger > 60) {
+                // 1. Kiểm tra Sò
+                if (peltierSafetyEnabled) {
+                    if (tempFan > 65) warningText = "⚠️ Quá nhiệt Sò (>65°C)! Đã tự động hạ công suất!";
+                    else if (tempFan < 2) warningText = "❄️ Đóng băng (<2°C)! Đã hạ công suất tránh đọng nước!";
+                }
+
+                // 2. Kiểm tra Củ sạc
+                if (chargerSafetyEnabled && tempCharger > 60) {
+                    warningText = "🔌 Quá nhiệt Củ Sạc (>60°C)! Đã hạ công suất bảo vệ nguồn!";
+                }
+
+                if (warningText !== "") {
                     banner.style.display = 'block';
-                    banner.innerText = "⚠️ Quá nhiệt! Đã tự động hạ công suất để bảo vệ!";
-                    setMode(1, 'btnL1');
-                } else if (tempFan < 2) {
-                    banner.style.display = 'block';
-                    banner.innerText = "❄️ Cảnh báo đóng băng! Hạ về Level 1 chống đọng nước!";
+                    banner.innerText = warningText;
                     setMode(1, 'btnL1');
                 } else {
                     banner.style.display = 'none';
@@ -306,11 +327,16 @@
             }, 3000);
         }
 
-        // Offline Service Worker
+        // SW Cập nhật bản v2000
         if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'piva-b3pro-scroll-v2';
+                    const CACHE_NAME = 'piva-b3pro-v2000';
                     self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); self.skipWaiting(); });
                     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null)))); self.clients.claim(); });
                     self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))); });
