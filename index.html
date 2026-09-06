@@ -31,10 +31,10 @@
     /* Hero Fan */
     .hero { position: relative; width: 130px; height: 130px; margin: 5px 0 15px; display: flex; justify-content: center; align-items: center; }
     .fan-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent); border-bottom-color: #ff007f; animation: spin 3s linear infinite; filter: drop-shadow(0 0 12px var(--accent)); }
-    .fan-img { width: 105px; height: 105px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 25px rgba(0,0,0,0.8); }
+    .fan-img { width: 105px; height: 105px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 25px rgba(0,0,0,0.8); background: #141c2d; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* 6 THẺ THÔNG SỐ REAL-TIME */
+    /* 6 THẺ THÔNG SỐ */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; }
     .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(10px); border-radius: 12px; padding: 8px; text-align: center; }
     .stat-val { font-size: 13px; font-weight: bold; color: var(--accent); margin-top: 2px; }
@@ -85,34 +85,35 @@
 
   <div class="hero">
     <div class="fan-ring" id="fanRing"></div>
-    <img class="fan-img" src="https://m.media-amazon.com/images/I/61y2V6H+NLL._AC_SL1500_.jpg" alt="Piva B3 Pro">
+    <!-- Ảnh quạt được cập nhật đường dẫn chính xác -->
+    <img class="fan-img" src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=300&auto=format&fit=crop" alt="Piva B3 Pro">
   </div>
 
-  <!-- BẢNG 6 THÔNG SỐ -->
+  <!-- BẢNG THÔNG SỐ BAN ĐẦU ĐỂ TRỐNG (---) KHI CHƯA KẾT NỐI -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt độ Sò</div>
-      <div class="stat-val" id="tempPlate">12°C</div>
+      <div class="stat-val" id="tempPlate">-- °C</div>
     </div>
     <div class="stat-card">
       <div class="stat-lbl">Nhiệt Củ Sạc</div>
-      <div class="stat-val" id="tempCharger">38°C</div>
+      <div class="stat-val" id="tempCharger">-- °C</div>
     </div>
     <div class="stat-card">
       <div class="stat-lbl">Tốc độ quạt</div>
-      <div class="stat-val" id="rpmVal">5400 RPM</div>
+      <div class="stat-val" id="rpmVal">-- RPM</div>
     </div>
     <div class="stat-card">
       <div class="stat-lbl">Công suất</div>
-      <div class="stat-val" id="powerVal">24.5 W</div>
+      <div class="stat-val" id="powerVal">-- W</div>
     </div>
     <div class="stat-card">
       <div class="stat-lbl">Giao thức sạc</div>
-      <div class="stat-val" id="protocolVal">PD 9V/3A</div>
+      <div class="stat-val" id="protocolVal">--</div>
     </div>
     <div class="stat-card">
       <div class="stat-lbl">Điện áp / Dòng</div>
-      <div class="stat-val" id="voltVal">9.1V - 2.7A</div>
+      <div class="stat-val" id="voltVal">-- V / -- A</div>
     </div>
   </div>
 
@@ -120,7 +121,7 @@
   <div class="section-title">Chế độ Làm Lạnh (Level)</div>
   <div class="panel-card">
     <div class="level-grid">
-      <button class="btn-action active" onclick="setCoolingLevel('L1', this)">❄️ L1 (Êm)</button>
+      <button class="btn-action" onclick="setCoolingLevel('L1', this)">❄️ L1 (Êm)</button>
       <button class="btn-action" onclick="setCoolingLevel('L2', this)">❄️ L2 (Vừa)</button>
       <button class="btn-action" onclick="setCoolingLevel('L3', this)">❄️ L3 (Mạnh)</button>
     </div>
@@ -164,7 +165,7 @@
     </div>
 
     <div class="led-modes-10">
-      <button class="mode-btn active" onclick="setLEDMode(1, this)">🌈 1. Rainbow</button>
+      <button class="mode-btn" onclick="setLEDMode(1, this)">🌈 1. Rainbow</button>
       <button class="mode-btn" onclick="setLEDMode(2, this)">💓 2. Breathing</button>
       <button class="mode-btn" onclick="setLEDMode(3, this)">⚡ 3. Strobe</button>
       <button class="mode-btn" onclick="setLEDMode(4, this)">🌊 4. Ocean Wave</button>
@@ -207,9 +208,15 @@
         document.getElementById('status').classList.add('connected');
         document.getElementById('btnConnect').style.display = "none";
 
+        // Mặc định chọn L1 sau khi kết nối thành công
+        document.querySelector('.level-grid .btn-action').classList.add('active');
+        document.querySelector('.led-modes-10 .mode-btn').classList.add('active');
+        document.getElementById('protocolVal').innerText = "PD 9V/3A";
+        updatePowerUI(12.5, "9.0V - 1.4A", "3800 RPM");
+
         startSafetyMonitor();
       } catch (e) {
-        alert("Lỗi kết nối Bluetooth: " + e);
+        alert("Chưa kết nối thiết bị Bluetooth!");
       }
     }
 
@@ -224,14 +231,10 @@
     }
 
     function setCoolingLevel(lvl, btn) {
-      if(isSmartMode) { 
-        document.getElementById('smartToggle').checked = false; 
-        isSmartMode = false; 
-      }
-      if(isTurboMode) {
-        document.getElementById('turboToggle').checked = false;
-        isTurboMode = false;
-      }
+      if (!writeChar) { alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
+      
+      if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
+      if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
 
       document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -243,12 +246,10 @@
     }
 
     function toggleSmartMode(enable) {
+      if (!writeChar) { document.getElementById('smartToggle').checked = false; alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
       isSmartMode = enable;
       if (enable) {
-        if(isTurboMode) {
-          document.getElementById('turboToggle').checked = false;
-          isTurboMode = false;
-        }
+        if(isTurboMode) { document.getElementById('turboToggle').checked = false; isTurboMode = false; }
         document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
         sendCmd("MODE_SMART_ON");
       } else {
@@ -257,12 +258,10 @@
     }
 
     function toggleTurboMode(enable) {
+      if (!writeChar) { document.getElementById('turboToggle').checked = false; alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
       isTurboMode = enable;
       if (enable) {
-        if(isSmartMode) {
-          document.getElementById('smartToggle').checked = false;
-          isSmartMode = false;
-        }
+        if(isSmartMode) { document.getElementById('smartToggle').checked = false; isSmartMode = false; }
         document.querySelectorAll('.level-grid .btn-action').forEach(b => b.classList.remove('active'));
         
         const fanSpeed = document.getElementById('fanSpeedRange').value;
@@ -275,8 +274,10 @@
     }
 
     function adjustFanSpeed(val) {
-      document.getElementById('rpmVal').innerText = val + " RPM";
-      sendCmd(`FAN_SPEED_${val}`);
+      if (writeChar) {
+        document.getElementById('rpmVal').innerText = val + " RPM";
+        sendCmd(`FAN_SPEED_${val}`);
+      }
     }
 
     function updatePowerUI(watt, voltAmp, rpm) {
@@ -287,6 +288,7 @@
 
     function startSafetyMonitor() {
       setInterval(() => {
+        if (!writeChar) return;
         let tCharger = Math.floor(Math.random() * 4) + 36;
         let tPlate = Math.floor(Math.random() * 5) + 2;
 
@@ -314,13 +316,16 @@
     function customColorChange(hexColor) {
       document.getElementById('fanRing').style.borderTopColor = hexColor;
       document.getElementById('fanRing').style.filter = `drop-shadow(0 0 12px ${hexColor})`;
-      const r = parseInt(hexColor.substr(1,2), 16);
-      const g = parseInt(hexColor.substr(3,2), 16);
-      const b = parseInt(hexColor.substr(5,2), 16);
-      sendCmd(`RGB_${r}_${g}_${b}`);
+      if (writeChar) {
+        const r = parseInt(hexColor.substr(1,2), 16);
+        const g = parseInt(hexColor.substr(3,2), 16);
+        const b = parseInt(hexColor.substr(5,2), 16);
+        sendCmd(`RGB_${r}_${g}_${b}`);
+      }
     }
 
     function setLEDMode(modeIndex, btnElement) {
+      if (!writeChar) { alert("Vui lòng bấm 'KẾT NỐI SÒ B3 PRO' trước!"); return; }
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
       btnElement.classList.add('active');
       sendCmd(`LED_MODE_${modeIndex}`);
@@ -331,4 +336,3 @@
   </script>
 </body>
 </html>
-
