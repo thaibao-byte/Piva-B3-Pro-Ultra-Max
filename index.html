@@ -47,8 +47,8 @@
         .section-box { width: 100%; max-width: 480px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
         .section-title { font-size: 12px; font-weight: bold; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-        .btn-opt { flex: 1; min-width: 60px; padding: 9px 4px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+        .btn-group { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .btn-opt { flex: 1; min-width: 50px; padding: 9px 2px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
         .btn-opt.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
 
         .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
@@ -103,7 +103,7 @@
         </div>
     </div>
 
-    <!-- 3. CHẾ ĐỘ ÉP XUNG & CHỈNH NẤC TỐC ĐỘ QUẠT -->
+    <!-- 3. CHẾ ĐỘ ÉP XUNG & CHỈNH 5 NẤC TỐC ĐỘ QUẠT -->
     <div class="section-box">
         <div class="section-title">Chế độ ép xung (Turbo Overclock)</div>
         <div class="toggle-row">
@@ -116,9 +116,10 @@
         <div style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 10px;">
             <span style="font-size: 13px; font-weight: 600;">🌀 Tốc độ quạt (Nấc cố định):</span>
             <div class="btn-group">
-                <button class="btn-opt active" id="fanAuto" onclick="setFanSpeed(0, 'fanAuto')">Auto</button>
+                <button class="btn-opt" id="fan20" onclick="setFanSpeed(20, 'fan20')">20%</button>
+                <button class="btn-opt" id="fan40" onclick="setFanSpeed(40, 'fan40')">40%</button>
                 <button class="btn-opt" id="fan60" onclick="setFanSpeed(60, 'fan60')">60%</button>
-                <button class="btn-opt" id="fan80" onclick="setFanSpeed(80, 'fan80')">80%</button>
+                <button class="btn-opt active" id="fan80" onclick="setFanSpeed(80, 'fan80')">80%</button>
                 <button class="btn-opt" id="fan100" onclick="setFanSpeed(100, 'fan100')">100%</button>
             </div>
         </div>
@@ -248,9 +249,9 @@
             sendHexBytes([0xA5, 0x03, enable ? 0x01 : 0x00, 0x5A]);
         }
 
-        // ĐIỀU CHỈNH TỐC ĐỘ QUẠT THEO NẤC
+        // ĐIỀU CHỈNH 5 NẤC TỐC ĐỘ QUẠT
         function setFanSpeed(val, btnId) {
-            document.querySelectorAll('#fanAuto, #fan60, #fan80, #fan100').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#fan20, #fan40, #fan60, #fan80, #fan100').forEach(b => b.classList.remove('active'));
             if(btnId) document.getElementById(btnId).classList.add('active');
             sendHexBytes([0xA5, 0x04, parseInt(val), 0x5A]);
         }
@@ -328,7 +329,7 @@
             }, 3000);
         }
 
-        // SW Cập nhật bản v3000
+        // SW Cập nhật bản v4000
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
                 for (let registration of registrations) {
@@ -337,7 +338,7 @@
             });
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'piva-b3pro-v3000';
+                    const CACHE_NAME = 'piva-b3pro-v4000';
                     self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); self.skipWaiting(); });
                     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.map(x => x !== CACHE_NAME ? caches.delete(x) : null)))); self.clients.claim(); });
                     self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))); });
