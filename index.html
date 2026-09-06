@@ -2,895 +2,442 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#07090f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>PIVA B3 PRO ULTRA · DEBUG v2</title>
+<title>PIVA B3 PRO ULTRA · DEBUG V3</title>
 
 <style>
 :root{
---bg:#07090f;
---surface:rgba(16,20,36,.72);
---border:rgba(255,255,255,.08);
---accent:#00e5ff;
---accent-2:#7c5cff;
---green:#00e676;
---red:#ff3d71;
---text:#f4f7ff;
---muted:#8b97b0;
---radius:16px;
+ --bg:#07090f;
+ --card:#101424;
+ --border:#252b3d;
+ --text:#f4f7ff;
+ --muted:#8b97b0;
+ --cyan:#00e5ff;
+ --green:#00e676;
+ --red:#ff3d71;
 }
-
 *{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
-"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
--webkit-tap-highlight-color:transparent;
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ -webkit-tap-highlight-color:transparent;
 }
-
-html,body{
-background:var(--bg);
-color:var(--text);
-min-height:100%;
-overflow-x:hidden;
-}
-
 body{
-padding:18px 16px 40px;
-background-image:
-radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,229,255,.12),transparent),
-radial-gradient(ellipse 60% 40% at 100% 100%,rgba(124,92,255,.08),transparent);
+ background:var(--bg);
+ color:var(--text);
+ padding:18px 14px 40px;
 }
-
 .app{
-max-width:440px;
-margin:auto;
+ max-width:460px;
+ margin:auto;
 }
-
 header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:18px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:16px;
 }
-
 .logo h1{
-font-size:17px;
-font-weight:800;
-letter-spacing:.6px;
-background:linear-gradient(105deg,#00e5ff,#7c5cff);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
+ font-size:18px;
+ color:var(--cyan);
 }
-
 .logo span{
-display:block;
-font-size:11px;
-color:var(--muted);
-margin-top:2px;
+ display:block;
+ color:var(--muted);
+ font-size:11px;
+ margin-top:3px;
 }
-
-.status-pill{
-display:flex;
-align-items:center;
-gap:7px;
-padding:7px 12px;
-border-radius:999px;
-font-size:12px;
-font-weight:600;
-background:rgba(255,61,113,.12);
-color:var(--red);
-border:1px solid rgba(255,61,113,.25);
+.status{
+ padding:7px 11px;
+ border-radius:20px;
+ font-size:11px;
+ color:var(--red);
+ background:#21101a;
+ border:1px solid #492033;
 }
-
-.status-pill.connected{
-background:rgba(0,230,118,.12);
-color:var(--green);
-border-color:rgba(0,230,118,.3);
+.status.on{
+ color:var(--green);
+ background:#0b2118;
+ border-color:#174c34;
 }
-
-.status-dot{
-width:7px;
-height:7px;
-border-radius:50%;
-background:currentColor;
-box-shadow:0 0 8px currentColor;
+.connect{
+ width:100%;
+ border:0;
+ padding:15px;
+ border-radius:14px;
+ background:linear-gradient(135deg,#00c6ff,#0072ff,#7c5cff);
+ color:white;
+ font-size:14px;
+ font-weight:800;
+ margin-bottom:12px;
 }
-
-.btn-connect{
-width:100%;
-padding:15px;
-border:0;
-border-radius:var(--radius);
-background:linear-gradient(135deg,#00c6ff,#0072ff 50%,#7c5cff);
-color:white;
-font-size:14px;
-font-weight:700;
-letter-spacing:.8px;
-cursor:pointer;
-margin-bottom:14px;
-}
-
-.btn-connect.connected{
-background:linear-gradient(135deg,#00c853,#00a040);
-}
-
-.btn-connect.loading{
-pointer-events:none;
-opacity:.8;
-}
-
-.stats{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:8px;
-margin-bottom:14px;
-}
-
-.stat{
-background:var(--surface);
-border:1px solid var(--border);
-border-radius:12px;
-padding:12px 8px;
-text-align:center;
-}
-
-.stat .label{
-font-size:10px;
-color:var(--muted);
-margin-bottom:4px;
-}
-
-.stat .value{
-font-size:14px;
-font-weight:700;
-color:var(--accent);
-}
-
 .card{
-background:var(--surface);
-border:1px solid var(--border);
-border-radius:var(--radius);
-margin-bottom:10px;
-overflow:hidden;
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:15px;
+ margin-bottom:10px;
+ overflow:hidden;
 }
-
-.card-header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:14px 16px;
-cursor:pointer;
+.title{
+ padding:14px;
+ font-size:13px;
+ font-weight:800;
+ border-bottom:1px solid #1b2030;
 }
-
-.card-header .title{
-font-size:13px;
-font-weight:700;
+.body{
+ padding:14px;
 }
-
-.chevron{
-color:var(--muted);
+.row{
+ display:flex;
+ gap:7px;
+ flex-wrap:wrap;
+ margin-bottom:9px;
 }
-
-.card.open .chevron{
-color:var(--accent);
-transform:rotate(180deg);
-}
-
-.card-body{
-max-height:0;
-overflow:hidden;
-transition:max-height .3s ease;
-padding:0 16px;
-}
-
-.card.open .card-body{
-max-height:900px;
-padding:0 16px 16px;
-border-top:1px solid rgba(255,255,255,.04);
-}
-
-.btn-row{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-margin-top:12px;
-}
-
 .btn{
-flex:1;
-min-width:70px;
-padding:10px 6px;
-border-radius:10px;
-border:1px solid var(--border);
-background:rgba(255,255,255,.04);
-color:var(--text);
-font-size:12px;
-font-weight:600;
-cursor:pointer;
+ flex:1;
+ min-width:65px;
+ border:1px solid var(--border);
+ background:#171c2b;
+ color:var(--text);
+ padding:11px 7px;
+ border-radius:10px;
+ font-size:12px;
+ font-weight:700;
 }
-
 .btn:active{
-transform:scale(.96);
+ transform:scale(.97);
 }
-
 .btn.active{
-background:var(--accent);
-color:#041018;
-border-color:var(--accent);
+ background:var(--cyan);
+ color:#001018;
+ border-color:var(--cyan);
 }
-
-.btn-danger{
-color:#ff6b8d;
-border-color:rgba(255,61,113,.25);
+.btn.debug{
+ background:#18202d;
+ border-color:#31516a;
 }
-
-.btn-primary{
-color:var(--accent);
-border-color:rgba(0,229,255,.25);
+.btn.danger{
+ border-color:#542337;
 }
-
-.toggle-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:10px 0;
-gap:12px;
+.label{
+ color:var(--muted);
+ font-size:11px;
+ margin:10px 0 5px;
 }
-
-.toggle-info{
-flex:1;
-}
-
-.toggle-info .name{
-font-size:13px;
-font-weight:600;
-}
-
-.toggle-info .desc{
-font-size:11px;
-color:var(--muted);
-margin-top:2px;
-line-height:1.35;
-}
-
-.switch{
-position:relative;
-width:46px;
-height:26px;
-flex-shrink:0;
-}
-
-.switch input{
-opacity:0;
-width:0;
-height:0;
-}
-
-.slider{
-position:absolute;
-inset:0;
-background:rgba(255,255,255,.12);
-border-radius:999px;
-cursor:pointer;
-}
-
-.slider:before{
-content:"";
-position:absolute;
-width:20px;
-height:20px;
-left:3px;
-bottom:3px;
-background:white;
-border-radius:50%;
-transition:.25s;
-}
-
-.switch input:checked+.slider{
-background:var(--accent);
-}
-
-.switch input:checked+.slider:before{
-transform:translateX(20px);
-}
-
-.led-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:6px;
-margin-top:12px;
-}
-
-.led-btn{
-padding:11px 10px;
-border-radius:10px;
-border:1px solid var(--border);
-background:rgba(255,255,255,.03);
-color:var(--text);
-font-size:12px;
-font-weight:600;
-cursor:pointer;
-text-align:left;
-}
-
-.led-btn.active{
-border-color:var(--accent);
-background:rgba(0,229,255,.1);
-}
-
-.range-row{
-margin-top:12px;
-}
-
-.range-label{
-display:flex;
-justify-content:space-between;
-font-size:11px;
-color:var(--muted);
-margin-bottom:6px;
-}
-
 input[type=range]{
-width:100%;
-accent-color:var(--accent);
+ width:100%;
 }
-
-.timer-display{
-text-align:center;
-font-size:18px;
-font-weight:700;
-color:var(--accent);
-margin:12px 0;
+.value{
+ text-align:right;
+ color:var(--cyan);
+ font-size:12px;
+ margin-top:4px;
 }
-
-.alert{
-display:none;
-padding:10px 12px;
-border-radius:10px;
-background:rgba(255,61,113,.12);
-border:1px solid rgba(255,61,113,.25);
-color:#ff6b8d;
-font-size:11px;
-margin-bottom:10px;
+.toggle{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:10px 0;
+ border-bottom:1px solid #1b2030;
 }
-
-#debugLog{
-margin-top:12px;
-max-height:380px;
-overflow:auto;
-white-space:pre-wrap;
-word-break:break-all;
-background:rgba(0,0,0,.3);
-border:1px solid var(--border);
-border-radius:10px;
-padding:10px;
-font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-font-size:10px;
-line-height:1.45;
-color:#dce7ff;
+.toggle:last-child{
+ border-bottom:0;
 }
-
-.footer{
-text-align:center;
-font-size:10px;
-color:var(--muted);
-margin-top:18px;
+.toggle small{
+ display:block;
+ color:var(--muted);
+ margin-top:3px;
+}
+.switch{
+ width:45px;
+ height:25px;
+ position:relative;
+}
+.switch input{
+ display:none;
+}
+.slider{
+ position:absolute;
+ inset:0;
+ background:#33394a;
+ border-radius:20px;
+}
+.slider:before{
+ content:"";
+ position:absolute;
+ width:19px;
+ height:19px;
+ left:3px;
+ top:3px;
+ background:white;
+ border-radius:50%;
+ transition:.2s;
+}
+.switch input:checked+.slider{
+ background:var(--cyan);
+}
+.switch input:checked+.slider:before{
+ transform:translateX(20px);
+}
+pre{
+ background:#05070b;
+ border:1px solid #1e2533;
+ border-radius:10px;
+ color:#a8f4ff;
+ padding:10px;
+ min-height:180px;
+ max-height:420px;
+ overflow:auto;
+ white-space:pre-wrap;
+ word-break:break-word;
+ font:10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+.note{
+ color:var(--muted);
+ font-size:10px;
+ line-height:1.45;
+ margin-top:9px;
+}
+.toast{
+ position:fixed;
+ left:50%;
+ bottom:20px;
+ transform:translateX(-50%);
+ background:#181d2a;
+ border:1px solid #30384c;
+ padding:10px 15px;
+ border-radius:10px;
+ font-size:12px;
+ display:none;
+ z-index:99;
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <header>
-<div class="logo">
-<h1>PIVA B3 PRO ULTRA</h1>
-<span>Web Bluetooth Controller · DEBUG v2</span>
-</div>
-
-<div class="status-pill" id="statusPill">
-<span class="status-dot"></span>
-<span id="statusText">Ngắt kết nối</span>
-</div>
+ <div class="logo">
+  <h1>PIVA B3 PRO ULTRA</h1>
+  <span>Web Bluetooth Controller · DEBUG V3</span>
+ </div>
+ <div id="status" class="status">● Chưa kết nối</div>
 </header>
 
-<button
-class="btn-connect"
-id="btnConnect"
-onclick="toggleConnection()">
-KẾT NỐI BLUETOOTH
+<button id="btnConnect" class="connect" onclick="toggleConnection()">
+ KẾT NỐI BLUETOOTH
 </button>
-
-<div id="alertBanner" class="alert"></div>
-
-<div class="stats">
-<div class="stat">
-<div class="label">Sò</div>
-<div class="value" id="tempFan">-- °C</div>
-</div>
-
-<div class="stat">
-<div class="label">Củ sạc</div>
-<div class="value" id="tempCharger">-- °C</div>
-</div>
-
-<div class="stat">
-<div class="label">Trạng thái</div>
-<div class="value" id="deviceState">OFF</div>
-</div>
-</div>
-
-
-<!-- DEBUG V2 -->
-
-<div class="card open" id="debugCard">
-
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">🧪 DEBUG v2 · GATT</span>
-<span class="chevron">▼</span>
-</div>
-
-<div class="card-body">
-
-<div style="
-font-size:11px;
-color:var(--muted);
-line-height:1.45;
-margin-top:12px;">
-Đọc các characteristic có READ và theo dõi packet.
-Không gửi packet ngẫu nhiên.
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn btn-primary"
-onclick="readDebugChars()">
-READ ALL
-</button>
-
-<button
-class="btn"
-onclick="dumpGattV2()">
-QUÉT GATT
-</button>
-
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn"
-onclick="readOneDebug('49535343-1E4D-4BD9-BA61-23C647249616')">
-READ 1E4D
-</button>
-
-<button
-class="btn"
-onclick="readOneDebug('00002A29-0000-1000-8000-00805F9B34FB')">
-READ 2A29
-</button>
-
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn"
-onclick="copyDebugLog()">
-COPY LOG
-</button>
-
-<button
-class="btn btn-danger"
-onclick="clearDebugLog()">
-XÓA LOG
-</button>
-
-</div>
-
-<pre id="debugLog"></pre>
-
-</div>
-</div>
-
 
 <!-- MODE -->
-
 <div class="card">
+ <div class="title">⚡ CÔNG SUẤT</div>
+ <div class="body">
+  <div class="row">
+   <button id="btnL1" class="btn active" onclick="setMode(1)">L1</button>
+   <button id="btnL2" class="btn" onclick="setMode(2)">L2</button>
+   <button id="btnL3" class="btn" onclick="setMode(3)">L3</button>
+  </div>
 
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">❄️ Công suất Peltier</span>
-<span class="chevron">▼</span>
+  <div class="toggle">
+   <div>
+    <b>Smart</b>
+    <small>Tự động điều chỉnh</small>
+   </div>
+   <label class="switch">
+    <input id="smartToggle" type="checkbox"
+           onchange="toggleSmart(this.checked)">
+    <span class="slider"></span>
+   </label>
+  </div>
+
+  <div class="toggle">
+   <div>
+    <b>Turbo</b>
+    <small>Chế độ tăng cường</small>
+   </div>
+   <label class="switch">
+    <input id="turboToggle" type="checkbox"
+           onchange="toggleTurbo(this.checked)">
+    <span class="slider"></span>
+   </label>
+  </div>
+ </div>
 </div>
-
-<div class="card-body">
-
-<div class="btn-row">
-
-<button
-id="btnL1"
-class="btn active"
-onclick="setMode(1)">
-L1
-</button>
-
-<button
-id="btnL2"
-class="btn"
-onclick="setMode(2)">
-L2
-</button>
-
-<button
-id="btnL3"
-class="btn"
-onclick="setMode(3)">
-L3
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- SMART / TURBO -->
-
-<div class="card">
-
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">⚡ Chế độ</span>
-<span class="chevron">▼</span>
-</div>
-
-<div class="card-body">
-
-<div class="toggle-row">
-
-<div class="toggle-info">
-<div class="name">Smart</div>
-<div class="desc">
-Tự điều chỉnh theo nhiệt độ
-</div>
-</div>
-
-<label class="switch">
-<input
-type="checkbox"
-id="smartToggle"
-onchange="toggleSmart(this.checked)">
-<span class="slider"></span>
-</label>
-
-</div>
-
-<div class="toggle-row">
-
-<div class="toggle-info">
-<div class="name">Turbo</div>
-<div class="desc">
-Tăng hiệu suất làm lạnh
-</div>
-</div>
-
-<label class="switch">
-<input
-type="checkbox"
-id="turboToggle"
-onchange="toggleTurbo(this.checked)">
-<span class="slider"></span>
-</label>
-
-</div>
-
-</div>
-</div>
-
 
 <!-- FAN -->
-
 <div class="card">
-
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">🌀 Quạt</span>
-<span class="chevron">▼</span>
+ <div class="title">🌀 QUẠT</div>
+ <div class="body">
+  <div class="row">
+   <button id="fan20" class="btn" onclick="setFan(20)">20%</button>
+   <button id="fan40" class="btn" onclick="setFan(40)">40%</button>
+   <button id="fan60" class="btn" onclick="setFan(60)">60%</button>
+   <button id="fan80" class="btn" onclick="setFan(80)">80%</button>
+   <button id="fan100" class="btn" onclick="setFan(100)">100%</button>
+  </div>
+ </div>
 </div>
-
-<div class="card-body">
-
-<div class="btn-row">
-
-<button
-id="fan20"
-class="btn"
-onclick="setFan(20)">
-20%
-</button>
-
-<button
-id="fan40"
-class="btn"
-onclick="setFan(40)">
-40%
-</button>
-
-<button
-id="fan60"
-class="btn"
-onclick="setFan(60)">
-60%
-</button>
-
-<button
-id="fan80"
-class="btn"
-onclick="setFan(80)">
-80%
-</button>
-
-<button
-id="fan100"
-class="btn active"
-onclick="setFan(100)">
-100%
-</button>
-
-</div>
-
-</div>
-</div>
-
 
 <!-- LED -->
-
 <div class="card">
+ <div class="title">💡 LED</div>
+ <div class="body">
+  <div class="row">
+   <button class="btn" onclick="setLed(0,this)">Tắt</button>
+   <button class="btn" onclick="setLed(1,this)">Đơn màu</button>
+   <button class="btn" onclick="setLed(2,this)">Rainbow</button>
+   <button class="btn" onclick="setLed(3,this)">Breath</button>
+  </div>
 
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">💡 LED</span>
-<span class="chevron">▼</span>
+  <div class="label">Màu tùy chỉnh</div>
+  <input type="color" id="customColor"
+         value="#00e5ff"
+         onchange="setCustomColor(this.value)">
+
+  <div class="label">Độ sáng</div>
+  <input type="range" min="0" max="100" value="100"
+         oninput="setBrightness(this.value)">
+  <div id="valBrightness" class="value">100%</div>
+
+  <div class="label">Tốc độ LED</div>
+  <input type="range" min="0" max="100" value="50"
+         oninput="setLedSpeed(this.value)">
+  <div id="valSpeed" class="value">50%</div>
+ </div>
 </div>
-
-<div class="card-body">
-
-<div class="led-grid">
-
-<button
-class="led-btn active"
-onclick="setLed(0,this)">
-Tắt LED
-</button>
-
-<button
-class="led-btn"
-onclick="setLed(1,this)">
-Màu cố định
-</button>
-
-<button
-class="led-btn"
-onclick="setLed(2,this)">
-Rainbow
-</button>
-
-<button
-class="led-btn"
-onclick="setLed(3,this)">
-Breathing
-</button>
-
-</div>
-
-<div class="range-row">
-
-<div class="range-label">
-<span>Độ sáng</span>
-<span id="valBrightness">100%</span>
-</div>
-
-<input
-type="range"
-min="0"
-max="100"
-value="100"
-oninput="setBrightness(this.value)">
-
-</div>
-
-<div class="range-row">
-
-<div class="range-label">
-<span>Tốc độ LED</span>
-<span id="valSpeed">50%</span>
-</div>
-
-<input
-type="range"
-min="0"
-max="100"
-value="50"
-oninput="setLedSpeed(this.value)">
-
-</div>
-
-</div>
-</div>
-
 
 <!-- TIMER -->
-
 <div class="card">
+ <div class="title">⏱ HẸN GIỜ</div>
+ <div class="body">
 
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">⏱ Hẹn giờ</span>
-<span class="chevron">▼</span>
+  <div class="label">Giờ</div>
+  <input id="sliderHour" type="range"
+         min="0" max="12" value="0"
+         oninput="updateTimerLabels()">
+  <div id="valHour" class="value">0h</div>
+
+  <div class="label">Phút</div>
+  <input id="sliderMin" type="range"
+         min="0" max="59" value="0"
+         oninput="updateTimerLabels()">
+  <div id="valMin" class="value">0p</div>
+
+  <div class="label">Giây</div>
+  <input id="sliderSec" type="range"
+         min="0" max="59" value="0"
+         oninput="updateTimerLabels()">
+  <div id="valSec" class="value">0s</div>
+
+  <div class="row">
+   <button class="btn" onclick="startTimer()">BẬT HẸN GIỜ</button>
+   <button class="btn" onclick="cancelTimer()">HỦY</button>
+  </div>
+
+  <div id="timerDisplay" class="value">Chưa hẹn giờ</div>
+ </div>
 </div>
-
-<div class="card-body">
-
-<div class="timer-display" id="timerDisplay">
-Chưa hẹn giờ
-</div>
-
-<div class="range-row">
-
-<div class="range-label">
-<span>Giờ</span>
-<span id="valHour">0h</span>
-</div>
-
-<input
-id="sliderHour"
-type="range"
-min="0"
-max="12"
-value="0"
-oninput="updateTimerLabels()">
-
-</div>
-
-<div class="range-row">
-
-<div class="range-label">
-<span>Phút</span>
-<span id="valMin">0p</span>
-</div>
-
-<input
-id="sliderMin"
-type="range"
-min="0"
-max="59"
-value="0"
-oninput="updateTimerLabels()">
-
-</div>
-
-<div class="range-row">
-
-<div class="range-label">
-<span>Giây</span>
-<span id="valSec">0s</span>
-</div>
-
-<input
-id="sliderSec"
-type="range"
-min="0"
-max="59"
-value="0"
-oninput="updateTimerLabels()">
-
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn btn-primary"
-onclick="startTimer()">
-BẬT HẸN GIỜ
-</button>
-
-<button
-class="btn"
-onclick="cancelTimer()">
-HỦY
-</button>
-
-</div>
-
-</div>
-</div>
-
 
 <!-- SAFETY -->
-
 <div class="card">
+ <div class="title">🛡 BẢO VỆ</div>
+ <div class="body">
 
-<div class="card-header" onclick="toggleCard(this)">
-<span class="title">🛡 Bảo vệ</span>
-<span class="chevron">▼</span>
+  <div class="toggle">
+   <div>
+    <b>Bảo vệ sò</b>
+    <small>Tự theo dõi nhiệt độ</small>
+   </div>
+   <label class="switch">
+    <input id="peltierSafety"
+           type="checkbox"
+           checked
+           onchange="peltierSafety=this.checked">
+    <span class="slider"></span>
+   </label>
+  </div>
+
+  <div class="toggle">
+   <div>
+    <b>Bảo vệ củ sạc</b>
+    <small>Giới hạn nhiệt độ an toàn</small>
+   </div>
+   <label class="switch">
+    <input id="chargerSafety"
+           type="checkbox"
+           checked
+           onchange="chargerSafety=this.checked">
+    <span class="slider"></span>
+   </label>
+  </div>
+
+ </div>
 </div>
 
-<div class="card-body">
+<!-- DEBUG -->
+<div class="card">
+ <div class="title">🔧 BLE DEBUG V3</div>
 
-<div class="toggle-row">
+ <div class="body">
 
-<div class="toggle-info">
-<div class="name">Bảo vệ Peltier</div>
-<div class="desc">
-Theo dõi nhiệt độ sò
-</div>
-</div>
+  <div class="row">
+   <button class="btn debug"
+           onclick="readDebugChars()">
+    READ ALL
+   </button>
 
-<label class="switch">
-<input
-type="checkbox"
-id="peltierSafety"
-checked
-onchange="peltierSafety=this.checked">
-<span class="slider"></span>
-</label>
+   <button class="btn debug"
+           onclick="dumpGattV2()">
+    QUÉT GATT
+   </button>
+  </div>
 
-</div>
+  <div class="row">
+   <button class="btn debug"
+           onclick="readOneDebug('49535343-1E4D-4BD9-BA61-23C647249616')">
+    READ 1E4D
+   </button>
 
-<div class="toggle-row">
+   <button class="btn debug"
+           onclick="readOneDebug('00002A29-0000-1000-8000-00805F9B34FB')">
+    READ 2A29
+   </button>
+  </div>
 
-<div class="toggle-info">
-<div class="name">Bảo vệ củ sạc</div>
-<div class="desc">
-Theo dõi nhiệt độ củ sạc
-</div>
-</div>
+  <div class="row">
+   <button class="btn debug"
+           onclick="copyDebugLog()">
+    COPY LOG
+   </button>
 
-<label class="switch">
-<input
-type="checkbox"
-id="chargerSafety"
-checked
-onchange="chargerSafety=this.checked">
-<span class="slider"></span>
-</label>
+   <button class="btn danger"
+           onclick="clearDebugLog()">
+    XÓA LOG
+   </button>
+  </div>
 
-</div>
+  <pre id="debugLog"></pre>
 
-</div>
-</div>
+  <div class="note">
+   READ ALL chỉ đọc các characteristic có thuộc tính READ.
+   Không gửi dữ liệu tới characteristic chỉ có WRITE.
+  </div>
 
-<div class="footer">
-PIVA B3 PRO ULTRA · DEBUG v2
-</div>
-
-</div>
-
-
-<div id="toast" style="
-position:fixed;
-left:50%;
-bottom:25px;
-transform:translateX(-50%) translateY(20px);
-background:#151a2b;
-border:1px solid rgba(255,255,255,.12);
-padding:10px 15px;
-border-radius:12px;
-font-size:12px;
-opacity:0;
-pointer-events:none;
-transition:.25s;
-z-index:9999;">
+ </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
+</div>
 
 <script>
-
-/* =========================
+/* =========================================================
+   PIVA B3 PRO ULTRA
    BLE UUID
-========================= */
+   ========================================================= */
 
 const SERVICE_UUID =
 '49535343-fe7d-4ae5-8fa9-9fafd205e455';
@@ -901,1269 +448,1288 @@ const WRITE_UUID =
 const NOTIFY_UUID =
 '49535343-aca3-481c-91ec-d85e28a60318';
 
+const UART_NOTIFY_UUID =
+'49535343-1e4d-4bd9-ba61-23c647249616';
 
-/* =========================
+const DEVICE_INFO_UUID =
+'00002a29-0000-1000-8000-00805f9b34fb';
+
+
+/* =========================================================
    STATE
-========================= */
+   ========================================================= */
 
 let bleDevice = null;
 let writeChar = null;
 let notifyChar = null;
-
 let isConnected = false;
 let isConnecting = false;
 
-let peltierSafety = true;
-let chargerSafety = true;
 let smartMode = false;
 
-let timerTarget = null;
+let peltierSafety = true;
+let chargerSafety = true;
+
 let timerInterval = null;
-let safetyInterval = null;
-
-
-/* =========================
-   DEBUG STATE
-========================= */
+let timerTarget = null;
 
 let debugListeners = new Map();
 
 
-/* =========================
-   DEBUG HELPERS
-========================= */
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
-function hex(bytes){
-
-return Array.from(
-bytes,
-b => b.toString(16).padStart(2,'0').toUpperCase()
-).join(' ');
-
+function hex(bytes) {
+    return Array.from(
+        bytes,
+        b => b.toString(16).padStart(2,'0').toUpperCase()
+    ).join(' ');
 }
 
 
-function debugLog(msg){
+function debugLog(msg) {
 
-const el =
-document.getElementById('debugLog');
+    const el = document.getElementById('debugLog');
 
-if(!el)return;
+    if (!el) return;
 
-const line =
-`[${new Date().toLocaleTimeString()}] ${msg}`;
+    const line =
+        '[' +
+        new Date().toLocaleTimeString() +
+        '] ' +
+        msg;
 
-el.textContent += line + '\n';
+    el.textContent += line + '\n';
 
-el.scrollTop = el.scrollHeight;
+    el.scrollTop = el.scrollHeight;
 
-console.log('[PIVA DEBUG]',msg);
-
+    console.log('[PIVA DEBUG]', msg);
 }
 
 
-function clearDebugLog(){
+function clearDebugLog() {
 
-const el =
-document.getElementById('debugLog');
+    const el =
+        document.getElementById('debugLog');
 
-if(el){
-el.textContent='Đã xóa log.\n';
-}
-
-}
-
-
-async function copyDebugLog(){
-
-const el =
-document.getElementById('debugLog');
-
-if(!el)return;
-
-try{
-
-await navigator.clipboard.writeText(
-el.textContent
-);
-
-toast('Đã copy log','success');
-
-}catch(e){
-
-toast('Không copy được log','error');
-
-}
-
+    if (el) {
+        el.textContent =
+            'Đã xóa log.\n';
+    }
 }
 
 
-function describeProperties(p){
+async function copyDebugLog() {
 
-const a=[];
+    const el =
+        document.getElementById('debugLog');
 
-if(p.read)a.push('READ');
+    if (!el) return;
 
-if(p.write)a.push('WRITE');
+    try {
 
-if(p.writeWithoutResponse)
-a.push('WRITE_NO_RESPONSE');
+        await navigator.clipboard.writeText(
+            el.textContent
+        );
 
-if(p.notify)a.push('NOTIFY');
+        toast(
+            'Đã copy log',
+            'success'
+        );
 
-if(p.indicate)a.push('INDICATE');
+    } catch (e) {
 
-return a.join(', ') || 'NONE';
-
+        toast(
+            'Không copy được log',
+            'error'
+        );
+    }
 }
 
 
-/* =========================
-   DEBUG NOTIFY
-========================= */
+function describeProperties(p) {
 
-function handleDebugNotify(event){
+    const a = [];
 
-const c=event.target;
+    if (p.read)
+        a.push('READ');
 
-const data=new Uint8Array(
-c.value.buffer,
-c.value.byteOffset,
-c.value.byteLength
-);
+    if (p.write)
+        a.push('WRITE');
 
-debugLog(
-`RX <- ${c.uuid} | ${hex(data)}`
-);
+    if (p.writeWithoutResponse)
+        a.push('WRITE_NO_RESPONSE');
 
+    if (p.notify)
+        a.push('NOTIFY');
+
+    if (p.indicate)
+        a.push('INDICATE');
+
+    return a.join(', ') || 'NONE';
 }
 
 
-/* =========================
-   GATT DISCOVERY
-========================= */
+function toast(message, type) {
 
-async function dumpGattV2(){
+    const el =
+        document.getElementById('toast');
 
-if(
-!bleDevice ||
-!bleDevice.gatt ||
-!bleDevice.gatt.connected
-){
+    if (!el) return;
 
-toast('Chưa kết nối','error');
+    el.textContent = message;
+    el.style.display = 'block';
 
-return;
+    clearTimeout(
+        toast._timer
+    );
 
-}
-
-try{
-
-debugLog('========== GATT V2 ==========');
-
-const services =
-await bleDevice.gatt.getPrimaryServices();
-
-debugLog(
-`Primary services: ${services.length}`
-);
-
-for(const service of services){
-
-debugLog(
-`SERVICE ${service.uuid}`
-);
-
-const chars =
-await service.getCharacteristics();
-
-for(const c of chars){
-
-debugLog(
-`  CHAR ${c.uuid} | ${describeProperties(c.properties)}`
-);
-
-
-if(
-(c.properties.notify ||
- c.properties.indicate) &&
-!debugListeners.has(c.uuid)
-){
-
-try{
-
-await c.startNotifications();
-
-c.addEventListener(
-'characteristicvaluechanged',
-handleDebugNotify
-);
-
-debugListeners.set(c.uuid,c);
-
-debugLog(
-`    -> notification listener attached`
-);
-
-}catch(e){
-
-debugLog(
-`    -> notification FAILED: ${e.message || e}`
-);
-
-}
-
-}
-
-}
-
-}
-
-debugLog(
-'========== END GATT V2 =========='
-);
-
-}catch(e){
-
-debugLog(
-`GATT ERROR: ${e.message || e}`
-);
-
-}
-
+    toast._timer =
+        setTimeout(() => {
+            el.style.display = 'none';
+        }, 2200);
 }
 
 
-/* =========================
-   READ ONE
-========================= */
-
-async function readOneDebug(uuid){
-
-if(
-!bleDevice ||
-!bleDevice.gatt ||
-!bleDevice.gatt.connected
-){
-
-toast('Chưa kết nối','error');
-
-return;
-
-}
-
-try{
-
-let target=null;
-
-const services =
-await bleDevice.gatt.getPrimaryServices();
-
-for(const service of services){
-
-const chars =
-await service.getCharacteristics();
-
-for(const c of chars){
-
-if(
-c.uuid.toLowerCase() ===
-uuid.toLowerCase()
-){
-
-target=c;
-
-break;
-
-}
-
-}
-
-if(target)break;
-
-}
-
-
-if(!target){
-
-debugLog(
-`READ ${uuid} -> NOT FOUND`
-);
-
-return;
-
-}
-
-
-if(!target.properties.read){
-
-debugLog(
-`READ ${target.uuid} -> NOT READABLE`
-);
-
-return;
-
-}
-
-
-const value =
-await target.readValue();
-
-const data =
-new Uint8Array(
-value.buffer,
-value.byteOffset,
-value.byteLength
-);
-
-debugLog(
-`READ <- ${target.uuid} | ${hex(data)}`
-);
-
-}catch(e){
-
-debugLog(
-`READ ERROR ${uuid} | ${e.message || e}`
-);
-
-}
-
-}
-
-
-/* =========================
-   READ ALL
-========================= */
-
-async function readDebugChars(){
-
-if(
-!bleDevice ||
-!bleDevice.gatt ||
-!bleDevice.gatt.connected
-){
-
-toast('Chưa kết nối','error');
-
-return;
-
-}
-
-debugLog(
-'========== READ ALL =========='
-);
-
-try{
-
-const services =
-await bleDevice.gatt.getPrimaryServices();
-
-for(const service of services){
-
-const chars =
-await service.getCharacteristics();
-
-for(const c of chars){
-
-if(!c.properties.read)continue;
-
-try{
-
-const value =
-await c.readValue();
-
-const data =
-new Uint8Array(
-value.buffer,
-value.byteOffset,
-value.byteLength
-);
-
-debugLog(
-`READ <- ${c.uuid} | ${hex(data)}`
-);
-
-}catch(e){
-
-debugLog(
-`READ ERROR ${c.uuid} | ${e.message || e}`
-);
-
-}
-
-}
-
-}
-
-debugLog(
-'========== END READ ALL =========='
-);
-
-}catch(e){
-
-debugLog(
-`READ ALL ERROR: ${e.message || e}`
-);
-
-}
-
-}
-
-
-/* =========================
-   TOAST
-========================= */
-
-function toast(msg,type=''){
-
-const el =
-document.getElementById('toast');
-
-el.textContent=msg;
-
-el.style.opacity='1';
-
-el.style.transform=
-'translateX(-50%) translateY(0)';
-
-clearTimeout(el._t);
-
-el._t=setTimeout(()=>{
-
-el.style.opacity='0';
-
-el.style.transform=
-'translateX(-50%) translateY(20px)';
-
-},2800);
-
-}
-
-
-/* =========================
+/* =========================================================
    STATUS
-========================= */
+   ========================================================= */
 
-function setStatus(connected,text){
+function setStatus(on, text) {
 
-const pill =
-document.getElementById('statusPill');
+    const status =
+        document.getElementById('status');
 
-const txt =
-document.getElementById('statusText');
+    const btn =
+        document.getElementById('btnConnect');
 
-const btn =
-document.getElementById('btnConnect');
+    isConnected = !!on;
 
-isConnected=connected;
+    if (on) {
 
-txt.textContent =
-text ||
-(
-connected ?
-'Đã kết nối' :
-'Ngắt kết nối'
-);
+        status.classList.add('on');
 
-if(connected){
+        status.textContent =
+            '● ' +
+            (text || 'Đã kết nối');
 
-pill.classList.add('connected');
+        btn.textContent =
+            'NGẮT KẾT NỐI';
 
-btn.classList.add('connected');
+    } else {
 
-btn.textContent='NGẮT KẾT NỐI';
+        status.classList.remove('on');
 
-}else{
+        status.textContent =
+            '● Chưa kết nối';
 
-pill.classList.remove('connected');
-
-btn.classList.remove('connected');
-
-btn.textContent='KẾT NỐI BLUETOOTH';
-
-}
-
+        btn.textContent =
+            'KẾT NỐI BLUETOOTH';
+    }
 }
 
 
-/* =========================
-   UI
-========================= */
+/* =========================================================
+   GATT DEBUG
+   ========================================================= */
 
-function toggleCard(header){
+async function dumpGattV2() {
 
-header.parentElement.classList.toggle('open');
+    if (!bleDevice ||
+        !bleDevice.gatt ||
+        !bleDevice.gatt.connected) {
 
+        debugLog(
+            'GATT SCAN ERROR: chưa kết nối'
+        );
+
+        return;
+    }
+
+    debugLog(
+        '========== GATT SCAN =========='
+    );
+
+    try {
+
+        const services =
+            await bleDevice.gatt
+                .getPrimaryServices();
+
+        debugLog(
+            `PRIMARY SERVICES: ${services.length}`
+        );
+
+        for (const service of services) {
+
+            debugLog(
+                `SERVICE ${service.uuid}`
+            );
+
+            let chars = [];
+
+            try {
+
+                chars =
+                    await service
+                        .getCharacteristics();
+
+            } catch (e) {
+
+                debugLog(
+                    `CHAR ERROR ${service.uuid} | ${
+                        e.message || e
+                    }`
+                );
+
+                continue;
+            }
+
+            for (const c of chars) {
+
+                const props =
+                    describeProperties(
+                        c.properties
+                    );
+
+                debugLog(
+                    `  CHAR ${c.uuid} | ${props}`
+                );
+
+                if (
+                    c.properties.notify ||
+                    c.properties.indicate
+                ) {
+
+                    if (!debugListeners.has(c.uuid)) {
+
+                        try {
+
+                            await c.startNotifications();
+
+                            const fn =
+                                handleDebugNotify;
+
+                            c.addEventListener(
+                                'characteristicvaluechanged',
+                                fn
+                            );
+
+                            debugListeners.set(
+                                c.uuid,
+                                {
+                                    characteristic:c,
+                                    listener:fn
+                                }
+                            );
+
+                            debugLog(
+                                `  NOTIFY ATTACHED ${c.uuid}`
+                            );
+
+                        } catch (e) {
+
+                            debugLog(
+                                `  NOTIFY ERROR ${c.uuid} | ${
+                                    e.message || e
+                                }`
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        debugLog(
+            '========== GATT SCAN DONE =========='
+        );
+
+    } catch (e) {
+
+        debugLog(
+            `GATT ERROR | ${e.message || e}`
+        );
+    }
 }
 
 
-function setActive(selector,id){
+function handleDebugNotify(event) {
 
-document
-.querySelectorAll(selector)
-.forEach(b=>b.classList.remove('active'));
+    const c =
+        event.target;
 
-const el=document.getElementById(id);
+    const value =
+        c.value;
 
-if(el)el.classList.add('active');
+    const data =
+        new Uint8Array(
+            value.buffer,
+            value.byteOffset,
+            value.byteLength
+        );
 
+    debugLog(
+        `RX <- ${c.uuid} | ${hex(data)}`
+    );
 }
 
 
-/* =========================
+/* =========================================================
+   READ ONE
+   ========================================================= */
+
+async function readOneDebug(uuid) {
+
+    if (!bleDevice ||
+        !bleDevice.gatt ||
+        !bleDevice.gatt.connected) {
+
+        toast(
+            'Chưa kết nối Bluetooth',
+            'error'
+        );
+
+        return;
+    }
+
+    debugLog(
+        `READ ONE -> ${uuid}`
+    );
+
+    try {
+
+        const services =
+            await bleDevice.gatt
+                .getPrimaryServices();
+
+        for (const service of services) {
+
+            const chars =
+                await service
+                    .getCharacteristics();
+
+            for (const c of chars) {
+
+                if (
+                    c.uuid.toLowerCase() !==
+                    uuid.toLowerCase()
+                ) {
+                    continue;
+                }
+
+                debugLog(
+                    `FOUND ${c.uuid} | ${
+                        describeProperties(
+                            c.properties
+                        )
+                    }`
+                );
+
+                if (!c.properties.read) {
+
+                    debugLog(
+                        `READ NOT SUPPORTED ${c.uuid}`
+                    );
+
+                    return;
+                }
+
+                const value =
+                    await c.readValue();
+
+                const data =
+                    new Uint8Array(
+                        value.buffer,
+                        value.byteOffset,
+                        value.byteLength
+                    );
+
+                debugLog(
+                    `READ <- ${c.uuid} | ${hex(data)}`
+                );
+
+                return;
+            }
+        }
+
+        debugLog(
+            `READ NOT FOUND ${uuid}`
+        );
+
+    } catch (e) {
+
+        debugLog(
+            `READ ERROR ${uuid} | ${
+                e.message || e
+            }`
+        );
+    }
+}
+
+
+/* =========================================================
+   READ ALL
+   ========================================================= */
+
+async function readDebugChars() {
+
+    if (!bleDevice ||
+        !bleDevice.gatt ||
+        !bleDevice.gatt.connected) {
+
+        toast(
+            'Chưa kết nối Bluetooth',
+            'error'
+        );
+
+        debugLog(
+            'READ ALL ERROR: GATT chưa kết nối'
+        );
+
+        return;
+    }
+
+    debugLog('');
+    debugLog(
+        '========== READ ALL START =========='
+    );
+
+    let count = 0;
+
+    try {
+
+        const services =
+            await bleDevice.gatt
+                .getPrimaryServices();
+
+        debugLog(
+            `Tìm thấy ${services.length} primary service`
+        );
+
+        for (const service of services) {
+
+            debugLog(
+                `SERVICE: ${service.uuid}`
+            );
+
+            let chars = [];
+
+            try {
+
+                chars =
+                    await service
+                        .getCharacteristics();
+
+            } catch (e) {
+
+                debugLog(
+                    `CHAR ERROR ${service.uuid} | ${
+                        e.message || e
+                    }`
+                );
+
+                continue;
+            }
+
+            for (const c of chars) {
+
+                const props =
+                    describeProperties(
+                        c.properties
+                    );
+
+                debugLog(
+                    `CHAR: ${c.uuid} | ${props}`
+                );
+
+                if (!c.properties.read) {
+
+                    debugLog(
+                        `SKIP ${c.uuid} | không có READ`
+                    );
+
+                    continue;
+                }
+
+                count++;
+
+                try {
+
+                    debugLog(
+                        `READ -> ${c.uuid}`
+                    );
+
+                    const value =
+                        await c.readValue();
+
+                    const data =
+                        new Uint8Array(
+                            value.buffer,
+                            value.byteOffset,
+                            value.byteLength
+                        );
+
+                    debugLog(
+                        `READ <- ${c.uuid} | ${hex(data)}`
+                    );
+
+                } catch (e) {
+
+                    debugLog(
+                        `READ ERROR ${c.uuid} | ${
+                            e.message || e
+                        }`
+                    );
+                }
+            }
+        }
+
+        debugLog('');
+        debugLog(
+            `========== READ ALL DONE | ${
+                count
+            } readable characteristic(s) ==========`
+        );
+
+        toast(
+            `READ ALL xong: ${count} characteristic`,
+            'success'
+        );
+
+    } catch (e) {
+
+        debugLog(
+            `READ ALL ERROR | ${
+                e.message || e
+            }`
+        );
+
+        toast(
+            'READ ALL lỗi',
+            'error'
+        );
+    }
+}
+
+
+/* =========================================================
    CONNECT
-========================= */
+   ========================================================= */
 
-async function toggleConnection(){
+async function toggleConnection() {
 
-if(isConnecting)return;
+    if (isConnecting)
+        return;
 
-if(isConnected){
+    if (isConnected) {
 
-await disconnect();
+        await disconnect();
 
-return;
+    } else {
 
-}
-
-await connect();
-
-}
-
-
-async function connect(){
-
-if(!navigator.bluetooth){
-
-toast(
-'Trình duyệt không hỗ trợ Web Bluetooth',
-'error'
-);
-
-return;
-
-}
-
-isConnecting=true;
-
-const btn =
-document.getElementById('btnConnect');
-
-btn.classList.add('loading');
-
-btn.textContent='ĐANG TÌM THIẾT BỊ...';
-
-try{
-
-bleDevice =
-await navigator.bluetooth.requestDevice({
-
-filters:[
-{name:'B3PRO'},
-{namePrefix:'B3'},
-{namePrefix:'PIVA'}
-],
-
-optionalServices:[
-SERVICE_UUID
-]
-
-});
-
-
-bleDevice.addEventListener(
-'gattserverdisconnected',
-onDisconnected
-);
-
-
-let server;
-
-if(bleDevice.gatt.connected){
-
-server=bleDevice.gatt;
-
-}else{
-
-server=
-await bleDevice.gatt.connect();
-
+        await connect();
+    }
 }
 
 
-const service =
-await server.getPrimaryService(
-SERVICE_UUID
-);
+async function connect() {
 
+    if (!navigator.bluetooth) {
 
-writeChar =
-await service.getCharacteristic(
-WRITE_UUID
-);
+        toast(
+            'Trình duyệt không hỗ trợ Web Bluetooth',
+            'error'
+        );
 
+        return;
+    }
 
-debugLog(
-`PRIMARY SERVICE = ${service.uuid}`
-);
+    isConnecting = true;
 
-debugLog(
-`WRITE CHAR = ${writeChar.uuid} | ${describeProperties(writeChar.properties)}`
-);
+    const btn =
+        document.getElementById(
+            'btnConnect'
+        );
 
+    btn.textContent =
+        'ĐANG TÌM THIẾT BỊ...';
 
-try{
+    try {
 
-notifyChar =
-await service.getCharacteristic(
-NOTIFY_UUID
-);
+        bleDevice =
+            await navigator.bluetooth
+                .requestDevice({
 
-await notifyChar.startNotifications();
+                    filters:[
+                        {name:'B3PRO'},
+                        {namePrefix:'B3'},
+                        {namePrefix:'PIVA'}
+                    ],
 
-notifyChar.addEventListener(
-'characteristicvaluechanged',
-handleNotify
-);
+                    optionalServices:[
+                        SERVICE_UUID
+                    ]
+                });
 
-debugLog(
-`NOTIFY CHAR = ${notifyChar.uuid} | ${describeProperties(notifyChar.properties)}`
-);
+        debugLog(
+            `DEVICE = ${
+                bleDevice.name || '(no name)'
+            }`
+        );
 
-}catch(e){
+        debugLog(
+            `DEVICE ID = ${bleDevice.id}`
+        );
 
-notifyChar=null;
+        bleDevice.addEventListener(
+            'gattserverdisconnected',
+            onDisconnected
+        );
 
-debugLog(
-`NOTIFY setup FAILED: ${e.message || e}`
-);
+        const server =
+            bleDevice.gatt.connected
+            ? bleDevice.gatt
+            : await bleDevice.gatt.connect();
 
+        const service =
+            await server
+                .getPrimaryService(
+                    SERVICE_UUID
+                );
+
+        writeChar =
+            await service
+                .getCharacteristic(
+                    WRITE_UUID
+                );
+
+        debugLog(
+            `PRIMARY SERVICE = ${service.uuid}`
+        );
+
+        debugLog(
+            `WRITE CHAR = ${writeChar.uuid} | ${
+                describeProperties(
+                    writeChar.properties
+                )
+            }`
+        );
+
+        try {
+
+            notifyChar =
+                await service
+                    .getCharacteristic(
+                        NOTIFY_UUID
+                    );
+
+            await notifyChar
+                .startNotifications();
+
+            notifyChar.addEventListener(
+                'characteristicvaluechanged',
+                handleNotify
+            );
+
+            debugLog(
+                `NOTIFY CHAR = ${notifyChar.uuid} | ${
+                    describeProperties(
+                        notifyChar.properties
+                    )
+                }`
+            );
+
+        } catch (e) {
+
+            notifyChar = null;
+
+            debugLog(
+                `NOTIFY SETUP ERROR | ${
+                    e.message || e
+                }`
+            );
+        }
+
+        setStatus(
+            true,
+            'Đã kết nối'
+        );
+
+        toast(
+            'Kết nối thành công!',
+            'success'
+        );
+
+        debugLog(
+            'BLE CONNECTED'
+        );
+
+        /*
+         * Quét toàn bộ GATT ngay sau khi kết nối.
+         */
+        await dumpGattV2();
+
+        /*
+         * Lệnh khởi tạo hiện tại.
+         */
+        await send([
+            0xA5,
+            0x02,
+            0x01,
+            0x5A
+        ]);
+
+    } catch (e) {
+
+        console.error(e);
+
+        debugLog(
+            `CONNECT ERROR | ${
+                e.message || e
+            }`
+        );
+
+        toast(
+            'Lỗi: ' +
+            (e.message || e.name || ''),
+            'error'
+        );
+
+        setStatus(false);
+
+    } finally {
+
+        isConnecting = false;
+
+        if (!isConnected) {
+
+            btn.textContent =
+                'KẾT NỐI BLUETOOTH';
+        }
+    }
 }
 
 
-setStatus(true,'Đã kết nối');
+async function disconnect() {
 
-toast(
-'Kết nối thành công với PIVA B3 Pro!',
-'success'
-);
+    try {
 
+        if (
+            bleDevice &&
+            bleDevice.gatt &&
+            bleDevice.gatt.connected
+        ) {
+            bleDevice.gatt.disconnect();
+        }
 
-debugLog('BLE connected');
+    } catch (e) {}
 
-await dumpGattV2();
+    cleanup();
 
+    setStatus(false);
 
-/*
-Giữ lệnh khởi tạo của bản gốc.
-*/
-
-await send([
-0xA5,
-0x02,
-0x01,
-0x5A
-]);
-
-
-}catch(err){
-
-console.error('Connect error:',err);
-
-const realMsg =
-err.message ||
-err.name ||
-'Không thể kết nối';
-
-toast(
-'Lỗi: '+realMsg,
-'error'
-);
-
-setStatus(false);
-
-}finally{
-
-isConnecting=false;
-
-btn.classList.remove('loading');
-
-if(!isConnected){
-
-btn.textContent=
-'KẾT NỐI BLUETOOTH';
-
-}
-
-}
-
+    toast(
+        'Đã ngắt kết nối'
+    );
 }
 
 
-/* =========================
-   DISCONNECT
-========================= */
+function onDisconnected() {
 
-async function disconnect(){
+    debugLog(
+        'BLE DISCONNECTED'
+    );
 
-try{
+    cleanup();
 
-if(
-bleDevice &&
-bleDevice.gatt.connected
-){
+    setStatus(false);
 
-await bleDevice.gatt.disconnect();
-
-}
-
-}catch(e){}
-
-cleanup();
-
-setStatus(false);
-
-toast('Đã ngắt kết nối');
-
+    toast(
+        'Mất kết nối Bluetooth',
+        'error'
+    );
 }
 
 
-function onDisconnected(){
+function cleanup() {
 
-debugLog(
-'BLE disconnected'
-);
+    for (
+        const item
+        of debugListeners.values()
+    ) {
 
-cleanup();
+        try {
 
-setStatus(false);
+            item.characteristic
+                .removeEventListener(
+                    'characteristicvaluechanged',
+                    item.listener
+                );
 
-toast(
-'Mất kết nối Bluetooth',
-'error'
-);
+        } catch (e) {}
+    }
 
+    debugListeners.clear();
+
+    writeChar = null;
+    notifyChar = null;
+    bleDevice = null;
+
+    clearInterval(
+        timerInterval
+    );
 }
 
 
-function cleanup(){
-
-writeChar=null;
-
-notifyChar=null;
-
-bleDevice=null;
-
-clearInterval(safetyInterval);
-
-clearInterval(timerInterval);
-
-}
-
-
-/* =========================
+/* =========================================================
    SEND
-========================= */
+   ========================================================= */
 
-async function send(bytes){
+async function send(bytes) {
 
-if(
-!writeChar ||
-!isConnected
-){
+    if (!writeChar ||
+        !isConnected) {
 
-toast(
-'Chưa kết nối thiết bị',
-'error'
-);
+        toast(
+            'Chưa kết nối thiết bị',
+            'error'
+        );
 
-return false;
+        return false;
+    }
 
-}
+    try {
 
-try{
+        debugLog(
+            `TX -> ${writeChar.uuid} | ${hex(bytes)}`
+        );
 
-debugLog(
-`TX -> ${writeChar.uuid} | ${hex(bytes)}`
-);
+        if (
+            writeChar.properties
+                .writeWithoutResponse
+        ) {
 
+            await writeChar
+                .writeValueWithoutResponse(
+                    new Uint8Array(bytes)
+                );
 
-if(
-writeChar.properties.writeWithoutResponse
-){
+            debugLog(
+                'TX METHOD = WRITE WITHOUT RESPONSE'
+            );
 
-debugLog(
-'TX method: writeWithoutResponse'
-);
+        } else {
 
-await writeChar.writeValueWithoutResponse(
-new Uint8Array(bytes)
-);
+            await writeChar
+                .writeValue(
+                    new Uint8Array(bytes)
+                );
 
-}else{
+            debugLog(
+                'TX METHOD = WRITE'
+            );
+        }
 
-debugLog(
-'TX method: write'
-);
+        debugLog(
+            'TX OK'
+        );
 
-await writeChar.writeValue(
-new Uint8Array(bytes)
-);
+        return true;
 
-}
+    } catch (e) {
 
+        debugLog(
+            `TX ERROR | ${
+                e.message || e
+            }`
+        );
 
-debugLog('TX OK');
+        toast(
+            'Gửi lệnh thất bại',
+            'error'
+        );
 
-return true;
-
-
-}catch(err){
-
-console.error(
-'Write error:',
-err
-);
-
-debugLog(
-`TX ERROR | ${err.message || err}`
-);
-
-toast(
-'Gửi lệnh thất bại: '+
-(err.message || ''),
-'error'
-);
-
-return false;
-
-}
-
+        return false;
+    }
 }
 
 
-/* =========================
-   MODE
-========================= */
+/* =========================================================
+   DEVICE COMMANDS
+   ========================================================= */
 
-function setMode(level){
+function setActive(selector, id) {
 
-setActive(
-'#btnL1,#btnL2,#btnL3',
-'btnL'+level
-);
+    document
+        .querySelectorAll(selector)
+        .forEach(
+            b => b.classList.remove('active')
+        );
 
-if(smartMode){
+    const el =
+        document.getElementById(id);
 
-document.getElementById(
-'smartToggle'
-).checked=false;
-
-smartMode=false;
-
-}
-
-send([
-0xA5,
-0x02,
-level,
-0x5A
-]);
-
+    if (el)
+        el.classList.add('active');
 }
 
 
-function toggleSmart(enable){
+function setMode(level) {
 
-smartMode=enable;
+    setActive(
+        '#btnL1,#btnL2,#btnL3',
+        'btnL' + level
+    );
 
-send([
-0xA5,
-0x06,
-enable ? 0x01 : 0x00,
-0x5A
-]);
+    if (smartMode) {
 
+        document.getElementById(
+            'smartToggle'
+        ).checked = false;
+
+        smartMode = false;
+    }
+
+    send([
+        0xA5,
+        0x02,
+        level,
+        0x5A
+    ]);
 }
 
 
-function toggleTurbo(enable){
+function toggleSmart(enable) {
 
-send([
-0xA5,
-0x03,
-enable ? 0x01 : 0x00,
-0x5A
-]);
+    smartMode = enable;
 
+    send([
+        0xA5,
+        0x06,
+        enable ? 0x01 : 0x00,
+        0x5A
+    ]);
 }
 
 
-/* =========================
-   FAN
-========================= */
+function toggleTurbo(enable) {
 
-function setFan(percent){
-
-setActive(
-'#fan20,#fan40,#fan60,#fan80,#fan100',
-'fan'+percent
-);
-
-send([
-0xA5,
-0x04,
-percent,
-0x5A
-]);
-
+    send([
+        0xA5,
+        0x03,
+        enable ? 0x01 : 0x00,
+        0x5A
+    ]);
 }
 
 
-/* =========================
-   LED
-========================= */
+function setFan(percent) {
 
-function setLed(modeId,btn){
+    setActive(
+        '#fan20,#fan40,#fan60,#fan80,#fan100',
+        'fan' + percent
+    );
 
-document
-.querySelectorAll('.led-btn')
-.forEach(b=>b.classList.remove('active'));
-
-if(btn)btn.classList.add('active');
-
-send([
-0xA5,
-0x05,
-modeId,
-0x5A
-]);
-
+    send([
+        0xA5,
+        0x04,
+        percent,
+        0x5A
+    ]);
 }
 
 
-function setCustomColor(hexColor){
+function setLed(modeId, btn) {
 
-const r =
-parseInt(hexColor.slice(1,3),16);
+    document
+        .querySelectorAll('.led-btn')
+        .forEach(
+            b => b.classList.remove('active')
+        );
 
-const g =
-parseInt(hexColor.slice(3,5),16);
+    if (btn)
+        btn.classList.add('active');
 
-const b =
-parseInt(hexColor.slice(5,7),16);
-
-send([
-0xA5,
-0x07,
-r,
-g,
-b,
-0x5A
-]);
-
+    send([
+        0xA5,
+        0x05,
+        modeId,
+        0x5A
+    ]);
 }
 
 
-function setBrightness(val){
+function setCustomColor(value) {
 
-document.getElementById(
-'valBrightness'
-).textContent=val+'%';
+    const r =
+        parseInt(
+            value.slice(1,3),
+            16
+        );
 
-send([
-0xA5,
-0x08,
-parseInt(val),
-0x5A
-]);
+    const g =
+        parseInt(
+            value.slice(3,5),
+            16
+        );
 
+    const b =
+        parseInt(
+            value.slice(5,7),
+            16
+        );
+
+    send([
+        0xA5,
+        0x07,
+        r,
+        g,
+        b,
+        0x5A
+    ]);
 }
 
 
-function setLedSpeed(val){
+function setBrightness(value) {
 
-document.getElementById(
-'valSpeed'
-).textContent=val+'%';
+    document.getElementById(
+        'valBrightness'
+    ).textContent =
+        value + '%';
 
-send([
-0xA5,
-0x09,
-parseInt(val),
-0x5A
-]);
-
+    send([
+        0xA5,
+        0x08,
+        parseInt(value),
+        0x5A
+    ]);
 }
 
 
-/* =========================
-   NOTIFY
-========================= */
+function setLedSpeed(value) {
 
-function handleNotify(event){
+    document.getElementById(
+        'valSpeed'
+    ).textContent =
+        value + '%';
 
-const data =
-new Uint8Array(
-event.target.value.buffer,
-event.target.value.byteOffset,
-event.target.value.byteLength
-);
-
-debugLog(
-`RX <- ${event.target.uuid || NOTIFY_UUID} | ${hex(data)}`
-);
-
+    send([
+        0xA5,
+        0x09,
+        parseInt(value),
+        0x5A
+    ]);
 }
 
 
-/* =========================
+/* =========================================================
+   NORMAL NOTIFY
+   ========================================================= */
+
+function handleNotify(event) {
+
+    const value =
+        event.target.value;
+
+    const data =
+        new Uint8Array(
+            value.buffer,
+            value.byteOffset,
+            value.byteLength
+        );
+
+    debugLog(
+        `RX <- ${event.target.uuid} | ${hex(data)}`
+    );
+}
+
+
+/* =========================================================
    TIMER
-========================= */
+   ========================================================= */
 
-function updateTimerLabels(){
+function updateTimerLabels() {
 
-const h =
-document.getElementById(
-'sliderHour'
-).value;
+    document.getElementById(
+        'valHour'
+    ).textContent =
+        document.getElementById(
+            'sliderHour'
+        ).value + 'h';
 
-const m =
-document.getElementById(
-'sliderMin'
-).value;
+    document.getElementById(
+        'valMin'
+    ).textContent =
+        document.getElementById(
+            'sliderMin'
+        ).value + 'p';
 
-const s =
-document.getElementById(
-'sliderSec'
-).value;
-
-document.getElementById(
-'valHour'
-).textContent=h+'h';
-
-document.getElementById(
-'valMin'
-).textContent=m+'p';
-
-document.getElementById(
-'valSec'
-).textContent=s+'s';
-
+    document.getElementById(
+        'valSec'
+    ).textContent =
+        document.getElementById(
+            'sliderSec'
+        ).value + 's';
 }
 
 
-function startTimer(){
+function startTimer() {
 
-const h =
-parseInt(
-document.getElementById('sliderHour').value
-)||0;
+    const h =
+        parseInt(
+            document.getElementById(
+                'sliderHour'
+            ).value
+        ) || 0;
 
-const m =
-parseInt(
-document.getElementById('sliderMin').value
-)||0;
+    const m =
+        parseInt(
+            document.getElementById(
+                'sliderMin'
+            ).value
+        ) || 0;
 
-const s =
-parseInt(
-document.getElementById('sliderSec').value
-)||0;
+    const s =
+        parseInt(
+            document.getElementById(
+                'sliderSec'
+            ).value
+        ) || 0;
 
-const total =
-h*3600+m*60+s;
+    const total =
+        h * 3600 +
+        m * 60 +
+        s;
 
-if(total<=0){
+    if (total <= 0) {
 
-toast(
-'Vui lòng chọn thời gian > 0',
-'error'
-);
+        toast(
+            'Vui lòng chọn thời gian > 0',
+            'error'
+        );
 
-return;
+        return;
+    }
 
-}
+    clearInterval(
+        timerInterval
+    );
 
-clearInterval(timerInterval);
+    timerTarget =
+        Date.now() +
+        total * 1000;
 
-timerTarget =
-Date.now()+total*1000;
+    const display =
+        document.getElementById(
+            'timerDisplay'
+        );
 
-const display =
-document.getElementById(
-'timerDisplay'
-);
+    timerInterval =
+        setInterval(() => {
 
+            const remain =
+                timerTarget -
+                Date.now();
 
-timerInterval=setInterval(()=>{
+            if (remain <= 0) {
 
-const remain =
-timerTarget-Date.now();
+                clearInterval(
+                    timerInterval
+                );
 
-if(remain<=0){
+                display.textContent =
+                    'Đã hết giờ';
 
-clearInterval(timerInterval);
+                toast(
+                    'Hết giờ',
+                    'success'
+                );
 
-setMode(1);
+                return;
+            }
 
-display.textContent=
-'Đã tắt theo hẹn giờ';
+            const sec =
+                Math.ceil(
+                    remain / 1000
+                );
 
-toast(
-'⏱️ Hết giờ! Đã hạ công suất sò',
-'success'
-);
+            const rh =
+                Math.floor(
+                    sec / 3600
+                );
 
-return;
+            const rm =
+                Math.floor(
+                    (sec % 3600) / 60
+                );
 
-}
+            const rs =
+                sec % 60;
 
-const sec =
-Math.ceil(remain/1000);
+            display.textContent =
+                `Còn ${
+                    String(rh).padStart(2,'0')
+                }:${
+                    String(rm).padStart(2,'0')
+                }:${
+                    String(rs).padStart(2,'0')
+                }`;
 
-const rh =
-Math.floor(sec/3600);
+        },250);
 
-const rm =
-Math.floor(
-(sec%3600)/60
-);
-
-const rs =
-sec%60;
-
-display.textContent=
-`Còn ${
-String(rh).padStart(2,'0')
-}:${
-String(rm).padStart(2,'0')
-}:${
-String(rs).padStart(2,'0')
-}`;
-
-},250);
-
-toast('Đã bật hẹn giờ');
-
-}
-
-
-function cancelTimer(){
-
-clearInterval(timerInterval);
-
-timerTarget=null;
-
-document.getElementById(
-'timerDisplay'
-).textContent='Chưa hẹn giờ';
-
-toast('Đã hủy hẹn giờ');
-
-}
-
-
-/* =========================
-   SAFETY
-========================= */
-
-function startSafetyMonitor(){
-
-clearInterval(safetyInterval);
-
-safetyInterval=setInterval(()=>{
-
-const tempFan =
-parseFloat(
-document.getElementById(
-'tempFan'
-).textContent
-)||25;
-
-const tempCharger =
-parseFloat(
-document.getElementById(
-'tempCharger'
-).textContent
-)||30;
-
-const banner =
-document.getElementById(
-'alertBanner'
-);
-
-let msg='';
-
-
-if(peltierSafety){
-
-if(tempFan>65){
-
-msg=
-'⚠️ Sò quá nhiệt (>65°C)';
-
-}else if(tempFan<2){
-
-msg=
-'❄️ Sò quá lạnh (<2°C)';
-
-}
-
+    toast(
+        'Đã bật hẹn giờ'
+    );
 }
 
 
-if(
-chargerSafety &&
-tempCharger>60
-){
+function cancelTimer() {
 
-msg=
-'🔌 Củ sạc quá nhiệt (>60°C)';
+    clearInterval(
+        timerInterval
+    );
 
+    timerTarget = null;
+
+    document.getElementById(
+        'timerDisplay'
+    ).textContent =
+        'Chưa hẹn giờ';
+
+    toast(
+        'Đã hủy hẹn giờ'
+    );
 }
 
 
-if(msg){
-
-banner.style.display='block';
-
-banner.textContent=msg;
-
-}else{
-
-banner.style.display='none';
-
-}
-
-},3000);
-
-}
-
-
-/* =========================
+/* =========================================================
    INIT
-========================= */
-
-updateTimerLabels();
-
-setStatus(false);
+   ========================================================= */
 
 clearDebugLog();
 
-if('serviceWorker' in navigator){
+updateTimerLabels();
 
-navigator.serviceWorker
-.getRegistrations()
-.then(regs=>{
-
-regs.forEach(
-r=>r.unregister()
+setStatus(
+    false
 );
 
-});
+debugLog(
+    'PIVA B3 PRO DEBUG V3 READY'
+);
 
-}
+debugLog(
+    `SERVICE = ${SERVICE_UUID}`
+);
 
+debugLog(
+    `WRITE = ${WRITE_UUID}`
+);
+
+debugLog(
+    `NOTIFY = ${NOTIFY_UUID}`
+);
 </script>
 
 </body>
