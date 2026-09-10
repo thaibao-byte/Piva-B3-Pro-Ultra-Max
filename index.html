@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro V212 Controller</title>
+  <title>Piva B3 Pro Controller</title>
   <style>
     :root { --bg: #0f172a; --card: #1e293b; --accent: #10b981; --text: #f8fafc; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 16px; margin: 0; }
@@ -44,7 +44,7 @@
         <div id="valPower" class="dash-val">0 W</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Nhiệt độ sò</div>
+        <div class="dash-lbl">Nhiệt độ mặt lạnh</div>
         <div id="valTemp" class="dash-val">0 °C</div>
       </div>
       <div class="dash-item">
@@ -137,27 +137,26 @@
   async function sendControlCmd(mode) {
     highlightButton(mode);
     
-    // Gói tin chuẩn V212: 20 A5 03 01 [MODE] 00 [CHECKSUM]
-    const header = [0x20, 0xA5, 0x03, 0x01, mode, 0x00];
+    // Đã đổi Opcode thành 0x81 (Ghi đè chế độ hiệu năng)
+    const header = [0x20, 0xA5, 0x03, 0x81, mode, 0x00];
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
 
-    // Gửi đồng thời tới cả 3 kênh để bắt buộc sò thi hành
-    if (charWrite1) await charWrite1.writeValueWithoutResponse(packet).catch(()=>{});
+    // Gửi lệnh qua cả 2 cổng Write để đảm bảo nhận
+    if (charWrite1) await charWrite1.writeValueWithResponse(packet).catch(() => charWrite1.writeValueWithoutResponse(packet)).catch(()=>{});
     if (charWrite2) await charWrite2.writeValueWithoutResponse(packet).catch(()=>{});
-    if (charNotify) await charNotify.writeValueWithoutResponse(packet).catch(()=>{});
   }
 
   async function sendLedCmd(state) {
-    const header = [0x20, 0xA5, 0x03, 0x02, state, 0x00];
+    // Đã đổi Opcode thành 0x82 (Ghi đè bật/tắt Đèn LED)
+    const header = [0x20, 0xA5, 0x03, 0x82, state, 0x00];
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
 
-    if (charWrite1) await charWrite1.writeValueWithoutResponse(packet).catch(()=>{});
+    if (charWrite1) await charWrite1.writeValueWithResponse(packet).catch(() => charWrite1.writeValueWithoutResponse(packet)).catch(()=>{});
     if (charWrite2) await charWrite2.writeValueWithoutResponse(packet).catch(()=>{});
   }
 
-  // Giải mã dữ liệu Notify chuẩn xác dựa trên 2 bức ảnh của bạn
   function handleNotifications(event) {
     const data = event.target.value;
     if (data.byteLength < 8) return;
@@ -167,15 +166,16 @@
       const power = data.getUint8(3);
       document.getElementById('valPower').innerText = power + " W";
 
-      // Byte 4: Chế độ hoạt động hiện tại từ vi điều khiển sò
+      // Byte 4: Chế độ đang chạy
       const currentMode = data.getUint8(4);
-      highlightButton(currentMode);
+      if (currentMode > 0) highlightButton(currentMode);
 
-      // Byte 5: Nhiệt độ (°C)
-      const temp = data.getUint8(5);
-      document.getElementById('valTemp').innerText = temp + " °C";
+      // Byte 5: Nhiệt độ mặt lạnh thực tế
+      const rawTemp = data.getUint8(5);
+      const realTemp = power > 0 ? Math.max(0, rawTemp - 25) : 0;
+      document.getElementById('valTemp').innerText = realTemp + " °C";
 
-      // Byte 6 & 7: Tốc độ quạt RPM (0x1584 = 5508 RPM)
+      // Byte 6 & 7: Tốc độ quạt RPM
       const rpmHigh = data.getUint8(7);
       const rpmLow = data.getUint8(6);
       const rpm = (rpmHigh << 8) | rpmLow;
