@@ -32,7 +32,6 @@
     <div id="statusText" class="status">Trạng thái: Chưa kết nối</div>
   </div>
 
-  <!-- Dashboard chuẩn V212 -->
   <div class="card">
     <h2>Thông Số Hoạt Động (Firmware V212)</h2>
     <div class="dashboard">
@@ -45,31 +44,30 @@
         <div id="valPower" class="dash-val">0 W</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Giao thức cấp nguồn</div>
-        <div id="valProtocol" class="dash-val">OFF</div>
+        <div class="dash-lbl">Nhiệt độ sò</div>
+        <div id="valTemp" class="dash-val">0 °C</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Công tắc tản nhiệt</div>
-        <div id="valSwitch" class="dash-val">OFF</div>
+        <div class="dash-lbl">Nguồn điện</div>
+        <div id="valProtocol" class="dash-val">OFF</div>
       </div>
     </div>
   </div>
 
-  <!-- Chế độ hoạt động -->
   <div class="card">
     <h2>Chế Độ Hoạt Động</h2>
     
-    <div class="sub-title">Chế độ hiệu năng (Lạnh vừa -> Cực lạnh):</div>
+    <div class="sub-title">Chế độ hiệu năng:</div>
     <div class="grid-3" style="margin-bottom: 14px;">
-      <button id="btnL1" class="opt-btn" onclick="selectMode(1)">Mức L1</button>
-      <button id="btnL2" class="opt-btn" onclick="selectMode(2)">Mức L2</button>
-      <button id="btnL3" class="opt-btn active" onclick="selectMode(3)">Mức L3</button>
+      <button id="btnL1" class="opt-btn" onclick="sendControlCmd(1)">Mức L1</button>
+      <button id="btnL2" class="opt-btn" onclick="sendControlCmd(2)">Mức L2</button>
+      <button id="btnL3" class="opt-btn" onclick="sendControlCmd(3)">Mức L3</button>
     </div>
 
-    <div class="sub-title">Chế độ nâng cao & Đèn LED:</div>
+    <div class="sub-title">Nâng cao & Đèn LED:</div>
     <div class="grid-2" style="margin-bottom: 8px;">
-      <button id="btnOverclock" class="opt-btn" onclick="selectMode(6)">Ép xung (26W-27W)</button>
-      <button id="btnSmart" class="opt-btn" onclick="selectMode(4)">Đ.Khiển thông minh</button>
+      <button id="btnOc" class="opt-btn" onclick="sendControlCmd(6)">Ép xung (27W)</button>
+      <button id="btnSmart" class="opt-btn" onclick="sendControlCmd(4)">Thông minh</button>
     </div>
     <div class="grid-2">
       <button class="opt-btn" onclick="sendLedCmd(1)">Bật LED RGB</button>
@@ -84,9 +82,7 @@
   const WRITE_UUID_2 = '49535343-8841-43f4-a8d4-ecbe34729bb3';
   const NOTIFY_UUID  = '49535343-1e4d-4bd9-ba61-23c647249616';
 
-  let charWrite1 = null;
-  let charWrite2 = null;
-  let currentLevel = 3;
+  let charWrite1 = null, charWrite2 = null, charNotify = null;
 
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
@@ -103,20 +99,16 @@
 
       try { charWrite1 = await service.getCharacteristic(WRITE_UUID_1); } catch(e){}
       try { charWrite2 = await service.getCharacteristic(WRITE_UUID_2); } catch(e){}
-
-      const notifyChar = await service.getCharacteristic(NOTIFY_UUID);
-      await notifyChar.startNotifications();
-      notifyChar.addEventListener('characteristicvaluechanged', handleNotifications);
+      
+      charNotify = await service.getCharacteristic(NOTIFY_UUID);
+      await charNotify.startNotifications();
+      charNotify.addEventListener('characteristicvaluechanged', handleNotifications);
 
       document.getElementById('statusText').innerText = "Trạng thái: Đã kết nối thành công!";
       document.getElementById('connectBtn').innerText = "Đã Kết Nối";
       document.getElementById('connectBtn').disabled = true;
 
-      // Đặt mặc định L3 khi vừa kết nối thành công
-      selectMode(3);
-
     } catch (error) {
-      console.error("Lỗi:", error);
       document.getElementById('statusText').innerText = "Lỗi kết nối: " + error.message;
     }
   });
@@ -125,75 +117,72 @@
     document.getElementById('statusText').innerText = "Trạng thái: Đã ngắt kết nối!";
     document.getElementById('connectBtn').disabled = false;
     document.getElementById('connectBtn').innerText = "Kết Nối Lại";
-    
     document.getElementById('valPower').innerText = "0 W";
     document.getElementById('valFan').innerText = "0 RPM";
+    document.getElementById('valTemp').innerText = "0 °C";
     document.getElementById('valProtocol').innerText = "OFF";
-    document.getElementById('valSwitch').innerText = "OFF";
   }
 
   function highlightButton(mode) {
-    ['btnL1', 'btnL2', 'btnL3', 'btnOverclock', 'btnSmart'].forEach(id => {
+    ['btnL1', 'btnL2', 'btnL3', 'btnOc', 'btnSmart'].forEach(id => {
       document.getElementById(id)?.classList.remove('active');
     });
     if (mode === 1) document.getElementById('btnL1')?.classList.add('active');
     if (mode === 2) document.getElementById('btnL2')?.classList.add('active');
     if (mode === 3) document.getElementById('btnL3')?.classList.add('active');
     if (mode === 4) document.getElementById('btnSmart')?.classList.add('active');
-    if (mode === 6) document.getElementById('btnOverclock')?.classList.add('active');
+    if (mode === 6) document.getElementById('btnOc')?.classList.add('active');
   }
 
-  async function selectMode(level) {
-    currentLevel = level;
-    highlightButton(level);
+  async function sendControlCmd(mode) {
+    highlightButton(mode);
+    
+    // Gói tin chuẩn V212: 20 A5 03 01 [MODE] 00 [CHECKSUM]
+    const header = [0x20, 0xA5, 0x03, 0x01, mode, 0x00];
+    const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
+    const packet = new Uint8Array([...header, checksum]);
 
-    // Gửi đồng thời gói tin Header V212 chuẩn (55 AA) và Header Legacy (20 A5)
-    const p1 = new Uint8Array([0x55, 0xAA, 0x01, level, 0x00, (0x55 + 0xAA + 0x01 + level) & 0xFF]);
-    const p2 = new Uint8Array([0x20, 0xA5, 0x02, 0x01, level, (0x20 + 0xA5 + 0x02 + 0x01 + level) & 0xFF]);
-
-    if (charWrite2) {
-      await charWrite2.writeValueWithoutResponse(p1).catch(()=>{});
-      await charWrite2.writeValueWithoutResponse(p2).catch(()=>{});
-    }
-    if (charWrite1) {
-      await charWrite1.writeValueWithoutResponse(p1).catch(()=>{});
-      await charWrite1.writeValueWithoutResponse(p2).catch(()=>{});
-    }
+    // Gửi đồng thời tới cả 3 kênh để bắt buộc sò thi hành
+    if (charWrite1) await charWrite1.writeValueWithoutResponse(packet).catch(()=>{});
+    if (charWrite2) await charWrite2.writeValueWithoutResponse(packet).catch(()=>{});
+    if (charNotify) await charNotify.writeValueWithoutResponse(packet).catch(()=>{});
   }
 
   async function sendLedCmd(state) {
-    const p = new Uint8Array([0x55, 0xAA, 0x02, state, 0x00, (0x55 + 0xAA + 0x02 + state) & 0xFF]);
-    if (charWrite2) await charWrite2.writeValueWithoutResponse(p).catch(()=>{});
-    if (charWrite1) await charWrite1.writeValueWithoutResponse(p).catch(()=>{});
+    const header = [0x20, 0xA5, 0x03, 0x02, state, 0x00];
+    const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
+    const packet = new Uint8Array([...header, checksum]);
+
+    if (charWrite1) await charWrite1.writeValueWithoutResponse(packet).catch(()=>{});
+    if (charWrite2) await charWrite2.writeValueWithoutResponse(packet).catch(()=>{});
   }
 
-  // Giải mã dữ liệu Notify chính xác (Lọc các gói tin rác)
+  // Giải mã dữ liệu Notify chuẩn xác dựa trên 2 bức ảnh của bạn
   function handleNotifications(event) {
     const data = event.target.value;
-    if (data.byteLength < 6) return;
+    if (data.byteLength < 8) return;
 
-    // Kiểm tra đúng gói tin chứa thông số kỹ thuật (Header 0x20 hoặc 0x55)
-    const header = data.getUint8(0);
-    if (header !== 0x20 && header !== 0x55) return;
+    if (data.getUint8(0) === 0x20 && data.getUint8(1) === 0xA5) {
+      // Byte 3: Công suất (0x1A = 26W)
+      const power = data.getUint8(3);
+      document.getElementById('valPower').innerText = power + " W";
 
-    // Đọc công suất chuẩn dựa trên chế độ hiện tại
-    let power = 26;
-    if (currentLevel === 1) power = 18;
-    if (currentLevel === 2) power = 22;
-    if (currentLevel === 3) power = 26;
-    if (currentLevel === 6) power = 27;
+      // Byte 4: Chế độ hoạt động hiện tại từ vi điều khiển sò
+      const currentMode = data.getUint8(4);
+      highlightButton(currentMode);
 
-    // Đọc RPM chuẩn tương ứng
-    let rpm = 5508;
-    if (currentLevel === 1) rpm = 4200;
-    if (currentLevel === 2) rpm = 4800;
-    if (currentLevel === 3) rpm = 5508;
-    if (currentLevel === 6) rpm = 5800;
+      // Byte 5: Nhiệt độ (°C)
+      const temp = data.getUint8(5);
+      document.getElementById('valTemp').innerText = temp + " °C";
 
-    document.getElementById('valPower').innerText = power + " W";
-    document.getElementById('valFan').innerText = rpm + " RPM";
-    document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : "PD / Normal";
-    document.getElementById('valSwitch').innerText = "ON";
+      // Byte 6 & 7: Tốc độ quạt RPM (0x1584 = 5508 RPM)
+      const rpmHigh = data.getUint8(7);
+      const rpmLow = data.getUint8(6);
+      const rpm = (rpmHigh << 8) | rpmLow;
+
+      document.getElementById('valFan').innerText = rpm + " RPM";
+      document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : "PD / Normal";
+    }
   }
 </script>
 </body>
