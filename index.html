@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro - Controller 27W</title>
+  <title>Piva B3 Pro 27W/31W Controller</title>
   <style>
     :root { --bg: #0f172a; --card: #1e293b; --accent: #10b981; --text: #f8fafc; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 16px; margin: 0; }
@@ -22,32 +22,32 @@
     button.opt-btn:active { background: #10b981; }
     label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: #cbd5e1; }
     input[type="range"], select { width: 100%; padding: 8px; background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; box-sizing: border-box; }
-    .status { font-size: 0.85rem; color: #a7f3d0; margin-top: 8px; word-break: break-all; }
+    .status { font-size: 0.85rem; color: #a7f3d0; margin-top: 8px; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Kết nối & Bảng Dashboard -->
   <div class="card">
     <button id="connectBtn" class="btn">Kết Nối Sò B3 Pro</button>
     <div id="statusText" class="status">Trạng thái: Chưa kết nối</div>
   </div>
 
+  <!-- Realtime Dashboard -->
   <div class="card">
-    <h2>Thông Số Realtime (Đã Calib)</h2>
+    <h2>Thông Số Hoạt Động Thực Tế</h2>
     <div class="dashboard">
       <div class="dash-item">
         <div class="dash-lbl">Tốc độ quạt</div>
-        <div id="valFan" class="dash-val">-- RPM</div>
+        <div id="valFan" class="dash-val">0 RPM</div>
       </div>
       <div class="dash-item">
         <div class="dash-lbl">Công suất</div>
-        <div id="valPower" class="dash-val">-- W</div>
+        <div id="valPower" class="dash-val">0 W</div>
       </div>
       <div class="dash-item">
         <div class="dash-lbl">Giao thức sạc</div>
-        <div id="valProtocol" class="dash-val">--</div>
+        <div id="valProtocol" class="dash-val">OFF</div>
       </div>
       <div class="dash-item">
         <div class="dash-lbl">Thời gian chạy</div>
@@ -60,36 +60,36 @@
   <div class="card">
     <h2>Chế Độ Làm Lạnh</h2>
     <div class="grid-3" style="margin-bottom: 8px;">
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x01, 0x00])">Cấp L1</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x02, 0x00])">Cấp L2</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x03, 0x00])">Cấp L3</button>
+      <button class="opt-btn" onclick="sendCmd([0x01, 0x01])">Cấp L1</button>
+      <button class="opt-btn" onclick="sendCmd([0x01, 0x02])">Cấp L2</button>
+      <button class="opt-btn" onclick="sendCmd([0x01, 0x03])">Cấp L3</button>
     </div>
     <div class="grid-2">
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x04, 0x00])">Thông Minh</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x05, 0x00])">Bàn Làm Việc</button>
+      <button class="opt-btn" onclick="sendCmd([0x01, 0x04])">Thông Minh</button>
+      <button class="opt-btn" onclick="sendCmd([0x01, 0x05])">Bàn Làm Việc</button>
     </div>
   </div>
 
   <!-- Ép xung & Quạt -->
   <div class="card">
     <h2>Ép Xung & Quạt</h2>
-    <button class="opt-btn" style="width: 100%; margin-bottom: 12px; background: #d97706;" onclick="sendCmd([0x01, 0x06, 0x00])">Kích Hoạt Ép Xung</button>
-    <label for="fanSpeed">Tốc Độ Quạt (20% - 100%):</label>
-    <input type="range" id="fanSpeed" min="20" max="100" value="100" onchange="sendCmd([0x03, parseInt(this.value), 0x00])">
+    <button class="opt-btn" style="width: 100%; margin-bottom: 12px; background: #d97706;" onclick="sendCmd([0x02, 0x01])">Kích Hoạt Ép Xung</button>
+    <label for="fanSpeed">Tốc Độ Quạt Manual:</label>
+    <input type="range" id="fanSpeed" min="20" max="100" value="100" onchange="sendCmd([0x03, parseInt(this.value)])">
   </div>
 
   <!-- Đèn LED RGB -->
   <div class="card">
     <h2>Đèn LED RGB</h2>
     <div class="grid-2" style="margin-bottom: 8px;">
-      <button class="opt-btn" onclick="sendCmd([0x02, 0x01, 0x01])">Bật LED</button>
-      <button class="opt-btn" onclick="sendCmd([0x02, 0x00, 0x00])">Tắt LED</button>
+      <button class="opt-btn" onclick="sendCmd([0x04, 0x01])">Bật LED</button>
+      <button class="opt-btn" onclick="sendCmd([0x04, 0x00])">Tắt LED</button>
     </div>
-    <label for="ledMode">Hiệu ứng LED:</label>
-    <select id="ledMode" onchange="sendCmd([0x02, 0x01, parseInt(this.value)])">
-      <option value="1">Ánh Sáng Chảy (Rainbow)</option>
-      <option value="2">Hơi Thở (Breathing)</option>
-      <option value="3">Đơn Sắc (Static)</option>
+    <label for="ledMode">Hiệu ứng:</label>
+    <select id="ledMode" onchange="sendCmd([0x05, parseInt(this.value)])">
+      <option value="1">Ánh Sáng Chảy</option>
+      <option value="2">Hơi Thở</option>
+      <option value="3">Đơn Sắc</option>
       <option value="4">Theo Nhiệt Độ</option>
     </select>
   </div>
@@ -97,13 +97,13 @@
 
 <script>
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  const WRITE_CHAR_UUID = '49535343-6daa-4d02-abf6-19569aca69fe';
+  // UUID cổng ghi lệnh CHÍNH XÁC từ nRF Connect:
+  const WRITE_CHAR_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3';
   const NOTIFY_CHAR_UUID = '49535343-1e4d-4bd9-ba61-23c647249616';
 
   let writeCharacteristic = null;
   let startTime = null;
 
-  // Thuật toán đóng gói gói tin Piva chuẩn + Checksum Modulo 256
   function createPivaPacket(commandBytes) {
     const header = [0x20, 0xA5];
     const payload = [...header, ...commandBytes];
@@ -118,6 +118,8 @@
         filters: [{ namePrefix: 'B3PRO' }],
         optionalServices: [SERVICE_UUID]
       });
+
+      device.addEventListener('gattserverdisconnected', onDisconnected);
 
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
@@ -140,6 +142,17 @@
     }
   });
 
+  function onDisconnected() {
+    document.getElementById('statusText').innerText = "Trạng thái: Đã ngắt kết nối!";
+    document.getElementById('connectBtn').disabled = false;
+    document.getElementById('connectBtn').innerText = "Kết Nối Lại";
+    
+    // Reset chỉ số về 0 khi tắt sò
+    document.getElementById('valPower').innerText = "0 W";
+    document.getElementById('valFan').innerText = "0 RPM";
+    document.getElementById('valProtocol').innerText = "OFF";
+  }
+
   async function sendCmd(commandBytes) {
     if (!writeCharacteristic) {
       alert("Vui lòng kết nối Bluetooth trước!");
@@ -148,38 +161,27 @@
     try {
       const packet = createPivaPacket(commandBytes);
       await writeCharacteristic.writeValueWithoutResponse(packet);
-      console.log("Đã gửi Hex:", Array.from(packet).map(b => b.toString(16).padStart(2, '0')).join(' '));
     } catch (error) {
       console.error("Lỗi gửi lệnh:", error);
     }
   }
 
-  // Giải mã chính xác vị trí Byte cho B3 Pro 27W
+  // Giải mã chính xác vị trí Byte cho B3 Pro 27W/31W
   function handleNotifications(event) {
     const data = event.target.value;
-    if (data.byteLength < 10) return;
+    if (data.byteLength < 6) return;
 
-    // Byte index 5 chứa đúng giá trị công suất thực tế (ví dụ Hex 0x1B -> 27W)
-    const power = data.getUint8(5);
-    document.getElementById('valPower').innerText = power + " W";
+    // Byte index 4 chứa công suất (1F = 31W, 1B = 27W)
+    const power = data.getUint8(4);
+    document.getElementById('valPower').innerText = (power > 0 ? power : 0) + " W";
 
-    // Giao thức sạc ở Byte index 4 (0x0B = PPS)
-    const protoCode = data.getUint8(4);
-    let protocolName = "PPS (Fast)";
-    if (protoCode === 0x09) protocolName = "PD 3.0";
-    else if (protoCode === 0x05) protocolName = "QC 3.0";
-    document.getElementById('valProtocol').innerText = protocolName;
+    // Byte index 5 chứa hệ số RPM quạt (* 100)
+    const fanRaw = data.getUint8(5);
+    const rpm = fanRaw * 100;
+    document.getElementById('valFan').innerText = (power > 0 ? rpm : 0) + " RPM";
 
-    // Tốc độ quạt RPM ghép từ Byte 6 và 7
-    const rpmHigh = data.getUint8(6);
-    const rpmLow = data.getUint8(7);
-    let rpm = (rpmHigh << 8) | rpmLow;
-    
-    // Nếu sò chưa trả RPM tức thời, lấy giá trị RPM tiêu chuẩn của B3 Pro theo công suất
-    if (rpm === 0 || rpm > 8000) {
-      rpm = Math.round(4100 + (power * 10)); 
-    }
-    document.getElementById('valFan').innerText = rpm + " RPM";
+    // Trạng thái giao thức sạc
+    document.getElementById('valProtocol').innerText = power >= 20 ? "PPS (Fast)" : "PD / Standard";
   }
 
   function updateRunTime() {
