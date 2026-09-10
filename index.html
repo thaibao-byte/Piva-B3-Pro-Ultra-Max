@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Piva B3 Pro Studio</title>
+  <title>Piva B3 Pro Controller</title>
   <style>
     :root {
       --bg: #090d16;
       --card: #131b2e;
       --border: #1e293b;
       --accent: #06b6d4;
-      --accent-glow: rgba(6, 182, 212, 0.45);
       --green: #10b981;
       --danger: #f43f5e;
       --text: #f8fafc;
@@ -22,12 +21,12 @@
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.5); }
     
     .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .title { font-size: 1.15rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+    .title { font-size: 1.15rem; font-weight: 800; color: #38bdf8; }
     .status-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; background: #1e293b; color: var(--text-dim); }
     .status-badge.connected { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; }
 
-    .btn { background: var(--accent); color: #000; border: none; padding: 11px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 0.95rem; }
-    .btn:active { opacity: 0.85; }
+    .btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 0.95rem; }
+    .btn:active { transform: scale(0.98); }
     .btn-danger { background: var(--danger); color: #fff; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -48,14 +47,22 @@
     .dash-lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; }
     .dash-val { font-size: 1.35rem; font-weight: 800; color: #38bdf8; margin-top: 4px; }
 
-    /* Controls */
+    /* Controls & Buttons */
     .section-title { font-size: 0.82rem; color: var(--text-dim); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     
-    button.opt-btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 12px 6px; border-radius: 10px; cursor: pointer; font-size: 0.88rem; font-weight: 600; text-align: center; transition: all 0.2s; }
-    button.opt-btn:active { transform: scale(0.97); }
-    button.opt-btn.active { background: #0891b2; color: #ffffff; border-color: #22d3ee; box-shadow: 0 0 12px var(--accent-glow); font-weight: bold; }
+    button.opt-btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 13px 6px; border-radius: 10px; cursor: pointer; font-size: 0.88rem; font-weight: 600; text-align: center; transition: all 0.2s; }
+    button.opt-btn:active { transform: scale(0.96); }
+    
+    /* HIỆU ỨNG SÁNG ĐÈN CHẾ ĐỘ ĐANG CHẠY */
+    button.opt-btn.active { 
+      background: #0891b2 !important; 
+      color: #ffffff !important; 
+      border-color: #22d3ee !important; 
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.6) !important; 
+      font-weight: 800 !important;
+    }
     
     .range-box { margin-top: 8px; }
     .range-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 6px; }
@@ -66,7 +73,7 @@
     input[type="color"] { border: none; width: 44px; height: 38px; border-radius: 6px; background: none; cursor: pointer; }
     .color-hex { flex: 1; background: #070b14; border: 1px solid #334155; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; color: #38bdf8; }
 
-    .log-box { font-family: monospace; font-size: 0.72rem; color: #64748b; background: #070b14; padding: 8px; border-radius: 6px; word-break: break-all; }
+    .log-box { font-family: monospace; font-size: 0.72rem; color: #10b981; background: #070b14; padding: 8px; border-radius: 6px; word-break: break-all; min-height: 28px; }
   </style>
 </head>
 <body>
@@ -89,7 +96,7 @@
       <span class="switch-sub" id="powerSubText">Đang Tắt (Standby)</span>
     </div>
     <label class="switch">
-      <input type="checkbox" id="powerSwitch" onchange="toggleCoolingPower(this.checked)">
+      <input type="checkbox" id="powerSwitch" onchange="userTogglePower(this.checked)">
       <span class="slider"></span>
     </label>
   </div>
@@ -105,7 +112,7 @@
         <div id="valPower" class="dash-val">0 W</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Mặt lạnh</div>
+        <div class="dash-lbl">Nhiệt độ sò</div>
         <div id="valTemp" class="dash-val">0 °C</div>
       </div>
       <div class="dash-item">
@@ -118,23 +125,23 @@
   <div class="card">
     <div class="section-title">Cài Đặt Hiệu Suất</div>
     <div class="grid-3" style="margin-bottom: 12px;">
-      <button id="btnL1" class="opt-btn" onclick="setPerformanceMode(1)">🍃 Im lặng</button>
-      <button id="btnL2" class="opt-btn" onclick="setPerformanceMode(2)">⚖️ Cân bằng</button>
-      <button id="btnL3" class="opt-btn" onclick="setPerformanceMode(3)">❄️ Cực lạnh</button>
+      <button id="btnL1" class="opt-btn" onclick="userSelectMode(1)">🍃 Im lặng</button>
+      <button id="btnL2" class="opt-btn" onclick="userSelectMode(2)">⚖️ Cân bằng</button>
+      <button id="btnL3" class="opt-btn" onclick="userSelectMode(3)">❄️ Cực lạnh</button>
     </div>
 
     <div class="section-title">Nâng Cao</div>
     <div class="grid-2" style="margin-bottom: 12px;">
-      <button id="btnOc" class="opt-btn" onclick="setPerformanceMode(6)">⚡ Ép xung (27W)</button>
-      <button id="btnSmart" class="opt-btn" onclick="setPerformanceMode(4)">🧠 Thông minh</button>
+      <button id="btnOc" class="opt-btn" onclick="userSelectMode(6)">⚡ Ép xung (27W)</button>
+      <button id="btnSmart" class="opt-btn" onclick="userSelectMode(4)">🧠 Thông minh</button>
     </div>
 
-    <div class="range-box" id="overclockBox">
+    <div class="range-box">
       <div class="range-label">
         <span>Smart Level (Ép xung):</span>
         <span id="ocLevelVal">Mức 5 (Mạnh)</span>
       </div>
-      <input type="range" id="ocSlider" min="1" max="5" value="5" onchange="updateOcLevel(this.value)">
+      <input type="range" id="ocSlider" min="1" max="5" value="5" onchange="userChangeOcLevel(this.value)">
     </div>
   </div>
 
@@ -142,13 +149,12 @@
     <div class="header-row" style="margin-bottom: 10px;">
       <div class="section-title" style="margin-bottom:0;">Hiệu Ứng Ánh Sáng</div>
       <label class="switch">
-        <input type="checkbox" id="ledSwitch" checked onchange="toggleLed(this.checked)">
+        <input type="checkbox" id="ledSwitch" checked onchange="userToggleLed(this.checked)">
         <span class="slider"></span>
       </label>
     </div>
 
-    <label style="font-size:0.8rem; color:var(--text-dim);">Chế độ hiệu ứng đèn:</label>
-    <select id="ledEffectSelect" onchange="changeLedEffect(this.value)">
+    <select id="ledEffectSelect" onchange="userSelectLedEffect(this.value)">
       <option value="1">1. Ánh sáng chảy (Rainbow)</option>
       <option value="2">2. Nhịp thở (Breathing)</option>
       <option value="3">3. Đuổi theo (Chasing)</option>
@@ -160,17 +166,17 @@
 
     <div class="range-box" style="margin-bottom: 12px;">
       <div class="range-label">
-        <span>Tốc độ hiệu ứng đèn:</span>
+        <span>Tốc độ đèn:</span>
         <span id="ledSpeedVal">Nhanh</span>
       </div>
-      <input type="range" id="ledSpeedSlider" min="1" max="5" value="5" onchange="changeLedSpeed(this.value)">
+      <input type="range" id="ledSpeedSlider" min="1" max="5" value="5" onchange="userChangeLedSpeed(this.value)">
     </div>
 
-    <div class="section-title">Chọn Màu Tùy Biến (HEX)</div>
+    <div class="section-title">Đổi Màu HEX Trực Tiếp</div>
     <div class="color-row">
       <input type="color" id="ledColorPicker" value="#06B6D4" onchange="applyCustomColor(this.value)">
       <div class="color-hex" id="hexText">#06B6D4</div>
-      <button class="opt-btn" style="padding:8px 12px;" onclick="applyCustomColor(document.getElementById('ledColorPicker').value)">Áp dụng</button>
+      <button class="opt-btn" style="padding:8px 14px;" onclick="applyCustomColor(document.getElementById('ledColorPicker').value)">Đổi Màu</button>
     </div>
   </div>
 
@@ -179,17 +185,17 @@
     <div class="switch-card" style="margin-bottom: 12px;">
       <div class="switch-label">
         <span>Chế độ bàn làm việc</span>
-        <span class="switch-sub">Chỉ bật LED, tắt quạt và sò lạnh</span>
+        <span class="switch-sub">Chỉ bật đèn LED, tắt quạt & sò lạnh</span>
       </div>
       <label class="switch">
-        <input type="checkbox" id="deskModeSwitch" onchange="toggleDeskMode(this.checked)">
+        <input type="checkbox" id="deskModeSwitch" onchange="userToggleDeskMode(this.checked)">
         <span class="slider"></span>
       </label>
     </div>
 
-    <label style="font-size:0.8rem; color:var(--text-dim);">Tắt nguồn theo lịch trình:</label>
+    <label style="font-size:0.8rem; color:var(--text-dim);">Hẹn giờ tắt nguồn:</label>
     <select id="timerSelect" onchange="setShutdownTimer(this.value)">
-      <option value="0">Đóng (Không hẹn giờ)</option>
+      <option value="0">Tắt hẹn giờ</option>
       <option value="30">Sau 30 phút</option>
       <option value="60">Sau 1 giờ</option>
       <option value="120">Sau 2 giờ</option>
@@ -201,27 +207,28 @@
 </div>
 
 <script>
-  // UUID CHUẨN ISSC CỦA PIVA B3 PRO
+  // UUID CHUẨN ISSC
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  const CHAR_RX_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3'; // Cổng nhận lệnh chính xác (App -> Sò)
-  const CHAR_TX_UUID = '49535343-1e4d-4bd9-ba61-23c647249616'; // Cổng thông báo trạng thái (Sò -> App)
+  const CHAR_RX_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3'; // Cổng nhận lệnh
+  const CHAR_TX_UUID = '49535343-1e4d-4bd9-ba61-23c647249616'; // Cổng thông báo trạng thái
   const CHAR_CP_UUID = '49535343-6daa-4d02-abf6-19569aca69fe'; // Cổng phụ
 
   let bluetoothDevice = null;
-  let rxChar = null;
-  let txChar = null;
-  let cpChar = null;
-  let userLock = false;
-  let lockTimer = null;
+  let charRx = null;
+  let charTx = null;
+  let charCp = null;
+  let userInteracting = false;
+  let interactTimeout = null;
   let timerInterval = null;
 
   function setLog(msg) {
     document.getElementById('debugLog').innerText = msg;
   }
 
+  // Kết nối và lấy đích danh từng cổng Characteristic bằng try/catch
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
-      setLog("Đang tìm kiếm sò Piva B3 Pro...");
+      setLog("Đang tìm thiết bị B3PRO...");
       bluetoothDevice = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: [SERVICE_UUID]
@@ -229,30 +236,25 @@
 
       bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
-      setLog("Đang thiết lập cổng kết nối BLE...");
+      setLog("Đang mở kết nối GATT...");
       const server = await bluetoothDevice.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
 
-      // Cố định chính xác cổng RX để truyền lệnh
-      try { rxChar = await service.getCharacteristic(CHAR_RX_UUID); } catch(e){}
-      try { txChar = await service.getCharacteristic(CHAR_TX_UUID); } catch(e){}
-      try { cpChar = await service.getCharacteristic(CHAR_CP_UUID); } catch(e){}
+      // Lấy trực tiếp từng UUID (Tránh lỗi getCharacteristics() trên iOS)
+      try { charRx = await service.getCharacteristic(CHAR_RX_UUID); } catch(e){}
+      try { charTx = await service.getCharacteristic(CHAR_TX_UUID); } catch(e){}
+      try { charCp = await service.getCharacteristic(CHAR_CP_UUID); } catch(e){}
 
-      if (!rxChar) {
-        const chars = await service.getCharacteristics();
-        rxChar = chars.find(c => c.properties.writeWithoutResponse || c.properties.write);
-      }
-
-      if (txChar) {
-        await txChar.startNotifications();
-        txChar.addEventListener('characteristicvaluechanged', handleNotifications);
+      if (charTx) {
+        await charTx.startNotifications();
+        charTx.addEventListener('characteristicvaluechanged', handleNotifications);
       }
 
       document.getElementById('statusBadge').innerText = "Đã kết nối";
       document.getElementById('statusBadge').classList.add('connected');
       document.getElementById('connectBtn').disabled = true;
       document.getElementById('disconnectBtn').disabled = false;
-      setLog("Kết nối thành công! Cổng RX: " + (rxChar ? "Sẵn sàng" : "Không tìm thấy"));
+      setLog("Kết nối thành công! Đã gắn cổng lệnh RX.");
 
     } catch (error) {
       setLog("Lỗi kết nối: " + error.message);
@@ -276,141 +278,164 @@
     document.getElementById('valFan').innerText = "0 RPM";
     document.getElementById('valTemp').innerText = "0 °C";
     document.getElementById('valProtocol').innerText = "OFF";
-    highlightMode(0);
-    setLog("Đã ngắt kết nối với thiết bị.");
+    clearAllActiveModes();
+    setLog("Đã ngắt kết nối với sò.");
   }
 
-  function lockUi() {
-    userLock = true;
-    clearTimeout(lockTimer);
-    lockTimer = setTimeout(() => { userLock = false; }, 2000);
+  // Khóa UI trong 1.5s khi bấm nút để tín hiệu cũ không đè ngược lại
+  function lockInteraction() {
+    userInteracting = true;
+    clearTimeout(interactTimeout);
+    interactTimeout = setTimeout(() => { userInteracting = false; }, 1500);
   }
 
-  function highlightMode(mode) {
+  function clearAllActiveModes() {
     ['btnL1', 'btnL2', 'btnL3', 'btnOc', 'btnSmart'].forEach(id => {
       document.getElementById(id)?.classList.remove('active');
     });
-
-    if (mode === 1) document.getElementById('btnL1')?.classList.add('active');
-    else if (mode === 2) document.getElementById('btnL2')?.classList.add('active');
-    else if (mode === 3) document.getElementById('btnL3')?.classList.add('active');
-    else if (mode === 4) document.getElementById('btnSmart')?.classList.add('active');
-    else if (mode === 6) document.getElementById('btnOc')?.classList.add('active');
   }
 
-  // HÀM TRUYỀN LỆNH AN TOÀN ĐẢM BẢO SÒ NHẬN 100%
-  async function sendPivaCommand(cmdArray) {
-    if (!rxChar && !cpChar) {
-      setLog("Chưa kết nối Bluetooth!");
-      return;
+  // Tự động làm sáng nút chế độ theo mã phản hồi từ con sò
+  function highlightModeByCode(modeCode) {
+    clearAllActiveModes();
+    if (modeCode === 1 || modeCode === 0x0D) {
+      document.getElementById('btnL1')?.classList.add('active');
+    } else if (modeCode === 2) {
+      document.getElementById('btnL2')?.classList.add('active');
+    } else if (modeCode === 3) {
+      document.getElementById('btnL3')?.classList.add('active');
+    } else if (modeCode === 4) {
+      document.getElementById('btnSmart')?.classList.add('active');
+    } else if (modeCode === 6) {
+      document.getElementById('btnOc')?.classList.add('active');
     }
+  }
 
-    const header = [0x20, 0xA5, cmdArray.length];
-    const raw = [...header, ...cmdArray];
-    const checksum = raw.reduce((a, b) => a + b, 0) & 0xFF;
-    const packet = new Uint8Array([...raw, checksum]);
+  // Hàm tạo gói tin Piva chuẩn [0x20, 0xA5, Len, Payload, Checksum]
+  function makePacket(payload) {
+    const header = [0x20, 0xA5, payload.length];
+    const full = [...header, ...payload];
+    const checksum = full.reduce((sum, b) => sum + b, 0) & 0xFF;
+    return new Uint8Array([...full, checksum]);
+  }
 
-    const target = rxChar || cpChar;
-    try {
-      if (target.properties.writeWithoutResponse) {
-        await target.writeValueWithoutResponse(packet);
-      } else {
-        await target.writeValue(packet);
+  // Hàm phát lệnh an toàn truyền trực tiếp tới cổng RX của sò
+  async function sendToCooler(payload) {
+    const targets = [charRx, charTx, charCp];
+    let sent = false;
+
+    // Gói tin chuẩn 3 byte
+    const packet = makePacket(payload);
+
+    for (const c of targets) {
+      if (!c) continue;
+      try {
+        if (c.properties.writeWithoutResponse) {
+          await c.writeValueWithoutResponse(packet);
+          sent = true;
+        } else {
+          await c.writeValue(packet);
+          sent = true;
+        }
+      } catch (e) {
+        try { await c.writeValue(packet); sent = true; } catch(err){}
       }
-      setLog("Đã gửi: " + Array.from(packet).map(b => b.toString(16).padStart(2,'0')).join(' '));
-    } catch (e) {
-      try { await target.writeValue(packet); } catch(err){}
     }
 
-    if (cpChar && cpChar !== target) {
-      try { await cpChar.writeValueWithoutResponse(packet); } catch(e){}
+    if (sent) {
+      setLog("Đã gửi: " + Array.from(packet).map(b => b.toString(16).padStart(2,'0')).join(' '));
+    } else {
+      setLog("Lỗi: Không tìm thấy cổng ghi Bluetooth!");
     }
   }
 
-  // Bật/Tắt công tắc tản nhiệt
-  async function toggleCoolingPower(isOn) {
-    lockUi();
+  // Xử lý khi người dùng ấn nút chế độ
+  async function userSelectMode(mode) {
+    lockInteraction();
+    highlightModeByCode(mode);
+    document.getElementById('powerSwitch').checked = true;
+    document.getElementById('powerSubText').innerText = "Đang Bật (Hoạt động)";
+
+    // Phát đồng thời cả 2 biến thể độ dài lệnh để đảm bảo vi điều khiển sò nhận ngay
+    await sendToCooler([0x01, mode, 0x00]);
+    setTimeout(() => sendToCooler([0x01, mode]), 40);
+  }
+
+  // Xử lý công tắc ON/OFF
+  async function userTogglePower(isOn) {
+    lockInteraction();
     if (isOn) {
-      document.getElementById('powerSubText').innerText = "Đang Bật";
-      highlightMode(3); // Mặc định mở Cực lạnh
-      await sendPivaCommand([0x01, 0x03, 0x00]);
+      document.getElementById('powerSubText').innerText = "Đang Bật (Hoạt động)";
+      highlightModeByCode(3); // Mặc định mở Mức 3 Cực lạnh
+      await sendToCooler([0x01, 0x03, 0x00]);
     } else {
       document.getElementById('powerSubText').innerText = "Đang Tắt (Standby)";
-      highlightMode(0);
-      await sendPivaCommand([0x01, 0x00, 0x00]);
+      clearAllActiveModes();
+      await sendToCooler([0x01, 0x00, 0x00]);
     }
   }
 
-  // Đổi chế độ hiệu suất
-  async function setPerformanceMode(mode) {
-    lockUi();
-    document.getElementById('powerSwitch').checked = true;
-    document.getElementById('powerSubText').innerText = "Đang Bật";
-    highlightMode(mode);
-    await sendPivaCommand([0x01, mode, 0x00]);
-  }
-
-  // Cài đặt mức Smart Level cho Ép xung
-  async function updateOcLevel(val) {
-    const labels = ["", "Mức 1 (Rất yếu)", "Mức 2 (Yếu)", "Mức 3 (Vừa)", "Mức 4 (Khá)", "Mức 5 (Mạnh nhất)"];
+  // Chỉnh Smart level ép xung
+  async function userChangeOcLevel(val) {
+    const labels = ["", "Mức 1 (Yếu)", "Mức 2", "Mức 3", "Mức 4", "Mức 5 (Mạnh)"];
     document.getElementById('ocLevelVal').innerText = labels[val];
-    await sendPivaCommand([0x03, parseInt(val), 0x00]);
+    await sendToCooler([0x03, parseInt(val), 0x00]);
   }
 
-  // Bật/Tắt đèn LED
-  async function toggleLed(isOn) {
-    await sendPivaCommand([0x02, isOn ? 0x01 : 0x00, 0x00]);
+  // Bật/Tắt đèn
+  async function userToggleLed(isOn) {
+    await sendToCooler([0x02, isOn ? 0x01 : 0x00, 0x00]);
   }
 
-  // Đổi hiệu ứng LED (1-7)
-  async function changeLedEffect(effectIndex) {
-    await sendPivaCommand([0x02, parseInt(effectIndex), 0x00]);
+  // Chọn hiệu ứng đèn 1-7
+  async function userSelectLedEffect(effect) {
+    await sendToCooler([0x02, parseInt(effect), 0x00]);
   }
 
-  // Đổi tốc độ LED (1-5)
-  async function changeLedSpeed(speed) {
+  // Tốc độ đèn 1-5
+  async function userChangeLedSpeed(spd) {
     const labels = ["", "Rất chậm", "Chậm", "Vừa", "Nhanh", "Rất nhanh"];
-    document.getElementById('ledSpeedVal').innerText = labels[speed];
-    await sendPivaCommand([0x04, parseInt(speed), 0x00]);
+    document.getElementById('ledSpeedVal').innerText = labels[spd];
+    await sendToCooler([0x04, parseInt(spd), 0x00]);
   }
 
-  // Đổi màu sắc HEX tùy biến
-  async function applyCustomColor(hexStr) {
-    document.getElementById('hexText').innerText = hexStr.toUpperCase();
-    const r = parseInt(hexStr.substr(1, 2), 16);
-    const g = parseInt(hexStr.substr(3, 2), 16);
-    const b = parseInt(hexStr.substr(5, 2), 16);
-    await sendPivaCommand([0x06, r, g, b]);
+  // Đổi màu HEX
+  async function applyCustomColor(hex) {
+    document.getElementById('hexText').innerText = hex.toUpperCase();
+    const r = parseInt(hex.substr(1, 2), 16);
+    const g = parseInt(hex.substr(3, 2), 16);
+    const b = parseInt(hex.substr(5, 2), 16);
+    await sendToCooler([0x06, r, g, b]);
   }
 
-  // Chế độ bàn làm việc (Desk mode: Chỉ bật đèn, tắt quạt & TEC)
-  async function toggleDeskMode(isEnabled) {
-    lockUi();
-    if (isEnabled) {
+  // Bàn làm việc
+  async function userToggleDeskMode(isOn) {
+    lockInteraction();
+    if (isOn) {
       document.getElementById('powerSwitch').checked = false;
       document.getElementById('powerSubText').innerText = "Chế độ bàn làm việc (Chỉ LED)";
-      highlightMode(0);
-      await sendPivaCommand([0x05, 0x01, 0x00]);
+      clearAllActiveModes();
+      await sendToCooler([0x05, 0x01, 0x00]);
     } else {
-      await sendPivaCommand([0x05, 0x00, 0x00]);
-      setPerformanceMode(2);
+      await sendToCooler([0x05, 0x00, 0x00]);
+      userSelectMode(2);
     }
   }
 
-  // Hẹn giờ tắt nguồn
-  function setShutdownTimer(minutes) {
+  // Hẹn giờ tắt
+  function setShutdownTimer(mins) {
     clearInterval(timerInterval);
-    const mins = parseInt(minutes);
-    if (mins > 0) {
-      setLog(`Đã đặt hẹn giờ tắt sau ${mins} phút.`);
+    const m = parseInt(mins);
+    if (m > 0) {
+      setLog(`Đã hẹn giờ tắt sau ${m} phút.`);
       timerInterval = setTimeout(() => {
-        toggleCoolingPower(false);
-        alert("Đã tự động tắt nguồn sò tản nhiệt theo lịch trình!");
-      }, mins * 60 * 1000);
+        userTogglePower(false);
+        alert("Đã tự động tắt sò lạnh theo lịch trình!");
+      }, m * 60 * 1000);
     }
   }
 
-  // GIẢI MÃ THÔNG SỐ VÀ ĐỒNG BỘ 2 CHIỀU TỪ SÒ
+  // BỘ GIẢI MÃ DỮ LIỆU & TỰ ĐỘNG ĐỒNG BỘ ĐÈN SÁNG VỚI SÒ
   function handleNotifications(event) {
     const data = event.target.value;
     if (data.byteLength < 8) return;
@@ -421,16 +446,23 @@
       const rawTemp = data.getUint8(5);
       const rpm = (data.getUint8(7) << 8) | data.getUint8(6);
 
+      // Cập nhật thông số
       document.getElementById('valPower').innerText = power + " W";
       document.getElementById('valFan').innerText = rpm + " RPM";
       document.getElementById('valTemp').innerText = (power > 0 ? Math.max(0, rawTemp - 25) : 0) + " °C";
-      document.getElementById('valProtocol').innerText = power >= 20 ? "PPS 27W" : (power > 0 ? "PD 18W" : "OFF");
+      document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : (power > 0 ? "PD" : "OFF");
 
-      if (!userLock) {
+      // Đồng bộ hai chiều với chế độ của sò
+      if (!userInteracting) {
         const isRunning = (power > 0 && modeByte !== 0);
         document.getElementById('powerSwitch').checked = isRunning;
-        document.getElementById('powerSubText').innerText = isRunning ? "Đang Bật" : "Đang Tắt (Standby)";
-        highlightMode(isRunning ? modeByte : 0);
+        document.getElementById('powerSubText').innerText = isRunning ? "Đang Bật (Hoạt động)" : "Đang Tắt (Standby)";
+
+        if (isRunning) {
+          highlightModeByCode(modeByte);
+        } else {
+          clearAllActiveModes();
+        }
       }
     }
   }
