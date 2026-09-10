@@ -16,10 +16,11 @@
     .dash-item { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; }
     .dash-val { font-size: 1.4rem; font-weight: bold; color: #38bdf8; margin-top: 4px; }
     .dash-lbl { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    button.opt-btn { background: #334155; color: white; border: 1px solid #475569; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: left; }
+    button.opt-btn { background: #334155; color: white; border: 1px solid #475569; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: center; }
     button.opt-btn:active { background: #10b981; }
-    .btn-desc { font-size: 0.75rem; color: #94a3b8; font-weight: normal; margin-top: 2px; }
+    .sub-title { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
     .status { font-size: 0.85rem; color: #a7f3d0; margin-top: 8px; }
   </style>
 </head>
@@ -31,7 +32,7 @@
     <div id="statusText" class="status">Trạng thái: Chưa kết nối</div>
   </div>
 
-  <!-- Dashboard chuẩn App Gốc -->
+  <!-- Dashboard chuẩn V212 -->
   <div class="card">
     <h2>Thông Số Hoạt Động (Firmware V212)</h2>
     <div class="dashboard">
@@ -54,28 +55,25 @@
     </div>
   </div>
 
-  <!-- Các Chế Độ Tương Tự App Gốc -->
+  <!-- Chế độ hiệu năng chia L1 - L2 - L3 -->
   <div class="card">
     <h2>Chế Độ Hoạt Động</h2>
+    
+    <div class="sub-title">1. Chế độ hiệu năng (Lạnh vừa -> Cực lạnh):</div>
+    <div class="grid-3" style="margin-bottom: 14px;">
+      <button class="opt-btn" onclick="sendV212Cmd([0x01, 0x01, 0x00])">Mức L1</button>
+      <button class="opt-btn" onclick="sendV212Cmd([0x01, 0x02, 0x00])">Mức L2</button>
+      <button class="opt-btn" onclick="sendV212Cmd([0x01, 0x03, 0x00])">Mức L3</button>
+    </div>
+
+    <div class="sub-title">2. Chế độ nâng cao & Đèn LED:</div>
     <div class="grid-2" style="margin-bottom: 8px;">
-      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x03)">
-        <div>Chế độ hiệu năng</div>
-        <div class="btn-desc">Cực lạnh</div>
-      </button>
-      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x06)">
-        <div>Chế độ ép xung</div>
-        <div class="btn-desc">Tối đa công suất</div>
-      </button>
+      <button class="opt-btn" style="background: #b45309;" onclick="sendV212Cmd([0x01, 0x06, 0x00])">Chế độ ép xung</button>
+      <button class="opt-btn" onclick="sendV212Cmd([0x01, 0x04, 0x00])">Đ.Khiển thông minh</button>
     </div>
     <div class="grid-2">
-      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x04)">
-        <div>Điều khiển thông minh</div>
-        <div class="btn-desc">Tự điều chỉnh</div>
-      </button>
-      <button class="opt-btn" onclick="sendV212Cmd(0x02, 0x01)">
-        <div>Hiệu ứng ánh sáng</div>
-        <div class="btn-desc">Bật/Tắt LED</div>
-      </button>
+      <button class="opt-btn" onclick="sendV212Cmd([0x02, 0x01, 0x01])">Bật LED RGB</button>
+      <button class="opt-btn" onclick="sendV212Cmd([0x02, 0x00, 0x00])">Tắt LED RGB</button>
     </div>
   </div>
 </div>
@@ -130,44 +128,39 @@
     document.getElementById('valSwitch').innerText = "OFF";
   }
 
-  // Khởi tạo gói tin đa dạng cấu trúc Header để tương thích V212
-  async function sendV212Cmd(type, mode) {
+  // Tạo gói tin 7 byte chuẩn xác tuyệt đối cho V212
+  async function sendV212Cmd(cmdArray) {
     if (!charWrite1 && !charWrite2) {
       alert("Vui lòng kết nối Bluetooth trước!");
       return;
     }
 
-    // Gửi đồng thời cả Header chuẩn V212 (55 AA) và Header legacy (20 A5)
-    const packetV212 = new Uint8Array([0x55, 0xAA, type, mode, 0x00, (0x55 + 0xAA + type + mode) & 0xFF]);
-    const packetLegacy = new Uint8Array([0x20, 0xA5, 0x02, type, mode, (0x20 + 0xA5 + 0x02 + type + mode) & 0xFF]);
+    const header = [0x20, 0xA5, cmdArray.length];
+    const payload = [...header, ...cmdArray];
+    const checksum = payload.reduce((sum, b) => sum + b, 0) & 0xFF;
+    const packet = new Uint8Array([...payload, checksum]);
 
-    const target = charWrite2 || charWrite1;
-    if (target) {
-      await target.writeValueWithoutResponse(packetV212).catch(()=>{});
-      await target.writeValueWithoutResponse(packetLegacy).catch(()=>{});
-    }
+    console.log("Gửi Hex:", Array.from(packet).map(b => b.toString(16).padStart(2,'0')).join(' '));
+
+    if (charWrite1) await charWrite1.writeValueWithoutResponse(packet).catch(()=>{});
+    if (charWrite2) await charWrite2.writeValueWithoutResponse(packet).catch(()=>{});
   }
 
-  // Giải mã chính xác theo App nhà phát hành
+  // Giải mã chính xác cho Firmware V212 (Fix 26W / 5508 RPM)
   function handleNotifications(event) {
     const data = event.target.value;
-    if (data.byteLength < 8) return;
+    if (data.byteLength < 9) return;
 
-    // Công suất thực tế:
+    // Công suất chuẩn (Byte index 5)
     const power = data.getUint8(5);
     document.getElementById('valPower').innerText = power + " W";
 
-    // Tính tốc độ quạt (ghép 2 byte mã hóa RPM thực tế 5508 RPM)
+    // Tốc độ quạt RPM chuẩn V212 (Ghép Byte 6 & Byte 7)
     const rpmHigh = data.getUint8(6);
     const rpmLow = data.getUint8(7);
-    let rpm = (rpmHigh << 8) | rpmLow;
+    const rpm = (rpmHigh << 8) | rpmLow;
 
-    if (rpm > 8000 || rpm < 500) {
-      rpm = data.getUint8(5) * 200; // Công thức dự phòng
-    }
-    document.getElementById('valFan').innerText = rpm + " RPM";
-
-    // Trạng thái giao thức & công tắc
+    document.getElementById('valFan').innerText = (rpm > 0 ? rpm : 0) + " RPM";
     document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : "PD / Normal";
     document.getElementById('valSwitch').innerText = power > 0 ? "ON" : "OFF";
   }
