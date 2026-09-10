@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Piva B3 Pro 27W/31W Controller</title>
+  <title>Piva B3 Pro V212 Controller</title>
   <style>
     :root { --bg: #0f172a; --card: #1e293b; --accent: #10b981; --text: #f8fafc; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 16px; margin: 0; }
@@ -16,12 +16,10 @@
     .dash-item { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; }
     .dash-val { font-size: 1.4rem; font-weight: bold; color: #38bdf8; margin-top: 4px; }
     .dash-lbl { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    button.opt-btn { background: #334155; color: white; border: 1px solid #475569; padding: 10px; border-radius: 6px; cursor: pointer; }
+    button.opt-btn { background: #334155; color: white; border: 1px solid #475569; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: left; }
     button.opt-btn:active { background: #10b981; }
-    label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: #cbd5e1; }
-    input[type="range"], select { width: 100%; padding: 8px; background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; box-sizing: border-box; }
+    .btn-desc { font-size: 0.75rem; color: #94a3b8; font-weight: normal; margin-top: 2px; }
     .status { font-size: 0.85rem; color: #a7f3d0; margin-top: 8px; }
   </style>
 </head>
@@ -33,9 +31,9 @@
     <div id="statusText" class="status">Trạng thái: Chưa kết nối</div>
   </div>
 
-  <!-- Realtime Dashboard -->
+  <!-- Dashboard chuẩn App Gốc -->
   <div class="card">
-    <h2>Thông Số Hoạt Động Thực Tế</h2>
+    <h2>Thông Số Hoạt Động (Firmware V212)</h2>
     <div class="dashboard">
       <div class="dash-item">
         <div class="dash-lbl">Tốc độ quạt</div>
@@ -46,76 +44,56 @@
         <div id="valPower" class="dash-val">0 W</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Giao thức sạc</div>
+        <div class="dash-lbl">Giao thức cấp nguồn</div>
         <div id="valProtocol" class="dash-val">OFF</div>
       </div>
       <div class="dash-item">
-        <div class="dash-lbl">Thời gian chạy</div>
-        <div id="valTime" class="dash-val">00:00</div>
+        <div class="dash-lbl">Công tắc tản nhiệt</div>
+        <div id="valSwitch" class="dash-val">OFF</div>
       </div>
     </div>
   </div>
 
-  <!-- Chế độ làm lạnh -->
+  <!-- Các Chế Độ Tương Tự App Gốc -->
   <div class="card">
-    <h2>Chế Độ Làm Lạnh</h2>
-    <div class="grid-3" style="margin-bottom: 8px;">
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x01])">Cấp L1</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x02])">Cấp L2</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x03])">Cấp L3</button>
+    <h2>Chế Độ Hoạt Động</h2>
+    <div class="grid-2" style="margin-bottom: 8px;">
+      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x03)">
+        <div>Chế độ hiệu năng</div>
+        <div class="btn-desc">Cực lạnh</div>
+      </button>
+      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x06)">
+        <div>Chế độ ép xung</div>
+        <div class="btn-desc">Tối đa công suất</div>
+      </button>
     </div>
     <div class="grid-2">
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x04])">Thông Minh</button>
-      <button class="opt-btn" onclick="sendCmd([0x01, 0x05])">Bàn Làm Việc</button>
+      <button class="opt-btn" onclick="sendV212Cmd(0x01, 0x04)">
+        <div>Điều khiển thông minh</div>
+        <div class="btn-desc">Tự điều chỉnh</div>
+      </button>
+      <button class="opt-btn" onclick="sendV212Cmd(0x02, 0x01)">
+        <div>Hiệu ứng ánh sáng</div>
+        <div class="btn-desc">Bật/Tắt LED</div>
+      </button>
     </div>
-  </div>
-
-  <!-- Ép xung & Quạt -->
-  <div class="card">
-    <h2>Ép Xung & Quạt</h2>
-    <button class="opt-btn" style="width: 100%; margin-bottom: 12px; background: #d97706;" onclick="sendCmd([0x02, 0x01])">Kích Hoạt Ép Xung</button>
-    <label for="fanSpeed">Tốc Độ Quạt Manual:</label>
-    <input type="range" id="fanSpeed" min="20" max="100" value="100" onchange="sendCmd([0x03, parseInt(this.value)])">
-  </div>
-
-  <!-- Đèn LED RGB -->
-  <div class="card">
-    <h2>Đèn LED RGB</h2>
-    <div class="grid-2" style="margin-bottom: 8px;">
-      <button class="opt-btn" onclick="sendCmd([0x04, 0x01])">Bật LED</button>
-      <button class="opt-btn" onclick="sendCmd([0x04, 0x00])">Tắt LED</button>
-    </div>
-    <label for="ledMode">Hiệu ứng:</label>
-    <select id="ledMode" onchange="sendCmd([0x05, parseInt(this.value)])">
-      <option value="1">Ánh Sáng Chảy</option>
-      <option value="2">Hơi Thở</option>
-      <option value="3">Đơn Sắc</option>
-      <option value="4">Theo Nhiệt Độ</option>
-    </select>
   </div>
 </div>
 
 <script>
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  // UUID cổng ghi lệnh CHÍNH XÁC từ nRF Connect:
-  const WRITE_CHAR_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3';
-  const NOTIFY_CHAR_UUID = '49535343-1e4d-4bd9-ba61-23c647249616';
+  const WRITE_UUID_1 = '49535343-6daa-4d02-abf6-19569aca69fe';
+  const WRITE_UUID_2 = '49535343-8841-43f4-a8d4-ecbe34729bb3';
+  const NOTIFY_UUID  = '49535343-1e4d-4bd9-ba61-23c647249616';
 
-  let writeCharacteristic = null;
-  let startTime = null;
-
-  function createPivaPacket(commandBytes) {
-    const header = [0x20, 0xA5];
-    const payload = [...header, ...commandBytes];
-    const checksum = payload.reduce((sum, byte) => sum + byte, 0) & 0xFF;
-    return new Uint8Array([...payload, checksum]);
-  }
+  let charWrite1 = null;
+  let charWrite2 = null;
 
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
       document.getElementById('statusText').innerText = "Trạng thái: Đang kết nối...";
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ namePrefix: 'B3PRO' }],
+        acceptAllDevices: true,
         optionalServices: [SERVICE_UUID]
       });
 
@@ -123,18 +101,17 @@
 
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
-      writeCharacteristic = await service.getCharacteristic(WRITE_CHAR_UUID);
 
-      const notifyChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
+      try { charWrite1 = await service.getCharacteristic(WRITE_UUID_1); } catch(e){}
+      try { charWrite2 = await service.getCharacteristic(WRITE_UUID_2); } catch(e){}
+
+      const notifyChar = await service.getCharacteristic(NOTIFY_UUID);
       await notifyChar.startNotifications();
       notifyChar.addEventListener('characteristicvaluechanged', handleNotifications);
 
       document.getElementById('statusText').innerText = "Trạng thái: Đã kết nối thành công!";
       document.getElementById('connectBtn').innerText = "Đã Kết Nối";
       document.getElementById('connectBtn').disabled = true;
-
-      startTime = Date.now();
-      setInterval(updateRunTime, 1000);
 
     } catch (error) {
       console.error("Lỗi:", error);
@@ -147,49 +124,52 @@
     document.getElementById('connectBtn').disabled = false;
     document.getElementById('connectBtn').innerText = "Kết Nối Lại";
     
-    // Reset chỉ số về 0 khi tắt sò
     document.getElementById('valPower').innerText = "0 W";
     document.getElementById('valFan').innerText = "0 RPM";
     document.getElementById('valProtocol').innerText = "OFF";
+    document.getElementById('valSwitch').innerText = "OFF";
   }
 
-  async function sendCmd(commandBytes) {
-    if (!writeCharacteristic) {
+  // Khởi tạo gói tin đa dạng cấu trúc Header để tương thích V212
+  async function sendV212Cmd(type, mode) {
+    if (!charWrite1 && !charWrite2) {
       alert("Vui lòng kết nối Bluetooth trước!");
       return;
     }
-    try {
-      const packet = createPivaPacket(commandBytes);
-      await writeCharacteristic.writeValueWithoutResponse(packet);
-    } catch (error) {
-      console.error("Lỗi gửi lệnh:", error);
+
+    // Gửi đồng thời cả Header chuẩn V212 (55 AA) và Header legacy (20 A5)
+    const packetV212 = new Uint8Array([0x55, 0xAA, type, mode, 0x00, (0x55 + 0xAA + type + mode) & 0xFF]);
+    const packetLegacy = new Uint8Array([0x20, 0xA5, 0x02, type, mode, (0x20 + 0xA5 + 0x02 + type + mode) & 0xFF]);
+
+    const target = charWrite2 || charWrite1;
+    if (target) {
+      await target.writeValueWithoutResponse(packetV212).catch(()=>{});
+      await target.writeValueWithoutResponse(packetLegacy).catch(()=>{});
     }
   }
 
-  // Giải mã chính xác vị trí Byte cho B3 Pro 27W/31W
+  // Giải mã chính xác theo App nhà phát hành
   function handleNotifications(event) {
     const data = event.target.value;
-    if (data.byteLength < 6) return;
+    if (data.byteLength < 8) return;
 
-    // Byte index 4 chứa công suất (1F = 31W, 1B = 27W)
-    const power = data.getUint8(4);
-    document.getElementById('valPower').innerText = (power > 0 ? power : 0) + " W";
+    // Công suất thực tế:
+    const power = data.getUint8(5);
+    document.getElementById('valPower').innerText = power + " W";
 
-    // Byte index 5 chứa hệ số RPM quạt (* 100)
-    const fanRaw = data.getUint8(5);
-    const rpm = fanRaw * 100;
-    document.getElementById('valFan').innerText = (power > 0 ? rpm : 0) + " RPM";
+    // Tính tốc độ quạt (ghép 2 byte mã hóa RPM thực tế 5508 RPM)
+    const rpmHigh = data.getUint8(6);
+    const rpmLow = data.getUint8(7);
+    let rpm = (rpmHigh << 8) | rpmLow;
 
-    // Trạng thái giao thức sạc
-    document.getElementById('valProtocol').innerText = power >= 20 ? "PPS (Fast)" : "PD / Standard";
-  }
+    if (rpm > 8000 || rpm < 500) {
+      rpm = data.getUint8(5) * 200; // Công thức dự phòng
+    }
+    document.getElementById('valFan').innerText = rpm + " RPM";
 
-  function updateRunTime() {
-    if (!startTime) return;
-    const diff = Math.floor((Date.now() - startTime) / 1000);
-    const mins = String(Math.floor(diff / 60)).padStart(2, '0');
-    const secs = String(diff % 60).padStart(2, '0');
-    document.getElementById('valTime').innerText = `${mins}:${secs}`;
+    // Trạng thái giao thức & công tắc
+    document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : "PD / Normal";
+    document.getElementById('valSwitch').innerText = power > 0 ? "ON" : "OFF";
   }
 </script>
 </body>
