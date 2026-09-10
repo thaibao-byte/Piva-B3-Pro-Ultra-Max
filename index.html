@@ -23,7 +23,6 @@
     button.opt-btn { background: #334155; color: #94a3b8; border: 1px solid #475569; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s; }
     button.opt-btn.active { background: #10b981; color: #ffffff; border-color: #34d399; box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); font-weight: bold; }
     
-    /* Style Công Tắc ON/OFF */
     .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
     .switch-title { font-weight: bold; font-size: 1rem; color: #f8fafc; }
     .switch { position: relative; display: inline-block; width: 56px; height: 30px; }
@@ -106,8 +105,9 @@
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
 
   let bluetoothDevice = null;
-  let writeCharacteristics = [];
+  let charWrite = null;
   let charNotify = null;
+  let lockTimer = null;
 
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
@@ -121,20 +121,21 @@
 
       const server = await bluetoothDevice.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
-
-      // Tự động tìm kiếm toàn bộ đặc tính để đảm bảo gửi lệnh thành công
       const characteristics = await service.getCharacteristics();
-      writeCharacteristics = [];
 
+      charWrite = null;
       for (const char of characteristics) {
-        if (char.properties.write || char.properties.writeWithoutResponse) {
-          writeCharacteristics.push(char);
-        }
         if (char.properties.notify || char.properties.indicate) {
           charNotify = char;
-          await charNotify.startNotifications();
-          charNotify.addEventListener('characteristicvaluechanged', handleNotifications);
         }
+        if (char.properties.writeWithoutResponse || char.properties.write) {
+          if (!charWrite) charWrite = char;
+        }
+      }
+
+      if (charNotify) {
+        await charNotify.startNotifications();
+        charNotify.addEventListener('characteristicvaluechanged', handleNotifications);
       }
 
       document.getElementById('statusText').innerText = "Trạng thái: Đã kết nối thành công!";
@@ -166,7 +167,11 @@
     highlightModeButton(0);
   }
 
-  // Tự động làm sáng nút chế độ tương ứng từ dữ liệu phản hồi của Sò
+  function lockUi() {
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(() => { lockTimer = null; }, 1500);
+  }
+
   function highlightModeButton(mode) {
     ['btnL1', 'btnL2', 'btnL3', 'btnOc', 'btnSmart'].forEach(id => {
       document.getElementById(id)?.classList.remove('active');
@@ -179,29 +184,35 @@
     else if (mode === 6) document.getElementById('btnOc')?.classList.add('active');
   }
 
-  // Hàm phát lệnh tin cậy gửi qua tất cả cổng ghi dữ liệu
   async function writePacket(packet) {
-    if (writeCharacteristics.length === 0) return;
-    for (const char of writeCharacteristics) {
-      try {
-        if (char.properties.writeWithoutResponse) {
-          await char.writeValueWithoutResponse(packet);
-        } else {
-          await char.writeValue(packet);
-        }
-      } catch (e) {}
+    if (!charWrite) return;
+    try {
+      if (charWrite.properties.writeWithoutResponse) {
+        await charWrite.writeValueWithoutResponse(packet);
+      } else {
+        await charWrite.writeValue(packet);
+      }
+    } catch (e) {
+      try { await charWrite.writeValue(packet); } catch(err){}
     }
   }
 
   async function togglePower(isOn) {
+    lockUi();
     if (isOn) {
-      await sendControlCmd(1); // Mặc định bật ở Mức L1
+      highlightModeButton(1);
+      await sendControlCmd(1);
     } else {
-      await sendControlCmd(0); // Tắt nguồn (Standby)
+      highlightModeButton(0);
+      await sendControlCmd(0);
     }
   }
 
   async function sendControlCmd(mode) {
+    lockUi();
+    highlightModeButton(mode);
+    document.getElementById('powerSwitch').checked = (mode !== 0);
+
     const header = [0x20, 0xA5, 0x03, 0x01, mode, 0x00];
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
@@ -225,13 +236,6 @@
       const power = data.getUint8(3);
       document.getElementById('valPower').innerText = power + " W";
 
-      // Đồng bộ trạng thái Công tắc ON/OFF
-      const modeByte = data.getUint8(4);
-      document.getElementById('powerSwitch').checked = (power > 0 && modeByte !== 0);
-
-      // Cập nhật đèn sáng theo chế độ thực tế của Sò
-      highlightModeButton(modeByte);
-
       const rawTemp = data.getUint8(5);
       const realTemp = power > 0 ? Math.max(0, rawTemp - 25) : 0;
       document.getElementById('valTemp').innerText = realTemp + " °C";
@@ -242,6 +246,13 @@
 
       document.getElementById('valFan').innerText = rpm + " RPM";
       document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : (power > 0 ? "PD / Normal" : "OFF");
+
+      // Bỏ qua cập nhật giao diện nếu người dùng vừa mới bấm nút
+      if (!lockTimer) {
+        const modeByte = data.getUint8(4);
+        document.getElementById('powerSwitch').checked = (power > 0 && modeByte !== 0);
+        highlightModeButton(power > 0 ? modeByte : 0);
+      }
     }
   }
 </script>
