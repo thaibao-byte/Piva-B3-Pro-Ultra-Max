@@ -75,25 +75,25 @@
       <button id="btnSmart" class="opt-btn" onclick="sendControlCmd(4)">Thông minh</button>
     </div>
     <div class="grid-2" style="margin-bottom: 14px;">
-      <button class="opt-btn" onclick="sendLedCmd(1)">Bật LED RGB</button>
-      <button class="opt-btn" onclick="sendLedCmd(0)">Tắt LED RGB</button>
+      <button id="btnLedOn" class="opt-btn" onclick="sendLedCmd(1)">Bật LED RGB</button>
+      <button id="btnLedOff" class="opt-btn" onclick="sendLedCmd(0)">Tắt LED RGB</button>
     </div>
 
     <div class="sub-title">Điều khiển nguồn:</div>
     <div>
-      <button class="opt-btn btn-off" style="width: 100%;" onclick="sendControlCmd(0)">Tắt Sò (Standby)</button>
+      <button id="btnOff" class="opt-btn btn-off" style="width: 100%;" onclick="sendControlCmd(0)">Tắt Sò (Standby)</button>
     </div>
   </div>
 </div>
 
 <script>
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
-  const WRITE_UUID_1 = '49535343-6daa-4d02-abf6-19569aca69fe';
-  const WRITE_UUID_2 = '49535343-8841-43f4-a8d4-ecbe34729bb3';
+  const WRITE_UUID   = '49535343-6daa-4d02-abf6-19569aca69fe';
   const NOTIFY_UUID  = '49535343-1e4d-4bd9-ba61-23c647249616';
 
   let bluetoothDevice = null;
-  let charWrite1 = null, charWrite2 = null, charNotify = null;
+  let charWrite = null;
+  let charNotify = null;
 
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
@@ -108,10 +108,9 @@
       const server = await bluetoothDevice.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
 
-      try { charWrite1 = await service.getCharacteristic(WRITE_UUID_1); } catch(e){}
-      try { charWrite2 = await service.getCharacteristic(WRITE_UUID_2); } catch(e){}
-      
+      charWrite = await service.getCharacteristic(WRITE_UUID);
       charNotify = await service.getCharacteristic(NOTIFY_UUID);
+
       await charNotify.startNotifications();
       charNotify.addEventListener('characteristicvaluechanged', handleNotifications);
 
@@ -140,53 +139,53 @@
     document.getElementById('valFan').innerText = "0 RPM";
     document.getElementById('valTemp').innerText = "0 °C";
     document.getElementById('valProtocol').innerText = "OFF";
-    highlightButton(-1);
+    setActiveButton(null);
   }
 
-  function highlightButton(mode) {
-    ['btnL1', 'btnL2', 'btnL3', 'btnOc', 'btnSmart'].forEach(id => {
-      document.getElementById(id)?.classList.remove('active');
-    });
-    if (mode === 1) document.getElementById('btnL1')?.classList.add('active');
-    if (mode === 2) document.getElementById('btnL2')?.classList.add('active');
-    if (mode === 3) document.getElementById('btnL3')?.classList.add('active');
-    if (mode === 4) document.getElementById('btnSmart')?.classList.add('active');
-    if (mode === 6) document.getElementById('btnOc')?.classList.add('active');
-  }
-
-  async function writePacket(packet) {
-    const targets = [charWrite1, charWrite2, charNotify];
-    for (const char of targets) {
-      if (!char) continue;
-      try {
-        if (char.properties.writeWithoutResponse) {
-          await char.writeValueWithoutResponse(packet);
-        } else {
-          await char.writeValue(packet);
-        }
-      } catch (e) {
-        try { await char.writeValue(packet); } catch(err){}
+  function setActiveButton(activeId) {
+    ['btnL1', 'btnL2', 'btnL3', 'btnOc', 'btnSmart', 'btnOff'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        if (id === activeId) btn.classList.add('active');
+        else btn.classList.remove('active');
       }
-    }
+    });
   }
 
   async function sendControlCmd(mode) {
-    highlightButton(mode);
-    
-    // Mode 0 = Tắt Sò (Standby)
+    if (!charWrite) return;
+
+    if (mode === 1) setActiveButton('btnL1');
+    else if (mode === 2) setActiveButton('btnL2');
+    else if (mode === 3) setActiveButton('btnL3');
+    else if (mode === 4) setActiveButton('btnSmart');
+    else if (mode === 6) setActiveButton('btnOc');
+    else if (mode === 0) setActiveButton('btnOff');
+
+    // Cấu trúc gói tin gửi chuẩn v212
     const header = [0x20, 0xA5, 0x03, 0x01, mode, 0x00];
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
 
-    await writePacket(packet);
+    try {
+      await charWrite.writeValueWithoutResponse(packet);
+    } catch(e) {
+      try { await charWrite.writeValue(packet); } catch(err){}
+    }
   }
 
   async function sendLedCmd(state) {
+    if (!charWrite) return;
+
     const header = [0x20, 0xA5, 0x03, 0x02, state, 0x00];
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
 
-    await writePacket(packet);
+    try {
+      await charWrite.writeValueWithoutResponse(packet);
+    } catch(e) {
+      try { await charWrite.writeValue(packet); } catch(err){}
+    }
   }
 
   function handleNotifications(event) {
@@ -196,9 +195,6 @@
     if (data.getUint8(0) === 0x20 && data.getUint8(1) === 0xA5) {
       const power = data.getUint8(3);
       document.getElementById('valPower').innerText = power + " W";
-
-      const currentMode = data.getUint8(4);
-      highlightButton(currentMode);
 
       const rawTemp = data.getUint8(5);
       const realTemp = power > 0 ? Math.max(0, rawTemp - 25) : 0;
