@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PIVA B3 PRO - Luxury White Gaming</title>
+  <title>PIVA B3 PRO - Luxury White Gaming Studio</title>
   <style>
     :root {
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
       --card-border: #e2e8f0;
-      --primary: #10b981;
+      --primary: #059669;
       --primary-light: #ecfdf5;
-      --primary-glow: rgba(16, 185, 129, 0.3);
+      --primary-glow: rgba(5, 150, 105, 0.25);
       --accent: #0284c7;
       --accent-light: #f0f9ff;
-      --danger: #ef4444;
+      --danger: #dc2626;
       --danger-light: #fef2f2;
       --text: #0f172a;
       --text-muted: #64748b;
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+      background-image: radial-gradient(circle at 50% 0%, #e0f2fe 0%, transparent 60%);
       color: var(--text);
       padding: 14px;
       min-height: 100vh;
@@ -34,19 +34,20 @@
     .card {
       background: var(--card-bg);
       border: 1.5px solid var(--card-border);
-      border-radius: 20px;
+      border-radius: 22px;
       padding: 16px;
       box-shadow: var(--shadow);
+      transition: all 0.25s ease;
     }
 
     /* Header */
     .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .brand-title { font-size: 1.25rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; letter-spacing: -0.3px; }
+    .brand-title { font-size: 1.22rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; letter-spacing: -0.3px; }
     .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
     .tag-pro { font-size: 0.65rem; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary); padding: 2px 7px; border-radius: 6px; font-weight: 800; }
     
     .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; background: #f1f5f9; color: var(--text-muted); font-weight: 700; }
-    .status-badge.connected { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge.connected { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(5, 150, 105, 0.3); }
 
     .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn {
@@ -59,7 +60,7 @@
       transition: all 0.2s;
     }
     .btn-connect { background: var(--primary); color: #ffffff; box-shadow: 0 4px 14px var(--primary-glow); }
-    .btn-disconnect { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .btn-disconnect { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
     /* Switch Style */
@@ -74,7 +75,7 @@
     input:checked + .slider { background: var(--primary); }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* Dashboard 6 Ô Chuẩn Gaming */
+    /* Dashboard 6 Ô */
     .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .dash-box {
       background: #f8fafc;
@@ -82,15 +83,12 @@
       border-radius: 16px;
       padding: 12px;
       text-align: center;
-      transition: all 0.2s;
     }
-    .dash-box:hover { border-color: #cbd5e1; }
-    .dash-box.full-width { grid-column: span 2; display: flex; justify-content: space-around; align-items: center; padding: 10px 14px; background: #f0fdf4; border-color: #bbf7d0; }
     .dash-lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
     .dash-val { font-size: 1.35rem; font-weight: 800; color: var(--text); margin-top: 2px; font-variant-numeric: tabular-nums; }
     .dash-val.highlight { color: var(--primary); }
 
-    /* Buttons Chế Độ */
+    /* Controls */
     .section-title { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -124,7 +122,7 @@
       background: var(--danger-light) !important;
       color: var(--danger) !important;
       border: 2px solid var(--danger) !important;
-      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25) !important;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25) !important;
     }
     .badge-run {
       font-size: 0.58rem;
@@ -138,24 +136,41 @@
     button.mode-btn.active .badge-run { display: inline-block; }
     button.mode-btn.active-oc .badge-run { display: inline-block; background: var(--danger); }
 
-    /* Banner Thuật Toán Thông Minh RedMagic 1W */
+    /* Fan Box Ép Xung (Chỉ hiện khi bật Ép Xung) */
+    #ocFanBox {
+      display: none;
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 10px;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* AI Banner */
     .ai-banner {
+      display: none;
       background: linear-gradient(135deg, #f0fdf4, #e0f2fe);
       border: 1.5px solid #bbf7d0;
       border-radius: 16px;
       padding: 14px;
       margin-top: 10px;
+      animation: slideDown 0.3s ease;
     }
     .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .ai-title { font-size: 0.95rem; font-weight: 800; color: #166534; }
     .ai-desc { font-size: 0.8rem; color: #0369a1; font-weight: 600; line-height: 1.4; }
 
-    /* Controls */
+    /* Controls & Sliders */
     .range-box { margin-top: 10px; }
     .range-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
     input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
 
-    select {
+    select, input[type="number"] {
       width: 100%;
       background: #f8fafc;
       color: var(--text);
@@ -171,6 +186,10 @@
     .color-row { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
     input[type="color"] { border: none; width: 46px; height: 40px; border-radius: 10px; background: none; cursor: pointer; }
     .color-hex { flex: 1; background: #f8fafc; border: 1.5px solid #e2e8f0; padding: 10px 12px; border-radius: 12px; font-family: monospace; font-size: 0.95rem; color: var(--text); font-weight: 700; }
+
+    /* Hẹn giờ chuyên sâu */
+    .timer-control-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+    .timer-input { width: 80px !important; margin-bottom: 0 !important; text-align: center; }
 
     .log-box {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -193,7 +212,7 @@
       <div class="brand-title">
         <div class="brand-dot"></div>
         <span>PIVA B3 PRO</span>
-        <span class="tag-pro">LUXURY WHITE</span>
+        <span class="tag-pro">WHITE LUXURY</span>
       </div>
       <span id="statusBadge" class="status-badge">Chưa kết nối</span>
     </div>
@@ -225,7 +244,7 @@
         <div id="valPower" class="dash-val highlight">0 W</div>
       </div>
       <div class="dash-box">
-        <div class="dash-lbl">🌡️ NTC Mặt Tản</div>
+        <div class="dash-lbl">🌡️ NTC Tản Nhiệt</div>
         <div id="valNtc" class="dash-val" style="color: var(--text-muted);">-- °C</div>
       </div>
       <div class="dash-box">
@@ -237,8 +256,8 @@
         <div id="valProtocol" class="dash-val" style="font-size: 1.15rem;">OFF</div>
       </div>
       <div class="dash-box">
-        <div class="dash-lbl">🎯 Chế độ đang chạy</div>
-        <div id="valMode" class="dash-val" style="font-size: 1.1rem; color: var(--primary);">OFF</div>
+        <div class="dash-lbl">🎯 Chế độ thực tế</div>
+        <div id="valMode" class="dash-val" style="font-size: 1.05rem; color: var(--primary);">OFF</div>
       </div>
     </div>
   </div>
@@ -264,7 +283,7 @@
     </div>
 
     <div class="section-title">Nâng Cao & Ép Xung</div>
-    <div class="grid-2" style="margin-bottom: 10px;">
+    <div class="grid-2">
       <button id="btnOc" class="mode-btn" onclick="userSelectMode(6)">
         <span>⚡ Ép xung (27W)</span>
         <span class="sub">Max Công Suất</span>
@@ -277,15 +296,15 @@
       </button>
     </div>
 
-    <div class="range-box">
-      <div class="range-label">
-        <span>Smart Level (Ép xung):</span>
-        <span id="ocLevelVal" style="color:var(--primary); font-weight:700;">Mức 5 (Mạnh nhất)</span>
+    <div id="ocFanBox">
+      <div class="range-label" style="color: var(--danger);">
+        <span>🔥 Điều Chỉnh Tốc Độ Quạt Ép Xung:</span>
+        <span id="ocLevelVal" style="font-weight: 800;">Mức 5 (Cực Đại)</span>
       </div>
       <input type="range" id="ocSlider" min="1" max="5" value="5" onchange="userChangeOcLevel(this.value)">
     </div>
 
-    <div class="ai-banner" id="aiBanner" style="display: none;">
+    <div class="ai-banner" id="aiBanner">
       <div class="ai-header">
         <span class="ai-title">🤖 Thuật Toán RedMagic AI 1W Active</span>
         <span style="font-size:0.75rem; background:#bbf7d0; color:#15803d; padding:2px 8px; border-radius:10px; font-weight:700;">PRO AI</span>
@@ -305,6 +324,7 @@
       </label>
     </div>
 
+    <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Kiểu hiệu ứng đèn:</label>
     <select id="ledEffectSelect" onchange="userSelectLedEffect(this.value)">
       <option value="1">🌈 1. Ánh sáng chảy (Rainbow Flow)</option>
       <option value="2">💨 2. Nhịp thở (Breathing)</option>
@@ -318,25 +338,26 @@
     <div class="range-box" style="margin-bottom: 12px;">
       <div class="range-label">
         <span>Tốc độ hiệu ứng đèn:</span>
-        <span id="ledSpeedVal" style="color:var(--primary); font-weight:700;">Nhanh</span>
+        <span id="ledSpeedVal" style="color: var(--primary); font-weight: 700;">Nhanh (Mức 4)</span>
       </div>
       <input type="range" id="ledSpeedSlider" min="1" max="5" value="4" onchange="userChangeLedSpeed(this.value)">
     </div>
 
-    <div class="section-title">Chọn Màu Tùy Biến (HEX)</div>
+    <div class="section-title">Màu Sắc Đèn Tùy Biến (HEX)</div>
     <div class="color-row">
-      <input type="color" id="ledColorPicker" value="#10B981" onchange="applyCustomColor(this.value)">
-      <div class="color-hex" id="hexText">#10B981</div>
+      <input type="color" id="ledColorPicker" value="#059669" onchange="applyCustomColor(this.value)">
+      <div class="color-hex" id="hexText">#059669</div>
       <button class="btn btn-connect" style="padding:10px 16px; font-size:0.88rem;" onclick="applyCustomColor(document.getElementById('ledColorPicker').value)">Áp dụng</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">Tiện Ích Hệ Thống</div>
-    <div class="switch-card" style="padding:0; margin-bottom: 12px;">
+    <div class="section-title">Tiện Ích & Hẹn Giờ Tự Động</div>
+    
+    <div class="switch-card" style="padding:0; margin-bottom: 14px;">
       <div class="switch-info">
         <span class="switch-title" style="font-size:0.95rem;">Chế độ bàn làm việc</span>
-        <span class="switch-sub">Chỉ bật đèn LED, tắt quạt và sò lạnh</span>
+        <span class="switch-sub">Chỉ bật đèn LED, tắt sò lạnh & quạt</span>
       </div>
       <label class="switch">
         <input type="checkbox" id="deskModeSwitch" onchange="userToggleDeskMode(this.checked)">
@@ -344,14 +365,14 @@
       </label>
     </div>
 
-    <div class="section-title" style="margin-top:10px;">Hẹn Giờ Tắt Máy</div>
-    <select id="timerSelect" onchange="userSetTimer(this.value)">
-      <option value="0">Đóng (Không hẹn giờ)</option>
-      <option value="30">Sau 30 phút</option>
-      <option value="60">Sau 1 giờ</option>
-      <option value="120">Sau 2 giờ</option>
-      <option value="180">Sau 3 giờ</option>
-    </select>
+    <div class="section-title" style="margin-top: 6px;">Hẹn Giờ Tắt Nguồn Chuyên Sâu</div>
+    <div class="timer-control-row">
+      <input type="number" id="customTimerInput" class="timer-input" min="1" max="360" value="60" placeholder="Phút">
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Phút</span>
+      <button class="btn btn-connect" style="padding: 10px 14px; font-size: 0.85rem; flex: 1;" onclick="startCustomTimer()">Kích Hoạt Hẹn Giờ</button>
+      <button class="btn btn-disconnect" style="padding: 10px 14px; font-size: 0.85rem;" onclick="cancelCustomTimer()">Hủy</button>
+    </div>
+    <div id="timerCountdownText" style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-top: 6px; display: none;"></div>
   </div>
 
   <div class="log-box" id="debugLog">Hệ thống: Sẵn sàng kết nối...</div>
@@ -359,15 +380,21 @@
 
 <script>
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+  const CHAR_RX_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3'; // Cổng nhận lệnh RX
+  const CHAR_TX_UUID = '49535343-1e4d-4bd9-ba61-23c647249616'; // Cổng thông báo TX
 
   let bluetoothDevice = null;
-  let writeChars = [];
-  let notifyChar = null;
+  let charRx = null;
+  let charTx = null;
+  let allWriteChars = [];
+  
   let isUserInteracting = false;
-  let interactTimeout = null;
+  let userInteractTimeout = null;
   let isSmartAiActive = false;
   let smartAiInterval = null;
-  let timerCountdown = null;
+
+  let customTimerInterval = null;
+  let timerRemainingSeconds = 0;
 
   // ĐỒNG HỒ ĐO THỜI GIAN SÒ CHẠY
   let runtimeSeconds = 0;
@@ -400,32 +427,34 @@
     document.getElementById('debugLog').innerText = text;
   }
 
-  // TẠO GÓI TIN CHUẨN CÓ CHECKSUM
+  // TẠO GÓI TIN CHUẨN PIVA (Header 0x20 0xA5 + Length + Payload + Checksum)
   function makePacket(payload) {
     const body = [0x20, 0xA5, payload.length, ...payload];
     const checksum = body.reduce((a, b) => a + b, 0) & 0xFF;
     return new Uint8Array([...body, checksum]);
   }
 
-  // BỘ PHÁT LỆNH ĐA CỔNG (PHÁT ĐỒNG THỜI VÀO 1E4D VÀ 8841)
+  // BỘ PHÁT LỆNH ĐA CỔNG AN TOÀN (GỬI ĐỒNG THỜI CẢ RX & TX)
   async function transmitCommand(payload) {
-    if (writeChars.length === 0) {
+    if (allWriteChars.length === 0) {
       setLog("Chưa kết nối Bluetooth!");
       return;
     }
 
     const p1 = makePacket(payload);
-    const p2 = makePacket([...payload, 0x00]);
+    const p2 = makePacket([...payload, 0x00]); // Biến thể 2 kèm byte 0x00
+    const rawPayload = new Uint8Array(payload); // Biến thể 3: Raw payload trực tiếp
 
     const hexStr = Array.from(p1).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
-    setLog("Đang phát: " + hexStr);
+    setLog("Đang phát lệnh: " + hexStr);
 
     let sent = false;
-    for (const char of writeChars) {
+    for (const char of allWriteChars) {
       try {
         if (char.properties.writeWithoutResponse) {
           await char.writeValueWithoutResponse(p1);
           await char.writeValueWithoutResponse(p2);
+          await char.writeValueWithoutResponse(rawPayload);
           sent = true;
         } else if (char.properties.write) {
           await char.writeValue(p1);
@@ -439,7 +468,7 @@
     if (sent) {
       setLog("Đã thi hành: " + hexStr);
     } else {
-      setLog("Lỗi: Không thể ghi dữ liệu tới sò!");
+      setLog("Lỗi truyền dữ liệu tới sò!");
     }
   }
 
@@ -447,7 +476,7 @@
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
       if (!navigator.bluetooth) {
-        alert("Trình duyệt không hỗ trợ Web Bluetooth! Hãy dùng Google Chrome trên Android hoặc Bluefy trên iOS.");
+        alert("Trình duyệt không hỗ trợ Web Bluetooth! Vui lòng dùng Google Chrome trên Android hoặc Bluefy trên iOS.");
         return;
       }
 
@@ -464,36 +493,37 @@
       const service = await server.getPrimaryService(SERVICE_UUID);
 
       setLog("Đang gán cổng RX & TX...");
-      const allChars = await service.getCharacteristics();
-      writeChars = [];
-      notifyChar = null;
+      const chars = await service.getCharacteristics();
+      allWriteChars = [];
+      charRx = null;
+      charTx = null;
 
-      for (const c of allChars) {
+      for (const c of chars) {
         const u = c.uuid.toLowerCase();
         if (c.properties.writeWithoutResponse || c.properties.write) {
           if (u.includes('8841') || u.includes('1e4d')) {
-            writeChars.unshift(c); // Ưu tiên hàng đầu
+            allWriteChars.unshift(c); // Ưu tiên cao nhất
           } else if (!u.includes('6daa')) {
-            writeChars.push(c);
+            allWriteChars.push(c);
           }
         }
         if (c.properties.notify || c.properties.indicate) {
-          if (!notifyChar || u.includes('1e4d')) {
-            notifyChar = c;
+          if (!charTx || u.includes('1e4d')) {
+            charTx = c;
           }
         }
       }
 
-      if (notifyChar) {
-        await notifyChar.startNotifications();
-        notifyChar.addEventListener('characteristicvaluechanged', handleNotifications);
+      if (charTx) {
+        await charTx.startNotifications();
+        charTx.addEventListener('characteristicvaluechanged', handleNotifications);
       }
 
       document.getElementById('statusBadge').innerText = "ĐÃ KẾT NỐI";
       document.getElementById('statusBadge').classList.add('connected');
       document.getElementById('connectBtn').disabled = true;
       document.getElementById('disconnectBtn').disabled = false;
-      setLog(`Kết nối thành công! Đã gắn ${writeChars.length} cổng điều khiển.`);
+      setLog(`Kết nối thành công! Đã gắn ${allWriteChars.length} cổng điều khiển.`);
 
     } catch (err) {
       setLog("Lỗi kết nối: " + err.message);
@@ -519,9 +549,11 @@
     document.getElementById('valNtc').style.color = "var(--text-muted)";
     document.getElementById('valProtocol').innerText = "OFF";
     document.getElementById('valMode').innerText = "OFF";
+    document.getElementById('ocFanBox').style.display = "none";
     clearAllButtons();
     stopSmartAiMode();
     stopRuntime();
+    cancelCustomTimer();
     setLog("Đã ngắt kết nối với sò.");
   }
 
@@ -535,37 +567,42 @@
     });
   }
 
-  // TỰ ĐỘNG LÀM SÁNG NÚT CHÍNH XÁC (ĐÃ SỬA TRIỆT ĐỂ LỖI L3 NHẬN NHẦM THÀNH ÉP XUNG)
+  // TỰ ĐỘNG LÀM SÁNG NÚT THEO TRẠNG THÁI SÒ (ĐÃ FIX LỖI NHẬN NHẦM L3)
   function highlightModeUI(mode) {
     if (isSmartAiActive) return;
     clearAllButtons();
 
-    // TUYỆT ĐỐI CHỈ DỰA VÀO MODE BYTE TỪ SÒ, KHÔNG DỰA VÀO CÔNG SUẤT WATT
+    // Ẩn ô chỉnh quạt nếu không phải ép xung
     if (mode === 6) {
       document.getElementById('btnOc')?.classList.add('active-oc');
       document.getElementById('valMode').innerText = "⚡ Ép xung (27W)";
-    } else if (mode === 3) {
-      document.getElementById('btnL3')?.classList.add('active');
-      document.getElementById('valMode').innerText = "❄️ Cực lạnh (L3)";
-    } else if (mode === 2) {
-      document.getElementById('btnL2')?.classList.add('active');
-      document.getElementById('valMode').innerText = "⚖️ Cân bằng (L2)";
-    } else if (mode === 0x0D || mode === 1) {
-      document.getElementById('btnL1')?.classList.add('active');
-      document.getElementById('valMode').innerText = "🍃 Im lặng (L1)";
-    } else if (mode === 4) {
-      document.getElementById('btnSmart')?.classList.add('active');
-      document.getElementById('valMode').innerText = "🧠 Thông minh";
+      document.getElementById('ocFanBox').style.display = "block"; // CHỈ HIỆN KHI ÉP XUNG
+    } else {
+      document.getElementById('ocFanBox').style.display = "none";
+
+      if (mode === 3) {
+        document.getElementById('btnL3')?.classList.add('active');
+        document.getElementById('valMode').innerText = "❄️ Cực lạnh (L3)";
+      } else if (mode === 2) {
+        document.getElementById('btnL2')?.classList.add('active');
+        document.getElementById('valMode').innerText = "⚖️ Cân bằng (L2)";
+      } else if (mode === 0x0D || mode === 1) {
+        document.getElementById('btnL1')?.classList.add('active');
+        document.getElementById('valMode').innerText = "🍃 Im lặng (L1)";
+      } else if (mode === 4) {
+        document.getElementById('btnSmart')?.classList.add('active');
+        document.getElementById('valMode').innerText = "🧠 Thông minh AI";
+      }
     }
   }
 
   function lockUserInteraction() {
     isUserInteracting = true;
-    clearTimeout(interactTimeout);
-    interactTimeout = setTimeout(() => { isUserInteracting = false; }, 2000);
+    clearTimeout(userInteractTimeout);
+    userInteractTimeout = setTimeout(() => { isUserInteracting = false; }, 2000);
   }
 
-  // CHỌN CHẾ ĐỘ HIỆU NĂNG THỦ CÔNG
+  // BẤM CHỌN CHẾ ĐỘ HIỆU SUẤT
   async function userSelectMode(mode) {
     stopSmartAiMode();
     lockUserInteraction();
@@ -575,7 +612,7 @@
     startRuntime();
 
     if (mode === 6) {
-      // ÉP XUNG: Gửi Mode 6 + Smart Level 5 Max Công Suất
+      // ÉP XUNG: Gửi Mode 6 + Smart Level 5
       await transmitCommand([0x01, 0x06]);
       setTimeout(() => transmitCommand([0x03, 0x05]), 80);
     } else if (mode === 1) {
@@ -598,12 +635,13 @@
       stopRuntime();
       document.getElementById('powerSubText').innerText = "Đang Tắt (Standby)";
       document.getElementById('valMode').innerText = "OFF";
+      document.getElementById('ocFanBox').style.display = "none";
       clearAllButtons();
       await transmitCommand([0x01, 0x00]);
     }
   }
 
-  // CHẾ ĐỘ THÔNG MINH AI 1W (REDMAGIC PRO DYNAMIC)
+  // CHẾ ĐỘ THÔNG MINH AI 1W (CHUẨN REDMAGIC COOLER 8 PRO)
   function toggleSmartAiMode() {
     if (isSmartAiActive) {
       stopSmartAiMode();
@@ -618,20 +656,21 @@
     clearAllButtons();
     document.getElementById('btnSmart')?.classList.add('active');
     document.getElementById('aiBanner').style.display = "block";
+    document.getElementById('ocFanBox').style.display = "none";
     document.getElementById('powerSwitch').checked = true;
     document.getElementById('powerSubText').innerText = "Đang Bật (AI Pro 1W)";
     document.getElementById('valMode').innerText = "🧠 RedMagic AI 1W";
     startRuntime();
 
-    // Vòng lặp giám sát nhiệt độ NTC theo thời gian thực
+    // Thuật toán quét cảm biến NTC mỗi 2.5s
     smartAiInterval = setInterval(async () => {
       if (!isSmartAiActive) return;
       const ntcText = document.getElementById('valNtc').innerText;
       const currentNtc = parseInt(ntcText) || 30;
 
-      if (currentNtc <= 32) {
-        // Máy mát: Tự hạ về mức siêu tiết kiệm ~1W chống đọng sương
-        document.getElementById('aiStatusText').innerText = `🍃 Tải nhẹ (NTC ${currentNtc}°C): Tự động ghìm xung về mức ~1.2W (Chống đọng sương làm ướt máy & bảo vệ pin).`;
+      if (currentNtc <= 33) {
+        // Máy mát: Ghìm xung nhịp về mức tối thiểu ~1W chống đọng sương
+        document.getElementById('aiStatusText').innerText = `🍃 Tải nhẹ (NTC ${currentNtc}°C): Đang duy trì mức ~1.2W (Chống đọng sương làm ướt máy & tiết kiệm pin).`;
         await transmitCommand([0x01, 0x0D]);
       } else if (currentNtc <= 38) {
         // Tải vừa
@@ -639,7 +678,7 @@
         await transmitCommand([0x01, 0x02]);
       } else {
         // Máy nóng (>38°C): Bung hết công suất 26W - 27W
-        document.getElementById('aiStatusText').innerText = `⚡ Tải nặng (NTC ${currentNtc}°C): Tự bung cực đại 27W làm lạnh thần tốc!`;
+        document.getElementById('aiStatusText').innerText = `⚡ Tải nặng (NTC ${currentNtc}°C): Tự động bung cực đại 27W làm lạnh thần tốc!`;
         await transmitCommand([0x01, 0x06]);
         setTimeout(() => transmitCommand([0x03, 0x05]), 80);
       }
@@ -655,26 +694,30 @@
     document.getElementById('btnSmart')?.classList.remove('active');
   }
 
-  // THANH TRƯỢT SMART LEVEL ÉP XUNG
+  // ĐIỀU CHỈNH QUẠT ÉP XUNG
   async function userChangeOcLevel(val) {
-    const labels = ["", "Mức 1 (Yếu)", "Mức 2", "Mức 3", "Mức 4", "Mức 5 (Mạnh nhất)"];
+    const labels = ["", "Mức 1 (Yếu)", "Mức 2", "Mức 3", "Mức 4", "Mức 5 (Cực Đại)"];
     document.getElementById('ocLevelVal').innerText = labels[val];
     await transmitCommand([0x03, parseInt(val)]);
   }
 
-  // HIỆU ỨNG ĐÈN LED
+  // HIỆU ỨNG ĐÈN LED (7 CHẾ ĐỘ & TỐC ĐỘ)
   async function userToggleLed(isOn) {
     await transmitCommand([0x02, isOn ? 0x01 : 0x00]);
   }
 
   async function userSelectLedEffect(effect) {
-    await transmitCommand([0x02, parseInt(effect)]);
+    const speed = parseInt(document.getElementById('ledSpeedSlider').value) || 4;
+    // Gửi lệnh hiệu ứng kèm tốc độ
+    await transmitCommand([0x02, parseInt(effect), speed]);
   }
 
   async function userChangeLedSpeed(spd) {
-    const labels = ["", "Rất chậm", "Chậm", "Vừa", "Nhanh", "Rất nhanh"];
+    const labels = ["", "Rất chậm", "Chậm", "Vừa", "Nhanh (Mức 4)", "Rực Cháy (Mức 5)"];
     document.getElementById('ledSpeedVal').innerText = labels[spd];
+    const effect = parseInt(document.getElementById('ledEffectSelect').value) || 1;
     await transmitCommand([0x04, parseInt(spd)]);
+    setTimeout(() => transmitCommand([0x02, effect, parseInt(spd)]), 60);
   }
 
   async function applyCustomColor(hex) {
@@ -685,7 +728,7 @@
     await transmitCommand([0x06, r, g, b]);
   }
 
-  // CHẾ ĐỘ BÀN LÀM VIỆC (DESK MODE)
+  // BÀN LÀM VIỆC (DESK MODE)
   async function userToggleDeskMode(isOn) {
     lockUserInteraction();
     if (isOn) {
@@ -693,6 +736,7 @@
       stopRuntime();
       document.getElementById('powerSwitch').checked = false;
       document.getElementById('powerSubText').innerText = "Chế độ bàn làm việc (Chỉ LED)";
+      document.getElementById('ocFanBox').style.display = "none";
       clearAllButtons();
       await transmitCommand([0x05, 0x01]);
     } else {
@@ -701,20 +745,41 @@
     }
   }
 
-  // HẸN GIỜ TẮT MÁY
-  function userSetTimer(mins) {
-    clearInterval(timerCountdown);
-    const m = parseInt(mins);
-    if (m > 0) {
-      setLog(`Đã đặt hẹn giờ tắt máy sau ${m} phút.`);
-      timerCountdown = setTimeout(() => {
+  // HẸN GIỜ TÙY CHỈNH SÂU
+  function startCustomTimer() {
+    const mins = parseInt(document.getElementById('customTimerInput').value) || 60;
+    if (mins <= 0) return;
+
+    clearInterval(customTimerInterval);
+    timerRemainingSeconds = mins * 60;
+
+    const el = document.getElementById('timerCountdownText');
+    el.style.display = "block";
+    setLog(`Đã đặt hẹn giờ tắt máy sau ${mins} phút.`);
+
+    customTimerInterval = setInterval(() => {
+      timerRemainingSeconds--;
+      if (timerRemainingSeconds <= 0) {
+        clearInterval(customTimerInterval);
+        el.style.display = "none";
         userTogglePower(false);
-        alert("Đã tự động tắt nguồn sò tản nhiệt theo lịch trình!");
-      }, m * 60 * 1000);
-    }
+        alert("Đã tự động tắt nguồn sò theo lịch hẹn chuyên sâu!");
+      } else {
+        const m = Math.floor(timerRemainingSeconds / 60);
+        const s = timerRemainingSeconds % 60;
+        el.innerText = `⏳ Tự động tắt sau: ${m} phút ${String(s).padStart(2,'0')} giây`;
+      }
+    }, 1000);
   }
 
-  // BỘ GIẢI MÃ DỮ LIỆU TELEMETRY TỪ CON SÒ (ĐỒNG BỘ 2 CHIỀU)
+  function cancelCustomTimer() {
+    clearInterval(customTimerInterval);
+    const el = document.getElementById('timerCountdownText');
+    el.style.display = "none";
+    setLog("Đã hủy hẹn giờ tắt máy.");
+  }
+
+  // BỘ GIẢI MÃ DỮ LIỆU TELEMETRY ĐỒNG BỘ 2 CHIỀU TỪ SÒ
   function handleNotifications(event) {
     const data = event.target.value;
     if (data.byteLength < 8) return;
@@ -722,7 +787,7 @@
     if (data.getUint8(0) === 0x20 && data.getUint8(1) === 0xA5) {
       const power = data.getUint8(3);
       const modeByte = data.getUint8(4);
-      const ntcHotTemp = data.getUint8(5); // CẢM BIẾN NTC MẶT NÓNG
+      const ntcHotTemp = data.getUint8(5);
       const rpm = (data.getUint8(7) << 8) | data.getUint8(6);
 
       // Cập nhật thông số
@@ -730,28 +795,26 @@
       document.getElementById('valFan').innerText = rpm + " RPM";
       document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : (power > 0 ? "PD" : "OFF");
 
-      if (power > 0) {
+      if (power > 0 || rpm > 0) {
         document.getElementById('valNtc').innerText = ntcHotTemp + " °C";
         document.getElementById('valNtc').style.color = "#ea580c";
+        document.getElementById('powerSwitch').checked = true;
+        document.getElementById('powerSubText').innerText = "Đang Bật (Hoạt động)";
         startRuntime();
       } else {
         document.getElementById('valNtc').innerText = ntcHotTemp + " °C (Phòng)";
         document.getElementById('valNtc').style.color = "var(--text-muted)";
+        document.getElementById('powerSwitch').checked = false;
+        document.getElementById('powerSubText').innerText = "Đang Tắt (Standby)";
+        document.getElementById('valMode').innerText = "OFF";
+        document.getElementById('ocFanBox').style.display = "none";
+        clearAllButtons();
         stopRuntime();
       }
 
-      // ĐỒNG BỘ NÚT BẤM VỚI TRẠNG THÁI SÒ (CHỈ KHI NGƯỜI DÙNG KHÔNG ĐANG BẤM NÚT)
-      if (!isUserInteracting && !isSmartAiActive) {
-        const isRunning = (power > 0 || rpm > 0);
-        document.getElementById('powerSwitch').checked = isRunning;
-        document.getElementById('powerSubText').innerText = isRunning ? "Đang Bật (Hoạt động)" : "Đang Tắt (Standby)";
-
-        if (isRunning) {
-          highlightModeUI(modeByte);
-        } else {
-          clearAllButtons();
-          document.getElementById('valMode').innerText = "OFF";
-        }
+      // ĐỒNG BỘ ĐÈN NÚT VỚI TRẠNG THÁI PHẦN CỨNG CỦA SÒ
+      if (!isUserInteracting && !isSmartAiActive && (power > 0 || rpm > 0)) {
+        highlightModeUI(modeByte);
       }
     }
   }
