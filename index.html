@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PIVA B3 PRO - White Edition Studio</title>
+  <title>PIVA B3 PRO - Ultimate White Edition</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -12,7 +12,6 @@
       --primary: #10b981;
       --primary-light: #ecfdf5;
       --primary-glow: rgba(16, 185, 129, 0.25);
-      --accent: #0284c7;
       --danger: #ef4444;
       --text: #0f172a;
       --text-muted: #64748b;
@@ -219,7 +218,7 @@
       </div>
       <div class="dash-box">
         <div class="dash-lbl">NTC Mặt Nóng (Tản)</div>
-        <div id="valNtc" class="dash-val" style="color: #ea580c;">0 °C</div>
+        <div id="valNtc" class="dash-val" style="color: #64748b;">-- °C</div>
       </div>
       <div class="dash-box">
         <div class="dash-lbl">Giao thức nguồn</div>
@@ -255,8 +254,8 @@
     <div class="section-title">Nâng Cao & Ép Xung</div>
     <div class="grid-2" style="margin-bottom: 10px;">
       <button id="btnOc" class="mode-btn" onclick="userSelectMode(6)">
-        <span>⚡ Ép xung</span>
-        <span class="sub">Đỉnh công suất 27W</span>
+        <span>⚡ Ép xung (27W)</span>
+        <span class="sub">Max Công Suất</span>
         <span class="badge-run">ĐANG CHẠY</span>
       </button>
       <button id="btnSmart" class="mode-btn" onclick="toggleSmartAiMode()">
@@ -321,19 +320,6 @@
   </div>
 
   <div class="card">
-    <div class="section-title">Bảng Thử Nghiệm Lệnh Trực Tiếp (1-Click Test)</div>
-    <div class="grid-3" style="margin-bottom: 8px;">
-      <button class="btn btn-connect" style="padding:10px 4px; font-size:0.8rem;" onclick="testCommand(1)">Test Mức 1</button>
-      <button class="btn btn-connect" style="padding:10px 4px; font-size:0.8rem;" onclick="testCommand(2)">Test Mức 2</button>
-      <button class="btn btn-connect" style="padding:10px 4px; font-size:0.8rem;" onclick="testCommand(3)">Test Mức 3</button>
-    </div>
-    <div class="grid-2">
-      <button class="btn btn-connect" style="padding:10px; font-size:0.82rem;" onclick="testCommand(6)">Test Ép Xung (27W)</button>
-      <button class="btn btn-disconnect" style="padding:10px; font-size:0.82rem;" onclick="testCommand(0)">Test Tắt Sò</button>
-    </div>
-  </div>
-
-  <div class="card">
     <div class="section-title">Tiện Ích Hệ Thống</div>
     <div class="switch-card" style="padding:0; margin-bottom: 12px;">
       <div class="switch-info">
@@ -361,10 +347,12 @@
 
 <script>
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+  const CHAR_RX_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3'; // CỔNG GHI LỆNH DUY NHẤT (RX UART)
+  const CHAR_TX_UUID = '49535343-1e4d-4bd9-ba61-23c647249616'; // CỔNG NHẬN THÔNG BÁO (TX NOTIFY)
 
   let bluetoothDevice = null;
-  let writeCharacteristics = [];
-  let notifyCharacteristic = null;
+  let rxCharacteristic = null;
+  let txCharacteristic = null;
   let isUserInteracting = false;
   let interactTimeout = null;
   let isSmartAiActive = false;
@@ -375,14 +363,13 @@
     document.getElementById('debugLog').innerText = text;
   }
 
-  // PHÁT LỆNH QUA CẢ 3 CỔNG BẰNG writeValueWithoutResponse
+  // PHÁT LỆNH CHUẨN XÁC CHỈ VÀO DUY NHẤT CỔNG RX (8841)
   async function transmitCommand(payload) {
-    if (writeCharacteristics.length === 0) {
-      setLog("Chưa kết nối Bluetooth!");
+    if (!rxCharacteristic) {
+      setLog("Chưa kết nối Bluetooth tới cổng nhận lệnh!");
       return;
     }
 
-    // Gói tin chuẩn V212
     const body = [0x20, 0xA5, payload.length, ...payload];
     const checksum = body.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...body, checksum]);
@@ -390,42 +377,32 @@
     const hexStr = Array.from(packet).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
     setLog("Đang phát: " + hexStr);
 
-    let sent = false;
-    for (const char of writeCharacteristics) {
+    try {
+      if (rxCharacteristic.properties.writeWithoutResponse) {
+        await rxCharacteristic.writeValueWithoutResponse(packet);
+      } else {
+        await rxCharacteristic.writeValue(packet);
+      }
+      setLog("Đã thi hành: " + hexStr);
+    } catch (err) {
       try {
-        if (char.properties.writeWithoutResponse) {
-          await char.writeValueWithoutResponse(packet);
-          sent = true;
-        } else if (char.properties.write) {
-          await char.writeValue(packet);
-          sent = true;
-        }
-      } catch (err) {
-        try { await char.writeValue(packet); sent = true; } catch (e) {}
+        await rxCharacteristic.writeValue(packet);
+        setLog("Đã thi hành (retry): " + hexStr);
+      } catch (e) {
+        setLog("Lỗi gửi lệnh: " + e.message);
       }
     }
-
-    if (sent) {
-      setLog("Đã thi hành: " + hexStr);
-    } else {
-      setLog("Lỗi: Không tìm thấy cổng ghi dữ liệu!");
-    }
   }
 
-  // HÀM TEST TRỰC TIẾP
-  async function testCommand(mode) {
-    await userSelectMode(mode);
-  }
-
-  // KẾT NỐI BLUETOOTH (CHUẨN 100% KHÔNG BAO GIỜ BỊ LỖI NÚT KẾT NỐI)
+  // KẾT NỐI BLUETOOTH
   document.getElementById('connectBtn').addEventListener('click', async () => {
     try {
       if (!navigator.bluetooth) {
-        alert("Trình duyệt không hỗ trợ Web Bluetooth! Vui lòng dùng Google Chrome.");
+        alert("Trình duyệt không hỗ trợ Web Bluetooth! Hãy dùng Google Chrome.");
         return;
       }
 
-      setLog("Đang mở cửa sổ chọn thiết bị...");
+      setLog("Đang quét thiết bị B3PRO...");
       bluetoothDevice = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: [SERVICE_UUID]
@@ -437,44 +414,25 @@
       const server = await bluetoothDevice.gatt.connect();
       const service = await server.getPrimaryService(SERVICE_UUID);
 
-      setLog("Đang gán cổng truyền nhận...");
+      setLog("Đang gán đúng cổng RX (8841) & TX (1e4d)...");
       const allChars = await service.getCharacteristics();
-      writeCharacteristics = [];
-      notifyCharacteristic = null;
 
-      for (const c of allChars) {
-        if (c.properties.writeWithoutResponse || c.properties.write) {
-          writeCharacteristics.push(c);
-        }
-        if (c.properties.notify || c.properties.indicate) {
-          if (!notifyCharacteristic || c.uuid.toLowerCase().includes('1e4d')) {
-            notifyCharacteristic = c;
-          }
-        }
-      }
+      rxCharacteristic = allChars.find(c => c.uuid.toLowerCase().includes('8841'));
+      txCharacteristic = allChars.find(c => c.uuid.toLowerCase().includes('1e4d'));
 
-      // Đưa cổng 1e4d và 8841 lên ưu tiên hàng đầu
-      writeCharacteristics.sort((a, b) => {
-        const uA = a.uuid.toLowerCase();
-        const uB = b.uuid.toLowerCase();
-        if (uA.includes('1e4d') || uA.includes('8841')) return -1;
-        if (uB.includes('1e4d') || uB.includes('8841')) return 1;
-        return 0;
-      });
-
-      if (notifyCharacteristic) {
-        await notifyCharacteristic.startNotifications();
-        notifyCharacteristic.addEventListener('characteristicvaluechanged', handleNotifications);
+      if (txCharacteristic) {
+        await txCharacteristic.startNotifications();
+        txCharacteristic.addEventListener('characteristicvaluechanged', handleNotifications);
       }
 
       document.getElementById('statusBadge').innerText = "ĐÃ KẾT NỐI";
       document.getElementById('statusBadge').classList.add('connected');
       document.getElementById('connectBtn').disabled = true;
       document.getElementById('disconnectBtn').disabled = false;
-      setLog(`Kết nối thành công! Đã gắn ${writeCharacteristics.length} cổng điều khiển.`);
+      setLog("Kết nối thành công! Đã gán cổng RX điều khiển.");
 
     } catch (err) {
-      setLog("Lỗi: " + err.message);
+      setLog("Lỗi kết nối: " + err.message);
     }
   });
 
@@ -493,7 +451,8 @@
     document.getElementById('powerSubText').innerText = "Đang Tắt (Standby)";
     document.getElementById('valPower').innerText = "0 W";
     document.getElementById('valFan').innerText = "0 RPM";
-    document.getElementById('valNtc').innerText = "0 °C";
+    document.getElementById('valNtc').innerText = "-- °C";
+    document.getElementById('valNtc').style.color = "#64748b";
     document.getElementById('valProtocol').innerText = "OFF";
     document.getElementById('valMode').innerText = "OFF";
     clearAllButtons();
@@ -511,19 +470,18 @@
     });
   }
 
-  // TỰ ĐỘNG SÁNG NÚT LIÊN TỤC THEO SÒ
+  // TỰ ĐỘNG LÀM SÁNG NÚT THEO TRẠNG THÁI SÒ
   function highlightModeUI(mode, power) {
     if (isSmartAiActive) return;
     clearAllButtons();
 
-    // Khớp mã trạng thái chuẩn V212: 0x0D/1 = Im lặng, 0x02 = Cân bằng, 0x03 = Cực lạnh, 0x06 = Ép xung
-    if (mode === 6 || power >= 26.5) {
+    if (mode === 6 || power >= 26) {
       document.getElementById('btnOc')?.classList.add('active-oc');
       document.getElementById('valMode').innerText = "⚡ Ép xung (27W)";
-    } else if (mode === 3 || (power >= 24 && mode !== 6)) {
+    } else if (mode === 3 || (power >= 23 && mode !== 6)) {
       document.getElementById('btnL3')?.classList.add('active');
       document.getElementById('valMode').innerText = "❄️ Cực lạnh (26W)";
-    } else if (mode === 2 || (power >= 17 && power < 24)) {
+    } else if (mode === 2 || (power >= 17 && power < 23)) {
       document.getElementById('btnL2')?.classList.add('active');
       document.getElementById('valMode').innerText = "⚖️ Cân bằng (20W)";
     } else if (mode === 0x0D || mode === 1 || (power > 0 && power < 17)) {
@@ -541,7 +499,7 @@
     interactTimeout = setTimeout(() => { isUserInteracting = false; }, 2000);
   }
 
-  // CHỌN CHẾ ĐỘ HIỆU NĂNG THỦ CÔNG
+  // CHỌN CHẾ ĐỘ HIỆU NĂNG
   async function userSelectMode(mode) {
     stopSmartAiMode();
     lockUserInteraction();
@@ -549,12 +507,15 @@
     document.getElementById('powerSubText').innerText = "Đang Bật (Hoạt động)";
     highlightModeUI(mode, 25);
 
-    if (mode === 1) {
+    if (mode === 6) {
+      // ÉP XUNG: Gửi Mode 6 + Smart Level 5 Max Công Suất
+      await transmitCommand([0x01, 0x06, 0x00]);
+      setTimeout(() => transmitCommand([0x03, 0x05, 0x00]), 60);
+    } else if (mode === 1) {
       await transmitCommand([0x01, 0x0D, 0x00]);
       setTimeout(() => transmitCommand([0x01, 0x01, 0x00]), 60);
     } else {
       await transmitCommand([0x01, mode, 0x00]);
-      setTimeout(() => transmitCommand([0x01, mode, 0x00]), 60);
     }
   }
 
@@ -570,7 +531,6 @@
       document.getElementById('valMode').innerText = "OFF";
       clearAllButtons();
       await transmitCommand([0x01, 0x00, 0x00]);
-      setTimeout(() => transmitCommand([0x01, 0x00, 0x00]), 60);
     }
   }
 
@@ -599,16 +559,19 @@
       const ntcText = document.getElementById('valNtc').innerText;
       const currentNtc = parseInt(ntcText) || 30;
 
-      // Thuật toán RedMagic: Dựa vào nhiệt độ mặt nóng NTC
       if (currentNtc <= 32) {
-        document.getElementById('aiStatusText').innerText = `🍃 Tải nhẹ (NTC ${currentNtc}°C): Tự động hạ về mức siêu tiết kiệm ~1.2W (Chống đọng sương & bảo vệ pin).`;
+        // Máy mát: Tự hạ về mức siêu tiết kiệm ~1W chống đọng sương
+        document.getElementById('aiStatusText').innerText = `🍃 Tải nhẹ (NTC ${currentNtc}°C): Tự động ghìm xung về mức ~1.2W (Chống đọng sương làm ướt máy & tiết kiệm điện).`;
         await transmitCommand([0x01, 0x0D, 0x00]);
       } else if (currentNtc <= 38) {
-        document.getElementById('aiStatusText').innerText = `⚖️ Tải vừa (NTC ${currentNtc}°C): Cân bằng nhiệt độ ở mức 18W - 20W.`;
+        // Tải vừa
+        document.getElementById('aiStatusText').innerText = `⚖️ Tải vừa (NTC ${currentNtc}°C): Tự động duy trì ở mức cân bằng 18W - 20W.`;
         await transmitCommand([0x01, 0x02, 0x00]);
       } else {
-        document.getElementById('aiStatusText').innerText = `⚡ Tải nặng (NTC ${currentNtc}°C): Tự động bung tối đa công suất 26W - 27W làm lạnh thần tốc!`;
-        await transmitCommand([0x01, 0x03, 0x00]);
+        // Máy nóng (>38°C): Bung hết công suất 26W - 27W
+        document.getElementById('aiStatusText').innerText = `⚡ Tải nặng (NTC ${currentNtc}°C): Tự bung cực đại 27W làm lạnh thần tốc!`;
+        await transmitCommand([0x01, 0x06, 0x00]);
+        setTimeout(() => transmitCommand([0x03, 0x05, 0x00]), 50);
       }
     }, 2500);
 
@@ -629,24 +592,21 @@
     await transmitCommand([0x03, parseInt(val), 0x00]);
   }
 
-  // BẬT / TẮT ĐÈN LED
+  // HIỆU ỨNG ĐÈN LED
   async function userToggleLed(isOn) {
     await transmitCommand([0x02, isOn ? 0x01 : 0x00, 0x00]);
   }
 
-  // HIỆU ỨNG ĐÈN LED (1-7)
   async function userSelectLedEffect(effect) {
     await transmitCommand([0x02, parseInt(effect), 0x00]);
   }
 
-  // TỐC ĐỘ ĐÈN (1-5)
   async function userChangeLedSpeed(spd) {
     const labels = ["", "Rất chậm", "Chậm", "Vừa", "Nhanh", "Rất nhanh"];
     document.getElementById('ledSpeedVal').innerText = labels[spd];
     await transmitCommand([0x04, parseInt(spd), 0x00]);
   }
 
-  // CHỌN MÀU HEX
   async function applyCustomColor(hex) {
     document.getElementById('hexText').innerText = hex.toUpperCase();
     const r = parseInt(hex.substr(1, 2), 16);
@@ -683,7 +643,7 @@
     }
   }
 
-  // BỘ GIẢI MÃ DỮ LIỆU TELEMETRY TỪ CON SÒ (CẬP NHẬT REALTIME)
+  // BỘ GIẢI MÃ DỮ LIỆU TELEMETRY TỪ CON SÒ (ĐỒNG BỘ 2 CHIỀU)
   function handleNotifications(event) {
     const data = event.target.value;
     if (data.byteLength < 8) return;
@@ -697,10 +657,17 @@
       // Cập nhật thông số
       document.getElementById('valPower').innerText = power + " W";
       document.getElementById('valFan').innerText = rpm + " RPM";
-      document.getElementById('valNtc').innerText = ntcHotTemp + " °C";
       document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : (power > 0 ? "PD" : "OFF");
 
-      // Nếu không trong thời gian người dùng vừa bấm nút, đồng bộ theo nút vật lý của sò
+      if (power > 0) {
+        document.getElementById('valNtc').innerText = ntcHotTemp + " °C";
+        document.getElementById('valNtc').style.color = "#ea580c";
+      } else {
+        document.getElementById('valNtc').innerText = ntcHotTemp + " °C (Phòng)";
+        document.getElementById('valNtc').style.color = "#64748b";
+      }
+
+      // Nếu không trong 2 giây vừa bấm nút, đồng bộ giao diện theo nút vật lý của sò
       if (!isUserInteracting && !isSmartAiActive) {
         const isRunning = (power > 0 || rpm > 0);
         document.getElementById('powerSwitch').checked = isRunning;
