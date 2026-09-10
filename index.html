@@ -105,7 +105,7 @@
   const SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
 
   let bluetoothDevice = null;
-  let charWrite = null;
+  let writeCharacteristics = [];
   let charNotify = null;
   let lockTimer = null;
 
@@ -123,15 +123,22 @@
       const service = await server.getPrimaryService(SERVICE_UUID);
       const characteristics = await service.getCharacteristics();
 
-      charWrite = null;
+      writeCharacteristics = [];
+      charNotify = null;
+
       for (const char of characteristics) {
         if (char.properties.notify || char.properties.indicate) {
-          charNotify = char;
+          if (!charNotify || char.uuid.includes('1e4d')) {
+            charNotify = char;
+          }
         }
-        if (char.properties.writeWithoutResponse || char.properties.write) {
-          if (!charWrite) charWrite = char;
+        if (char.properties.write || char.properties.writeWithoutResponse) {
+          writeCharacteristics.push(char);
         }
       }
+
+      // Ưu tiên xếp cổng 1e4d lên đầu danh sách gửi
+      writeCharacteristics.sort((a, b) => b.uuid.includes('1e4d') ? 1 : -1);
 
       if (charNotify) {
         await charNotify.startNotifications();
@@ -185,26 +192,18 @@
   }
 
   async function writePacket(packet) {
-    if (!charWrite) return;
-    try {
-      if (charWrite.properties.writeWithoutResponse) {
-        await charWrite.writeValueWithoutResponse(packet);
-      } else {
-        await charWrite.writeValue(packet);
-      }
-    } catch (e) {
-      try { await charWrite.writeValue(packet); } catch(err){}
-    }
-  }
+    if (writeCharacteristics.length === 0) return;
 
-  async function togglePower(isOn) {
-    lockUi();
-    if (isOn) {
-      highlightModeButton(1);
-      await sendControlCmd(1);
-    } else {
-      highlightModeButton(0);
-      await sendControlCmd(0);
+    for (const char of writeCharacteristics) {
+      try {
+        if (char.properties.writeWithoutResponse) {
+          await char.writeValueWithoutResponse(packet);
+        } else {
+          await char.writeValue(packet);
+        }
+      } catch (e) {
+        try { await char.writeValue(packet); } catch(err){}
+      }
     }
   }
 
@@ -217,7 +216,17 @@
     const checksum = header.reduce((a, b) => a + b, 0) & 0xFF;
     const packet = new Uint8Array([...header, checksum]);
 
+    // Gửi lệnh 2 lần liên tiếp cách nhau 80ms để đảm bảo sò nhận lệnh tuyệt đối
     await writePacket(packet);
+    setTimeout(() => writePacket(packet), 80);
+  }
+
+  async function togglePower(isOn) {
+    if (isOn) {
+      await sendControlCmd(1);
+    } else {
+      await sendControlCmd(0);
+    }
   }
 
   async function sendLedCmd(state) {
@@ -247,7 +256,6 @@
       document.getElementById('valFan').innerText = rpm + " RPM";
       document.getElementById('valProtocol').innerText = power >= 20 ? "PPS" : (power > 0 ? "PD / Normal" : "OFF");
 
-      // Bỏ qua cập nhật giao diện nếu người dùng vừa mới bấm nút
       if (!lockTimer) {
         const modeByte = data.getUint8(4);
         document.getElementById('powerSwitch').checked = (power > 0 && modeByte !== 0);
